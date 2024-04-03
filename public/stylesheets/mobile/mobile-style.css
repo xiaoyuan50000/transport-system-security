@@ -1,0 +1,52 @@
+@media screen and (min-width: 360px) {
+    #body{
+        width: 360px;
+        margin:auto;
+    }
+}
+
+body{
+    width: 360px;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    color: white;
+    background: #3E476E;
+}
+img{
+    width: 18px;
+    height: 18px;
+    margin-right: 5px;
+}
+.contain{
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-top:15px;
+}
+.layui-input-block{
+    margin-left: 0px;
+    margin-right: 0px;
+    min-height: 50px;
+    margin-top:15px;
+}
+.layui-input, .layui-select, .layui-textarea{
+    background-color: #485E8F;
+    border-color: #485E8F;
+    color: white;
+    margin-top: 10px;
+}
+
+.submit-btn{
+    width:100%;
+    background-color: #EEDF24;
+    color: black;
+}
+.layui-form-select dl dd.layui-this{
+    background-color: #3E476E;
+}
+.layui-form-select dl, body .layui-layer-dialog{
+    background-color: #485E8F;
+}
+body .layui-layer-dialog{
+    border: none;
+}
