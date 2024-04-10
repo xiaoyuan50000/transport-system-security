@@ -170,14 +170,20 @@ const QueryIndentsByFilter = async function (roleName, action, execution_date,
 
     let orderBySql = ``;
     if (sortParams) {
-        if (sortParams.exeSort) {
-            orderBySql += ` b.executionDate ` + sortParams.exeSort + ' ';
+        if (sortParams.exeSort && sortParams.exeSort == 'asc') {
+            orderBySql += ` b.executionDate asc `;
+        } else if(sortParams.exeSort && sortParams.exeSort == 'desc'){
+            orderBySql += ` b.executionDate desc `;
         }
         if (sortParams.createdSort) {
             if (orderBySql) {
                 orderBySql += ` ,`
             }
-            orderBySql += ` b.createdAt ` + sortParams.createdSort;
+            if(sortParams.createdSort == 'asc'){
+                orderBySql += ` b.createdAt asc`;
+            } else if(sortParams.createdSort == 'desc'){
+                orderBySql += ` b.createdAt desc`;
+            }
         }
     }
     if (orderBySql) {
@@ -751,6 +757,7 @@ const FilterServiceProvider = async function (vehicle, serviceModeId, dropoffPoi
         }
     }
     let dailyTripFilter = ""
+    let replacements = [vehicle, serviceModeId, serviceModeId, dropoffPoint, pickupPoint, chargeType, executionTime, executionTime, executionTime, executionDate, executionDate]
     if (chargeType.indexOf(ChargeType.DAILYTRIP) != -1) {
         dailyTripFilter = `and (
             dailyTripCondition is null 
@@ -758,15 +765,16 @@ const FilterServiceProvider = async function (vehicle, serviceModeId, dropoffPoi
             dailyTripCondition is not null and 
             (
                 SUBSTRING_INDEX(d.dailyTripCondition,'-',1) < SUBSTRING_INDEX(d.dailyTripCondition,'-',-1) and
-                CONCAT('2020-01-01',' ','${executionTime}') BETWEEN CONCAT('2020-01-01',' ',SUBSTRING_INDEX(d.dailyTripCondition,'-',1)) and CONCAT('2020-01-01',' ',SUBSTRING_INDEX(d.dailyTripCondition,'-',-1))
+                CONCAT('2020-01-01',' ',?) BETWEEN CONCAT('2020-01-01',' ',SUBSTRING_INDEX(d.dailyTripCondition,'-',1)) and CONCAT('2020-01-01',' ',SUBSTRING_INDEX(d.dailyTripCondition,'-',-1))
                 or 
                 SUBSTRING_INDEX(d.dailyTripCondition,'-',1) > SUBSTRING_INDEX(d.dailyTripCondition,'-',-1) and
-                CONCAT('2020-01-02',' ','${executionTime}') BETWEEN CONCAT('2020-01-01',' ',SUBSTRING_INDEX(d.dailyTripCondition,'-',1)) and CONCAT('2020-01-02',' ',SUBSTRING_INDEX(d.dailyTripCondition,'-',-1))
+                CONCAT('2020-01-02',' ',?) BETWEEN CONCAT('2020-01-01',' ',SUBSTRING_INDEX(d.dailyTripCondition,'-',1)) and CONCAT('2020-01-02',' ',SUBSTRING_INDEX(d.dailyTripCondition,'-',-1))
                 or 
                 SUBSTRING_INDEX(d.dailyTripCondition,'-',1) > SUBSTRING_INDEX(d.dailyTripCondition,'-',-1) and
-                CONCAT('2020-01-01',' ','${executionTime}') BETWEEN CONCAT('2020-01-01',' ',SUBSTRING_INDEX(d.dailyTripCondition,'-',1)) and CONCAT('2020-01-02',' ',SUBSTRING_INDEX(d.dailyTripCondition,'-',-1))
+                CONCAT('2020-01-01',' ',?) BETWEEN CONCAT('2020-01-01',' ',SUBSTRING_INDEX(d.dailyTripCondition,'-',1)) and CONCAT('2020-01-02',' ',SUBSTRING_INDEX(d.dailyTripCondition,'-',-1))
             )
         )`
+        replacements.push(...[executionTime,executionTime,executionTime])
     }
     let data = await sequelizeObj.query(
         `SELECT
@@ -791,12 +799,12 @@ const FilterServiceProvider = async function (vehicle, serviceModeId, dropoffPoi
             SUBSTRING_INDEX(e.availableTime,'-',1) > SUBSTRING_INDEX(e.availableTime,'-',-1) and
             CONCAT('2020-01-01',' ',?) BETWEEN CONCAT('2020-01-01',' ',SUBSTRING_INDEX(e.availableTime,'-',1)) and CONCAT('2020-01-02',' ',SUBSTRING_INDEX(e.availableTime,'-',-1))
         )
-        and '${executionDate}' between a.startDate and IFNULL(a.extensionDate,a.endDate)
-        and '${executionDate}' between c.startDate and c.endDate
+        and ? between a.startDate and IFNULL(a.extensionDate,a.endDate)
+        and ? between c.startDate and c.endDate
         ${dailyTripFilter}
         ${wogFilter} GROUP BY e.id, c.endPoint, a.contractNo`,
         {
-            replacements: [vehicle, serviceModeId, serviceModeId, dropoffPoint, pickupPoint, chargeType, executionTime, executionTime, executionTime],
+            replacements: replacements,
             type: QueryTypes.SELECT
         }
     );

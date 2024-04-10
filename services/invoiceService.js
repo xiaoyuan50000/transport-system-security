@@ -633,7 +633,7 @@ var GetDailyPrice = function (startTime, endTime, price, dailyDaytime, halfDayMo
     let datetime13 = moment(date + " 13:00")
     let datetime18 = moment(date + " 18:00")
     let datetimeNext08 = moment(date + " 08:00").add(1, 'd').format('YYYY-MM-DD HH:mm')
-    
+
     if (moment(startTime).isSameOrAfter(moment(datetime08)) && moment(endTime).isSameOrBefore(moment(datetime13))) {
         total = total + Number(halfDayMorning)
         return total
@@ -918,10 +918,14 @@ module.exports.SetStatisticsDatas = SetStatisticsDatas
 
 module.exports.DownloadFile = function (req, res) {
     let filename = req.query.filename
-    var rs = fs.createReadStream(path.join('./public/download/invoice/', filename));
+    if (!filename) {
+        return Response.error(res, 'Download error, no filename!')
+    }
+    const safeFilename = Utils.getSafeFileName(filename)
+    var rs = fs.createReadStream(path.join('./public/download/invoice/', safeFilename));
     res.writeHead(200, {
         'Content-Type': 'application/force-download',
-        'Content-Disposition': 'attachment; filename=' + filename
+        'Content-Disposition': 'attachment; filename=' + safeFilename
     });
     rs.pipe(res);
 }

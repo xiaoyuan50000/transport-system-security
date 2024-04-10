@@ -10,6 +10,8 @@ const { sequelizeObj } = require('../sequelize/dbConf');
 const xlsx = require('node-xlsx');
 const { INDENT_STATUS } = require('../util/content')
 const { User } = require('../model/user');
+const utils = require('../util/utils');
+
 
 let folder = './public/download/indent/'
 
@@ -38,6 +40,9 @@ module.exports.ExportIndentToExcel = async function (req, res) {
 
 module.exports.DownloadIndent = async function (req, res) {
     let { filename } = req.query
+
+	filename = utils.getSafeFileName(filename);
+
     var rs = fs.createReadStream(folder + filename);
     res.writeHead(200, {
         'Content-Type': 'application/force-download',

@@ -22,7 +22,7 @@ const Response = require('../util/response.js');
 const { Task2 } = require('../model/task.js');
 
 module.exports.getSimpleChatInfo = async function (req, res) {
-    let userId = req.body.userId;
+	let userId = req.body.userId;
 	let serviceProviderId = req.body.serviceProviderId
 	let taskId = req.body.taskId
 	let user = await getUserModel(userId);
@@ -54,7 +54,7 @@ module.exports.getSimpleChatInfo = async function (req, res) {
 		// let userIdList = targetMessageList.map(message => message.fromUser);
 		// targetUser = await User.findAll({ where: { id: userIdList } })
 		targetUser = await getUserModelList([operationHistory.operatorId]);
-	}	
+	}
 	roomUser = await getRoomUserList(taskId)
 	roomUser = generateResponseUserList(roomUser);
 	user = generateResponseUserList([user])[0];
@@ -79,7 +79,7 @@ module.exports.getSimpleChatMessageInfo = async function (req, res) {
 		AND messageTime >= ? AND messageTime <= ?  
 		AND m.taskId = ?
 		ORDER BY m.id ASC
-	`, { replacements: [ userId, targetUserId, targetUserId, userId, startTime, endTime, taskId ], type: QueryTypes.SELECT });
+	`, { replacements: [userId, targetUserId, targetUserId, userId, startTime, endTime, taskId], type: QueryTypes.SELECT });
 	return Response.success(res, messageList);
 }
 
@@ -91,17 +91,17 @@ module.exports.getRoomChatMessageInfo = async function (req, res) {
 	startTime = startTime ? startTime : moment().subtract(1, 'd').format('YYYY-MM-DD HH:mm:ss');
 	endTime = endTime ? endTime : moment().format('YYYY-MM-DD HH:mm:ss');
 
-	await sequelizeObj.transaction(async (t1) => { 
+	await sequelizeObj.transaction(async (t1) => {
 		let messageList = await sequelizeObj.query(`
 			SELECT m.*, fromU.username AS fromUsername FROM message m
 			LEFT JOIN \`user\` fromU ON m.fromUser = fromU.id
 			WHERE m.taskId = ?
 			AND messageTime >= ? AND messageTime <= ?  
 			ORDER BY m.id ASC
-		`, { replacements: [ taskId, startTime, endTime ], type: QueryTypes.SELECT });
+		`, { replacements: [taskId, startTime, endTime], type: QueryTypes.SELECT });
 
 		// Update last message as read
-		let lastMessage = await Message.findOne({ where: { taskId }, order: [ ['updatedAt', 'DESC'] ] })
+		let lastMessage = await Message.findOne({ where: { taskId }, order: [['updatedAt', 'DESC']] })
 		if (lastMessage) {
 			if (lastMessage.read) {
 				let userIdList = lastMessage.read.split(',');
@@ -116,22 +116,23 @@ module.exports.getRoomChatMessageInfo = async function (req, res) {
 				await lastMessage.save();
 			}
 		} else {
-			log.warn(`TaskId ${ taskId } do not has chat info now.`)
+			log.warn(`TaskId ${taskId} do not has chat info now.`)
 		}
 		return Response.success(res, messageList);
-	})	
+	})
 }
 
 module.exports.sendChatMessage = async function (req, res) {
-    let message = req.body.message;
+	let message = req.body.message;
 	message = await Message.create(message, { returning: true });
 	return Response.success(res, message.id);
 }
 
+
 module.exports.uploadChatFile = async function (req, res) {
-	const form = formidable({ multiples: true, maxFileSize: 10 * 1024 * 1024, keepExtensions: true });
+	const form = formidable({ multiples: true, maxFileSize: 10 * 1024 * 1024, keepExtensions: false });
 	let chatUploadPath = path.join('./', 'public/chat/upload/');
-	if(!fs.existsSync(chatUploadPath)) fs.mkdirSync(chatUploadPath);
+	if (!fs.existsSync(chatUploadPath)) fs.mkdirSync(chatUploadPath);
 	form.parse(req, async (error, fields, files) => {
 		if (error) {
 			log.error(error)
@@ -168,22 +169,27 @@ module.exports.uploadChatFile = async function (req, res) {
 			message.fromUsername = currentUser.username;
 			message.toUsername = targetUser.username;
 			messageList.push(message)
-		}			
+		}
 		return Response.success(res, { messageList });
 	});
 }
 
 module.exports.uploadChatAudio = async function (req, res) {
-    let fileName = req.body.fileName;
-    let fileSize = req.body.fileSize;
+	let fileName = req.body.fileName;
+	let fileSize = req.body.fileSize;
 	let currentUser = req.body.currentUser;
 	let targetUser = req.body.targetUser;
 	let taskId = req.body.taskId;
 	let base64Data = req.body.base64Data;
 	let chatUploadPath = path.join('./', 'public/chat/upload/');
-	if(!fs.existsSync(chatUploadPath)) fs.mkdirSync(chatUploadPath);
-	let dataBuffer = new Buffer(base64Data, 'base64');
-	await fs.writeFileSync(path.join('./', 'public/chat/upload/', fileName), dataBuffer)
+	if (!fs.existsSync(chatUploadPath)) fs.mkdirSync(chatUploadPath);
+
+	const safeFileName = utils.getSafeFileName(fileName);
+	const filePath = path.join(chatUploadPath, safeFileName);
+
+	let dataBuffer = Buffer.from(base64Data, 'base64');
+	await fs.writeFileSync(filePath, dataBuffer)
+
 	let message = {
 		fromUser: currentUser.id,
 		toUser: targetUser.id,
@@ -199,7 +205,7 @@ module.exports.uploadChatAudio = async function (req, res) {
 	message = await Message.create(message, { returning: true })
 	message.fromUsername = currentUser.username;
 	message.toUsername = targetUser.username;
-	return Response.success(res, [ message ]);
+	return Response.success(res, [message]);
 };
 
 module.exports.downloadChatFile = async function (req, res) {
@@ -207,14 +213,14 @@ module.exports.downloadChatFile = async function (req, res) {
 	res.download(chatUploadPath + req.query.fileName, req.query.fileName);
 }
 
-module.exports.getAudioByName = async function (req, res) {
-	let audioName = req.body.audioName;
-	let audioPath = path.join('./', 'public/chat/upload/', audioName);
-	// console.log(audioPath)
-	let base64Data = fs.readFileSync(audioPath, 'base64');
-	// console.log(base64Data)
-	return Response.success(res, base64Data);
-}
+// module.exports.getAudioByName = async function (req, res) {
+// 	let audioName = req.body.audioName;
+// 	let audioPath = path.join('./', 'public/chat/upload/', audioName);
+// 	// console.log(audioPath)
+// 	let base64Data = fs.readFileSync(audioPath, 'base64');
+// 	// console.log(base64Data)
+// 	return Response.success(res, base64Data);
+// }
 
 const getUserModel = async function (userId) {
 	let userList = await sequelizeObj.query(`
@@ -222,9 +228,9 @@ const getUserModel = async function (userId) {
 		LEFT JOIN role r ON r.id = u.role
 		LEFT JOIN \`group\` g ON g.id = u.group
 		WHERE u.id = ? 
-	`, { type: QueryTypes.SELECT, replacements: [ userId ] });
+	`, { type: QueryTypes.SELECT, replacements: [userId] });
 	if (!userId || !userList.length) {
-		log.error(` UserId ${ userId } does not exist. `)
+		log.error(` UserId ${userId} does not exist. `)
 		throw `User does not exist!`
 	}
 	return userList[0];
@@ -237,7 +243,7 @@ const getUserModelList = async function (userIdList) {
 		LEFT JOIN role r ON r.id = u.role
 		LEFT JOIN \`group\` g ON g.id = u.group
 		WHERE u.id IN (?) 
-	`, { type: QueryTypes.SELECT, replacements: [ userIdList ] });
+	`, { type: QueryTypes.SELECT, replacements: [userIdList] });
 	return userList;
 }
 
@@ -260,8 +266,8 @@ const generateResponseUserList = function (userList) {
 const getRoleModel = async function (roleName) {
 	let role = await Role.findAll({ where: { roleName: roleName } })
 	if (!role) {
-		log.error(` UserRole ${ ROLE.TSP } does not exist. `)
-		throw ` UserRole ${ ROLE.TSP } does not exist. `
+		log.error(` UserRole ${ROLE.TSP} does not exist. `)
+		throw ` UserRole ${ROLE.TSP} does not exist. `
 	}
 	return role[0];
 }

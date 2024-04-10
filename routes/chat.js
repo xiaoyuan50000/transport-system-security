@@ -13,5 +13,5 @@ router.post('/uploadChatFiles', chatService.uploadChatFile);
 router.post('/uploadChatAudio', chatService.uploadChatAudio);
 
 router.get('/downloadChatFile', chatService.downloadChatFile);
-router.post('/getAudioByName', chatService.getAudioByName);
+// router.post('/getAudioByName', chatService.getAudioByName);
 module.exports = router;

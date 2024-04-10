@@ -89,8 +89,8 @@ module.exports.InitTemplateIndent = async function (req, res) {
     let pageNum = Number(req.body.start);
     let pageLength = Number(req.body.length);
 
-    let filter = [`groupId = ${groupId}`]
-    let replacements = []
+    let filter = [`groupId = ?`]
+    let replacements = [groupId]
     if (templateName) {
         filter.push(`name like ?`)
         replacements.push(`%${templateName}%`)

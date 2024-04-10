@@ -26,6 +26,7 @@ const indentService = require('../services/indentService2');
 const { INDENT_STATUS, TASK_STATUS, OperationAction } = require('../util/content')
 const requestService = require('../services/requestService2');
 const initialPoService = require('../services/initialPoService');
+const utils = require('../util/utils');
 
 
 const indent_path = conf.upload_indent_path;
@@ -42,7 +43,7 @@ module.exports.uploadJobFile = async function (req, res) {
     let form = formidable({
         encoding: 'utf-8',
         uploadDir: indent_path,
-        keepExtensions: true,
+        keepExtensions: false,
         maxFileSize: 1024 * 1024 * 1024,
     });
 
@@ -50,7 +51,10 @@ module.exports.uploadJobFile = async function (req, res) {
         try {
             let filename = fields.filename;
             let userId = req.body.userId;
-            // let userId = fields.userId;
+            if (!filename) {
+                return Response.error(res, 'Upload error! Filename is empty!');
+            }
+            filename = utils.getSafeFileName(filename)
             let extension = filename.substring(filename.lastIndexOf('.') + 1);
             if (extension !== 'xlsx') {
                 return Response.error(res, 'The file type must be xlsx.');
@@ -381,13 +385,17 @@ module.exports.uploadOldIndentFile = async function (req, res) {
     let form = formidable({
         encoding: 'utf-8',
         uploadDir: indent_path,
-        keepExtensions: true,
+        keepExtensions: false,
         maxFileSize: 1024 * 1024 * 1024,
     });
 
     form.parse(req, async (err, fields, files) => {
         try {
             let filename = fields.filename;
+            if (!filename) {
+                return Response.error(res, 'Upload error! Filename is empty!');
+            }
+            filename = utils.getSafeFileName(filename)
             let extension = filename.substring(filename.lastIndexOf('.') + 1);
             if (extension !== 'xlsx') {
                 return Response.error(res, 'The file type must be xlsx.');
@@ -585,13 +593,17 @@ module.exports.newContract = async function (req, res) {
     let form = formidable({
         encoding: 'utf-8',
         uploadDir: indent_path,
-        keepExtensions: true,
+        keepExtensions: false,
         maxFileSize: 1024 * 1024 * 1024,
     });
 
     form.parse(req, async (err, fields, files) => {
         try {
             let filename = fields.filename;
+            if (!filename) {
+                return Response.error(res, 'Upload error! Filename is empty!');
+            }
+            filename = utils.getSafeFileName(filename)
             let extension = filename.substring(filename.lastIndexOf('.') + 1);
             if (extension !== 'xlsx') {
                 return Response.error(res, 'The file type must be xlsx.');
@@ -623,7 +635,7 @@ module.exports.newContract = async function (req, res) {
                     }
                 }
                 if (B) {
-                    B = B.replace("\r\n",'|').replace("\n",'|')
+                    B = B.replace("\r\n", '|').replace("\n", '|')
                     let serviceMode = B.split('|')[0].split('Service Mode: ')[1]
                     let serviceType = B.split('|')[1].split('Service Type: ')[1]
                     if (serviceMode != serviceModeName) {

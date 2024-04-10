@@ -15,6 +15,7 @@ const { User } = require('../model/user');
 const { Role } = require('../model/role');
 const { ROLE, ContractRateStatus } = require('../util/content')
 const _ = require('lodash');
+const utils = require('../util/utils');
 
 
 const indent_path = conf.upload_indent_path;
@@ -33,7 +34,7 @@ module.exports.UploadContract = async function (req, res) {
     let form = formidable({
         encoding: 'utf-8',
         uploadDir: indent_path,
-        keepExtensions: true,
+        keepExtensions: false,
         maxFileSize: 1024 * 1024 * 1024,
     });
 
@@ -42,6 +43,10 @@ module.exports.UploadContract = async function (req, res) {
             let uploadContractNo = fields.uploadContractNo
             console.log(uploadContractNo)
             let filename = fields.filename;
+            if(!filename){
+                return Response.error(res, 'Upload error! Filename is empty!');
+            }
+            filename = utils.getSafeFileName(filename)
             let extension = filename.substring(filename.lastIndexOf('.') + 1);
             if (extension !== 'xlsx') {
                 return Response.error(res, 'The file type must be xlsx.');

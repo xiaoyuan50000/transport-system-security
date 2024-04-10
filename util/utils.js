@@ -406,3 +406,8 @@ const validDateTime = function (datetime) {
     return true
 }
 module.exports.validDateTime = validDateTime
+
+
+module.exports.getSafeFileName = function (fileName) {
+	return fileName.replace(/[<>:"|?*]/g, '_');
+}

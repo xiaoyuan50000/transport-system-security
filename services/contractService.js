@@ -1251,8 +1251,10 @@ const GetReachedSpendingAlertContract = async function (roleName, userId, servic
     }
 
     let filter = ""
+    let replacements = []
     if (roleName == ROLE.CM) {
-        filter += ` AND allocateCM = ${userId}`
+        filter += ` AND allocateCM = ?`
+        replacements.push(userId)
     } else if (roleName == ROLE.RF) {
         if (serviceModeIds != "") {
             filter += ` and !(',${serviceModeIds},' REGEXP concat(',', REPLACE(serviceModeId,',',',|,'),','))`
@@ -1264,6 +1266,7 @@ const GetReachedSpendingAlertContract = async function (roleName, userId, servic
             ) a LEFT JOIN contract_balance b on a.contractNo = b.contractNo
             where b.id is not null`,
         {
+            replacements: replacements,
             type: QueryTypes.SELECT,
         }
     );

@@ -18,6 +18,7 @@ const { ContractRate } = require('../model/contractRate');
 const conf = require('../conf/conf')
 const _ = require('lodash');
 const { FormatPrice } = require('../util/utils')
+const utils = require('../util/utils');
 
 
 const checkUser = function (user) {
@@ -686,15 +687,17 @@ module.exports.DownloadInitialPOExcel = async function (req, res) {
         let filename = ""
         if (isPO) {
             if (monthly) {
+                monthly = utils.getSafeFileName(monthly)
                 filename = `PO(${contractor})(${monthly})-${suffix}.xlsx`
             } else {
+                indentId = utils.getSafeFileName(indentId)
                 filename = `PO(${contractor})(${indentId})-${suffix}.xlsx`
             }
         } else {
+            indentId = utils.getSafeFileName(indentId)
             filename = `InitialPO(${contractor})(${indentId})-${suffix}.xlsx`
         }
 
-        // let path = `./public/download/invoice/${filename}`
         let buffer = xlsx.build([
             {
                 name: 'sheet1',

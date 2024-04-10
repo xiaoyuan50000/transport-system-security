@@ -4,7 +4,7 @@ const { sequelizeObj } = require('../sequelize/dbConf');
 const { QueryTypes, Model, Op } = require('sequelize');
 
 module.exports.GetAllServiceProvider = async function (req, res) {
-    let { sortBy, sort } = req.body
+    
 
     let sql = `select
         a.contractPartNo, a.perTrip, a.typeOfVehicle, d.name, b.category
@@ -13,9 +13,7 @@ module.exports.GetAllServiceProvider = async function (req, res) {
     LEFT JOIN contract c on b.contractNo = c.contractNo
     LEFT JOIN service_provider d on c.serviceProviderId = d.id `;
 
-    if (sortBy != null && sortBy != "") {
-        sql += ` order by ${sortBy} ${sort}`
-    }
+    
     let contractRate = await sequelizeObj.query(
         sql,
         {
