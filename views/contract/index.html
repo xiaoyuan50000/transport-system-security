@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Contract</title>
+    <!-- css -->
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font: 14px Helvetica Neue, Helvetica, PingFang SC, Tahoma, Arial, sans-serif;
+        }
+
+        .body-top {
+            height: 50px;
+        }
+
+        .contract-iframe {
+            width: 100%;
+            height: calc(100% - 50px);
+            position: fixed;
+            border: none;
+        }
+
+        .nav-link {
+            color: #204B4D;
+            font-weight: 500;
+            font-size: 16px;
+            padding: 0.2rem 0rem;
+        }
+
+        .nav-item>.active {
+            border-bottom: 4px solid #308860 !important;
+            color: #308860 !important;
+        }
+
+        .nav-item {
+            display: flex;
+            padding: 0rem 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid h-100 p-0 m-0">
+        <div class="body-top shadow">
+            <div class="row h-100 mx-0 justify-content-around">
+                <div class="col align-self-end">
+                    <ul class="nav" id="indent-action">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-indent-action="1">Contract</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-indent-action="2" data-contractNo="">Contract Info</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <iframe class="contract-iframe" src=""></iframe>
+    </div>
+</body>
+<script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+<script src="/contract/index.js"></script>
+<script type="text/javascript" src="../../resize.js"></script>
+
+
+
+</html>

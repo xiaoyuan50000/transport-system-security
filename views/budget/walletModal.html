@@ -1,0 +1,92 @@
+<div class="modal fade" id="incomeModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0">
+            <div class="modal-header modal-header-background">
+                <h5 class="modal-title">Increase Wallet Amount</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row m-2">
+                    <div class="col-8 offset-2">
+                        <form id="income-modal-form">
+                            <div class="mb-2 row">
+                                <label for="amount" class="col-sm-4 col-form-label">Amount:</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="amount" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row justify-content-center pt-3">
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-system" id="amount-save">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="payoutModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0">
+            <div class="modal-header modal-header-background">
+                <h5 class="modal-title">Deduct Wallet Amount</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row m-2">
+                    <div class="col-8 offset-2">
+                        <form id="payout-modal-form">
+                            <div class="mb-2 row">
+                                <label for="amount" class="col-sm-4 col-form-label">Amount:</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="amount" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row justify-content-center pt-3">
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-system" id="payout-amount-save">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="latestTransactionsModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0">
+            <div class="modal-header modal-header-background">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table latestTransaction-seemore-table w-100 px-5"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="amountTransactionsModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0">
+            <div class="modal-header modal-header-background">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table amountTransaction-seemore-table w-100 px-5"></table>
+            </div>
+        </div>
+    </div>
+</div>

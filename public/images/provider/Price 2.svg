@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <g id="Price_2" data-name="Price 2" transform="translate(-1857 -124)">
+    <g id="A" transform="translate(1857 124)" fill="none" stroke="#f88423" stroke-width="1">
+      <rect width="32" height="32" rx="5" stroke="none"/>
+      <rect x="0.5" y="0.5" width="31" height="31" rx="4.5" fill="none"/>
+    </g>
+    <g id="A-2" data-name="A" transform="translate(1881.026 148.014) rotate(180)">
+      <path id="A-3" data-name="A" d="M0,.744A.744.744,0,0,1,.744,0H16.282a.744.744,0,1,1,0,1.488H.744A.744.744,0,0,1,0,.744Zm8.515,2.1a.744.744,0,0,1,.744.744V16.27a.744.744,0,1,1-1.488,0V3.586a.744.744,0,0,1,.744-.744Z" transform="translate(0 0)" fill="#f88423"/>
+      <path id="A-4" data-name="A" d="M.218.218a.744.744,0,0,1,1.052,0L6.853,5.8A.744.744,0,1,1,5.8,6.853L.218,1.27A.744.744,0,0,1,.218.218Z" transform="translate(7.771 2.847)" fill="#f88423"/>
+      <path id="A-5" data-name="A" d="M6.853.218a.744.744,0,0,1,0,1.052L1.27,6.853A.744.744,0,0,1,.218,5.8L5.8.218A.744.744,0,0,1,6.853.218Z" transform="translate(2.188 2.847)" fill="#f88423"/>
+    </g>
+  </g>
+</svg>

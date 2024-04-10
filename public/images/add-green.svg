@@ -1,0 +1,5 @@
+<svg id="add" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
+  <rect id="rock_47" data-name="rock 47" width="26" height="26" rx="3" fill="#2bb982"/>
+  <path id="rate_90" data-name="rate 90" d="M128,449.4a1.4,1.4,0,0,1,1.4-1.4h14a1.4,1.4,0,0,1,1.4,1.4h0a1.4,1.4,0,0,1-1.4,1.4h-14a1.4,1.4,0,0,1-1.4-1.4Z" transform="translate(-122.69 -435.994)" fill="#fffffd"/>
+  <path id="rate_4121" data-name="rate 4121" d="M0,1.4A1.4,1.4,0,0,1,1.4,0h14a1.4,1.4,0,0,1,1.4,1.4h0a1.4,1.4,0,0,1-1.4,1.4H1.4A1.4,1.4,0,0,1,0,1.4Z" transform="translate(15.109 5.006) rotate(90)" fill="#fffffd"/>
+</svg>

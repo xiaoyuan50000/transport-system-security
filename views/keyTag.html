@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><%=title%></title>
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./stylesheets/task.css">
+    <link rel="stylesheet" href="./stylesheets/style.css">
+    <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="../javascripts/moment.min.js"></script>
+    <script src="./javascripts/datatables/jquery.dataTables.min.js"></script>
+    <script src="./javascripts/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="./js/pageHelper.js"></script>
+    <style>
+        label {
+            margin-bottom: 0;
+        }
+        .card-div {
+            height: 8em;
+            width: 80%;
+            border-radius: 5px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body style="padding: 30px 30px;">
+<div class="row" style="height: fit-content;">
+    <div class="col-4 col-sm-4 col-md-4 col-lg-4">
+        <div class="card-div" style="background: url('../images/tag/In-1@2x.png');">
+            <table style="width: 100%;height: 100%;text-align: center;font-weight: bolder;color: whitesmoke;">
+                <tr>
+                    <td width="30">
+                        <img style="width: 50px;" src="../images/tag/in.png">
+                    </td>
+                    <td width="50">
+                        <label style="font-size: 2em;">IN</label>
+                    </td>
+                    <td width="20">
+                        <label style="font-size: 3em;">7</label>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="col-4 col-sm-4 col-md-4 col-lg-4">
+        <div class="card-div" style="background: url('../images/tag/out-1@2x.png');">
+            <table style="width: 100%;height: 100%;text-align: center;font-weight: bolder;color: whitesmoke;">
+                <tr>
+                    <td width="30">
+                        <img style="width: 50px;" src="../images/tag/out.png">
+                    </td>
+                    <td width="50">
+                        <label style="font-size: 2em;">OUT</label>
+                    </td>
+                    <td width="20">
+                        <label style="font-size: 3em;">7</label>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="col-4 col-sm-4 col-md-4 col-lg-4">
+        <div class="card-div" style="background: url('../images/tag/Overdue-1@2x.png')">
+            <table style="width: 100%;height: 100%;text-align: center;font-weight: bolder;color: whitesmoke;">
+                <tr>
+                    <td width="30">
+                        <img style="width: 50px;" src="../images/tag/overdue.png">
+                    </td>
+                    <td width="50">
+                        <label style="font-size: 2em;">Overdue</label>
+                    </td>
+                    <td width="20">
+                        <label style="font-size: 3em;">6</label>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row task-table" style="margin-top: 2em;">
+    <div class="w-100">
+        <table class="table table-hover center w-100">
+            <thead class="thead-light">
+            </thead>
+        </table>
+    </div>
+</div>
+
+<!-- <script>
+    let btn = '<button type="button" class="btn btn-primary">Submit</button>';
+    let company = '<button type="button" class="btn btn-link" data-toggle="modal" data-target="#gridSystemModal">3 Rates Found</button>';
+
+    $(function() {
+        let table = $('.table').DataTable({
+            "ordering": false,
+            "searching": false,
+            "paging": true,
+            "processing": true,
+            "language" : PageHelper.language(),
+            "lengthMenu": PageHelper.lengthMenu(),
+            "dom": PageHelper.dom(),
+            "pageLength" : PageHelper.pageLength(),
+            "fnDrawCallback": function() {
+                PageHelper.drawGoPageMenu();
+            },
+            "serverSide": true,
+            "ajax": {
+                url: "./keyTag",
+                type: "POST",
+                data: function (d) {
+                    return { "start": d.start, "length": d.length }
+                }
+            },
+            "columns": [
+                {"data": "a1", "title": "Key Tag Name"},
+                {"data": "a2", "title": "KMS Location"},
+                {"data": "a3", "title": "Taken By"},
+                {"data": "a4", "title": "Date Taken", "render":function (data, type, full, meta) {
+                        return moment(data).format('MM/DD/YYYY HH:mm')
+                    }},
+                {"data": "a5", "title": "KMS Return"},
+                {"data": "a6", "title": "Return BY"},
+                {"data": "a7", "title": "Date Returned", "render":function (data, type, full, meta) {
+                        return moment(data).format('MM/DD/YYYY HH:mm')
+                    }},
+                {"data": "a8", "title": "Status",
+                    "render":function (data, type, full, meta) {
+                        let color = '#FF6153';
+                        if(data.toLowerCase()=="in"){
+                            color = '#95CE1D';
+                        }else if(data.toLowerCase()=="out"){
+                            color = '#FEA151';
+                        }
+                        return `<span style="color: ${color}">${data}</span>`
+                    }
+                }
+            ]
+        });
+    });
+</script> -->
+</body>
+</html>

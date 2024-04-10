@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/images/trips/css/calendar.css">
+    <link rel="stylesheet" href="/javascripts/jquery-confirm/jquery-confirm.css">
+    <link rel="stylesheet" href="/mobile/task/style.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+
+    <script src="/javascripts/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/javascripts/axios/axios.min.js"></script>
+    <script src="/images/trips/js/calendar.js"></script>
+    <script src="/javascripts/moment.min.js"></script>
+    <script src="/javascripts/jquery-confirm/jquery-confirm.js"></script>
+    <script src="/javascripts/jquery-confirm/custom-confirm.js"></script>
+    <script src="/javascripts/layui/layui.js"></script>
+
+    <link rel="icon" href="data:;base64,=">
+    <script src="/mobile/task/task.js"></script>
+    <script src="/mobile/task/script.js"></script>
+    <script src="/mobile/common.js"></script>
+
+    <title><%= title%></title>
+    <style>
+        body {
+            width: 100vw;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        .index-head {
+            height: 60px;
+            background-color: #204b4d;
+            margin: 0;
+        }
+        .tms-mobile-nav {
+            width: 100vw;
+            position: absolute;
+            bottom: 0;
+            text-align: center;
+            height: 80px;
+            border-top: 0;
+            background-color: #ffffff;
+        }
+        .tms-nav td {
+            cursor: pointer;
+        }
+        .nav-tab-label {
+            color: #696969;
+            font-size: 18;
+            margin-bottom: 2px;
+        }
+        .nav-tab-label.native {
+            color: #2bb982;
+            font-size: 20;
+        }
+        .nav-tab-img-indent {
+            width: 50px;
+            padding: 0 5px;
+        }
+        .nav-tab-img-task {
+            width: 50px;
+            padding: 0 5px;
+        }
+
+        label {
+            margin-bottom: 0;
+            font-size: 13px;
+        }
+        .item-div-list {
+            padding-bottom: 2.5em;
+            width: 100%;
+        }
+        .item-div-list.all {
+            max-height: calc(100vh - 180px);
+        }
+        .item-div-list.weekly {
+            max-height: calc(100vh - 260px);
+        }
+        .item-div-list.monthly {
+            max-height: calc(100vh - 420px);
+        }
+        .item-div {
+            margin-top: 1em;
+            border: solid 1px #2bb982;
+            box-shadow: 0 0 2px #2bb982;
+            border-radius: 5px;
+            width: 94%;
+            margin-left: 3%;
+        }
+        
+        .arriving-div {
+            background-color: #2bb982;
+            margin-left: -1px;
+            margin-right: -1px;
+            margin-bottom: -1px;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+        .item-route {
+            padding-top: 6px;
+        }
+
+        .tms-nav {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            height: 3em;
+            text-align: center;
+            border-top: solid 1px #dcdcdc;
+            background-color: whitesmoke;
+        }
+        .tms-nav td {
+            cursor: pointer;
+        }
+        .nav-tab {
+            padding-top: 15px;
+            padding-bottom: 10px;
+        }
+        .nav-tab img {
+            width: 22px;
+            margin-bottom: 3px;
+            margin-left: 3px;
+        }
+        ol, ul, dl {
+            margin-bottom: 0;
+        }
+        .custom-arrow {
+            display: inline-table;
+            /*margin-left: 60px;*/
+        }
+        .custom-arrow span {
+            color: #b4b2b2;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 25px;
+            padding: 0 10px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+        }
+        .custom-arrow-next {
+            margin-right: 0 !important;
+        }
+        .form-item {
+            width: 94%;
+            margin-left: 3%;
+        }
+        .form-label {
+            margin-top: 5px;
+            margin-bottom: 2px;
+        }
+        .layui-laydate {
+            z-index: 999999999;
+        }
+        .layui-laydate-list li:last-child {
+            display: none;
+        }
+        .layui-laydate-list li{
+            width: 50%;
+        }
+        .layui-laydate-list ol {
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .condition-div {
+            margin-left: 3%;
+            margin-top: 10px; 
+        }
+        .jconfirm .jconfirm-holder{
+            width: 70%;
+            margin-left: 15%;
+        }
+    </style>
+</head>
+<body style="background-color: #f3f3f3;overflow: hidden;">
+    <div class="index-head row">
+        <div class="row" style="width: 100%; height: 60px; margin: 0;">
+            <div class="col-2" style="text-align: right;">
+                <img src="" />
+            </div>
+            <div class="col-8" style="text-align: center;">
+                <label style="color: white;font-weight:bolder;font-size: x-large; margin-top: 15px;">Schedule Job</label>
+            </div>
+            <div id="logout" class="col-2" style="display: flex;justify-content: right;align-items: center;">
+                <img style="width: 16px;margin-right: 3px;margin-bottom:2px;" src="/images/logout.svg">
+                <span class="role-name-span" style="color: white;"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="width:100%;height: 50px;margin: 0px; background-color: white;">
+        <div class="col-6 condition-div" style="top: 5px;">
+            <select id="task-statu-select" class="form-control calender-option">
+                <option value="" selected>All</option>
+                <option value="Assigned">Assigned</option>
+                <option value="Arrived">Arrived</option>
+                <option value="Completed">Completed</option>
+                <option value="Late Trip">Late Trip</option>
+                <option value="No Show">No Show</option>
+                <option value="Started">Started</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-12 col-sm-12 col-md-12" style="text-align: center; margin-top: 10px; width: 94%; margin-left: 3%;">
+        <div class="bd_w jcalendar_week" id="jcalendar_week"></div>
+        <div class="bd_w jcalendar_week" id="jcalendar_month"></div>
+    </div>
+    <div class="col-12 col-sm-12 col-md-12 item-div-list all" style="overflow-x: hidden; overflow-y: auto;">
+       
+    </div>
+    <table class="tms-mobile-nav poc-nav" style="display: node;">
+        <tr>
+            <td class="col-12 nav-task">
+                <table style="text-align: center; display:flex;justify-content: center;">
+                    <tr>
+                        <td><img class="nav-tab-img-task" src="/images/indent/mobileRsp/Job-active.svg"></td>
+                    </tr>
+                    <tr>
+                        <td><label class="nav-tab-label native">Job</label></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+<div class="modal fade" id="jobAaproveModal" data-bs-backdrop="static" tabindex="-1"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0">
+            <div class="modal-header modal-header-background">
+                <h7 class="modal-title"></h7>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="background-color: #e8e8e8;">
+                <div class="row md-2">
+                    <label class="col-12 col-sm-12 form-item form-label">Execution Date:</label>
+                    <div class="col-12 col-sm-12">
+                        <input class="form-control form-item" id="executionDate" name="executionDate" autocomplete="off">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/mobile/task/index.js"></script>
+</html>

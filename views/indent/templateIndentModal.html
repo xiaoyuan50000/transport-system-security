@@ -1,0 +1,131 @@
+<div class="modal fade" id="templateIndentModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0">
+            <div class="modal-header modal-header-background">
+                <h5 class="modal-title">Create Template Indent</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row m-2">
+                    <div class="col-6">
+                        <form id="template-indent-left-form">
+                            <div class="mb-2 row">
+                                <label for="templateIndentName" class="col-sm-5 col-form-label">Template Indent Name:</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" id="templateIndentName" name="templateIndentName" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label class="col-sm-5 col-form-label">Resource:</label>
+                                <ul class="list-group">
+                                    
+                                </ul>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-6">
+                        <div class="card card-body">
+                            <form id="template-indent-right-form">
+                                <div class="row">
+                                    <div>
+                                        <div class="mb-2 row">
+                                            <label for="category" class="col-sm-5 col-form-label">Category:</label>
+                                            <div class="col-sm-7" id="template-indent-category-radio">
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="mb-2 row">
+                                            <label for="serviceType" class="col-sm-5 col-form-label">Resource Type:</label>
+                                            <div class="col-sm-7">
+                                                <select class="form-select" name="serviceType">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div id="template-indent-content">
+                                            <div class="mb-2 row">
+                                                <label for="serviceMode" class="col-sm-5 col-form-label">Service Mode:</label>
+                                                <div class="col-sm-7">
+                                                    <select class="form-select" name="serviceMode">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2 row">
+                                                <label for="typeOfVehicle" class="col-sm-5 col-form-label">Resource:</label>
+                                                <div class="col-sm-7">
+                                                    <select class="form-select" name="typeOfVehicle">
+                                                        <option value=""></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2 row" id="template-indent-vehicle-row">
+                                                <label for="noOfVehicle" class="col-sm-5 col-form-label">No. Of Resource:</label>
+                                                <div class="col-sm-7" style="float: right;">
+                                                    <input type="number" min="1" class="form-control" name="noOfVehicle" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))"
+                                                        autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="mb-2 row" id="template-indent-driver-row" style="display: none;">
+                                                <label class="col-sm-5 col-form-label">Driver:</label>
+                                                <div class="col-sm-7 align-self-center" style="float: right;">
+                                                    <input class="form-check-input mt-0" type="checkbox" name="driver">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-2 row noOfDriver" style="display: none;">
+                                                <label for="noOfDriver" class="col-sm-5 col-form-label">No. Of Driver:</label>
+                                                <div class="col-sm-7" style="float: right;">
+                                                    <input type="number" min="1" class="form-control" name="noOfDriver"
+                                                        autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <!-- <div class="mb-2 row">
+                                                <label for="repeats" class="col-sm-5 col-form-label">Recurring:</label>
+                                                <div class="col-sm-7">
+                                                    <select class="form-select" name="repeats">
+                                                        
+                                                    </select>
+                                                </div>
+                                            </div> -->
+                                        </div>
+                                        <!-- <div id="template-indent-fuel-content" style="display: none;">
+                                            <div class="mb-2 row">
+                                                <label for="fuelResource" class="col-sm-5 col-form-label">Resource:</label>
+                                                <div class="col-sm-7">
+                                                    <select class="form-select" name="fuelResource">
+                                                        <option value=""></option>
+                                                        <option value="Diesel">Diesel</option>
+                                                        <option value="Petrol">Petrol</option>
+                                                        <option value="Bio Diesel">Bio Diesel</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2 row">
+                                                <label for="litres" class="col-sm-5 col-form-label">Quantity(Litres):</label>
+                                                <div class="col-sm-7">
+                                                    <input type="number" min="1" class="form-control" name="litres" autocomplete="off" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))">
+                                                </div>
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                    <div class="row justify-content-center">
+                                        <div class="col-auto">
+                                            <button type="button" class="btn btn-system" onclick="addTemplateIndent()">Add Resources</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center pt-3">
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                    <div class="col-auto action-button">
+                        <button type="button" class="btn btn-system" onclick="createTemplateIndent()">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="428" height="256" viewBox="0 0 428 256">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="rock_6571" data-name="rock 6571" width="428" height="256" transform="translate(0 560)" fill="#fff"/>
+    </clipPath>
+    <linearGradient id="linear-gradient" x1="0.531" y1="0.421" x2="0.928" y2="0.827" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#57a6ff"/>
+      <stop offset="1" stop-color="#516ced"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#579efe"/>
+      <stop offset="1" stop-color="#557cfa"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-3" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#57a6fe"/>
+      <stop offset="1" stop-color="#5572f9"/>
+    </linearGradient>
+  </defs>
+  <g id="bg" transform="translate(0 -560)" clip-path="url(#clip-path)">
+    <g id="b_g" data-name="b g" transform="translate(0 -95.818)" opacity="0.636">
+      <path id="a" d="M10185.17,13039.321s-28,204.85-302.459,195.436,0,144.954,0,144.954l339.8-47.882Z" transform="translate(-9751.258 -12383.221)" stroke="#fff" stroke-width="12" fill="url(#linear-gradient)"/>
+      <g id="a-2" data-name="a" transform="translate(-94.258 750)" stroke="#fff" stroke-width="12" fill="url(#linear-gradient-2)">
+        <circle cx="122" cy="122" r="122" stroke="none"/>
+        <circle cx="122" cy="122" r="116" fill="none"/>
+      </g>
+      <g id="a-3" data-name="a" transform="translate(27.742 854)" stroke="#fff" stroke-width="12" fill="url(#linear-gradient-3)">
+        <circle cx="122.5" cy="122.5" r="122.5" stroke="none"/>
+        <circle cx="122.5" cy="122.5" r="116.5" fill="none"/>
+      </g>
+    </g>
+  </g>
+</svg>

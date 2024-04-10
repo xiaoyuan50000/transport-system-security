@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="360" height="304" viewBox="0 0 360 304">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="rock_6615" data-name="rock 6615" width="360" height="304" fill="#fff" stroke="#707070" stroke-width="1"/>
+    </clipPath>
+    <linearGradient id="linear-gradient" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#57abff"/>
+      <stop offset="1" stop-color="#1e47bd"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="1" stop-color="#1e47bd"/>
+    </linearGradient>
+  </defs>
+  <g id="bg-1" clip-path="url(#clip-path)">
+    <path id="rate_8198" data-name="rate 8198" d="M15147.355,9280.125s60.482,68.438,132.617,69.546,97.457-73.633,132.563-103.448,75.981-49.532,104.354-51.456,27.955-134.187,27.955-134.187L15509.9,8985h-391.73l4.877,295.128Z" transform="translate(-15150.986 -9078.794)" fill="url(#linear-gradient)"/>
+    <path id="rate_8199" data-name="rate 8199" d="M15256.514,9010.965s-75.368,34.81-68.455,95.181,45.948,87.211,105.965,105.966,105.663,18.7,139.422,52.459,83.913,67.861,197.895,37.994-70.53-174.161-70.53-174.161l-19.017-127.84Z" transform="translate(-15130.738 -9054.841)" opacity="0.5" fill="url(#linear-gradient-2)"/>
+  </g>
+</svg>

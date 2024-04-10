@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <link rel="icon" href="data:;base64,=">
+    <link rel="stylesheet" href="/stylesheets/mobile.css">
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+    <link rel="stylesheet" href="/stylesheets/icon/iconfont.css">
+    <link rel="stylesheet" href="/javascripts/jquery-confirm/jquery-confirm.css">
+
+    <script src="/javascripts/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/javascripts/axios/axios.min.js"></script>
+    <script src="/javascripts/moment.min.js"></script>
+    <script src="/javascripts/layui/layui.js"></script>
+    <script src="/javascripts/jquery-confirm/jquery-confirm.js"></script>
+    <script src="/javascripts/jquery-confirm/custom-confirm.js"></script>
+
+    <script src="/mobile/common.js"></script>
+    <script src="/job/job-common.js"></script>
+    <script src="/js/userValidation.js"></script>
+    <script src="/mobile/indent/editIndent.js"></script>
+    <script src="/mobile/indent/editTrip.js"></script>
+    <title><%= title%></title>
+    <style>
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .index-head {
+            height: 60px;
+            background-color: #204b4d;
+            margin: 0;
+            width: 100%;
+            position: fixed;
+            top: 0;
+        }
+        .create-nav {
+            width: 90%;
+            height: 35px;
+            border: 1px solid #4EB981;
+            border-radius: 20px;
+            margin-top: 15px;
+            margin-left: 5%;
+        }
+        .create-info-item {
+            width: 50%;
+            height: 34px;
+            border-radius: 20px;
+            color: #6ab196;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .create-info-item.active {
+            background-color: #4EB981;
+            background-size: 100%;
+            color: white;
+        }
+        .info-nav {
+            width: 94%;
+            height: 30px;
+            background-color: #c0f4e0;
+            background-size: 100%;
+            border-radius: 5px 5px 0 0;
+            margin-top: 15px;
+            margin-left: 3%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+        .info-nav img {
+        }
+        .info-nav label {
+            margin: 0px;
+            padding: 0px;
+        }
+        .content-div {
+            width: 100vw;
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        .success-page-div {
+            width: 100vw;
+            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background-color: white;
+        }
+        .success-div {
+            width: 94%;
+            margin-left: 3%;
+            height: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .success-info-div {
+            width: 94%;
+            margin-left: 3%;
+            height: 30%;
+        }
+        .info-form {
+            width: 94%;
+            margin-left: 3%;
+            border: 1px solid white;
+            border-radius: 0 0 5px 5px;
+            background-color: white;
+        }
+        .form-item {
+            width: 94%;
+            margin-left: 3%;
+        }
+        .form-label {
+            margin-top: 5px;
+            margin-bottom: 2px;
+        }
+        .trip-btn {
+            width: 80%;
+            height: 33px;
+            border: 1px solid #204b4d;
+            background-color: #204b4d;
+            border-radius: 20px;
+            margin-top: 20px;
+            margin-left: 10%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .task-item-div {
+            display: flex;
+            justify-content: left;
+            align-items: center;
+            border: 1px solid #ced4da;
+            border-radius: 0.25em;
+            margin-left: calc(5% + 15px);
+        }
+        .duration-nuit-ele {
+            width: 40px;
+            background-color: #e9ecef;
+            height: 100%;
+            border: 1px solid #ced4da;
+            border-radius: 0 0.25rem 0.25rem 0;
+            font-size: 1rem;
+            font-weight: 400;
+            margin-right: 3%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .layui-laydate-list>li:last-child {
+            display: none;
+        }
+        .layui-laydate-list>li{
+            width: 50% !important;
+        }
+        .layui-laydate-list ol {
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .success-msg-div {
+            width: 94%;
+            margin-left: 3%;
+            font-size: x-large;
+        }
+        .add-trip-btn {
+            display: flex;
+        }
+    </style>
+
+    <script>
+
+    </script>
+</head>
+<body style="background-color: #f3f3f3;overflow: hidden;">
+    <div class="index-head row">
+        <div class="row" style="width: 100%; height: 60px; margin: 0;">
+            <div class="col-1 col-sm-1" style="display: flex;justify-content: center;align-items: center;">
+                <label onclick="backToIndentList();" style="color: white;font-weight:bolder;font-size: xx-large;margin-bottom: 3px;">
+                    <img style="padding: 0 5px;" src="/images/indent/mobileRsp/left.svg">
+                </label>
+            </div>
+            <div class="col-10 col-sm-10" style="display: flex;justify-content: center;align-items: center;">
+                <label class="edit-trip-title-label" style="color: white;font-weight:bolder;font-size: large; margin-bottom: 0px;">
+                </label>
+            </div>
+            <div class="col-1 col-sm-1" style="text-align: right;"></div>
+        </div>
+    </div>
+    <div class="content-div">
+        <div class="top-space" style="width: 100%;height: 65px;">
+        </div>
+        <div class="create-nav row" style="display: none;">
+            <div class="create-info-item active base-info">
+                <lable style="font-weight:bolder;font-size: large;">Activity</lable>
+            </div>
+            <div class="create-info-item trip-info">
+                <lable style="font-weight:bolder;font-size: large;">Trip</lable>
+            </div>
+        </div>
+        <div class="info-div" style="display:none;">
+            <div class="info-nav base-info-nav up">
+                <label style="font-weight:bolder;" class="col-4 col-sm-4">Activity</label>
+                <label class="col-5 col-sm-5"></label>
+                <img src="/images/indent/mobileRsp/up.svg">
+            </div>
+            <div class = "info-form base-info-form">
+                <form id="base-task-form">
+                    <div id="groupSelect" class="mb-2 row">
+
+                    </div>
+                    <div class="mb-2 row">
+                        <label for="purposeType" class="col-12 col-sm-12 form-item form-label">Purpose:</label>
+                        <div class="col-12 col-sm-12">
+                            <select class="form-control form-item" id="purposeType" name="purposeType">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-2 row">
+                        <label for="remarks" class="col-12 col-sm-12 form-item form-label">Activity Name:</label>
+                        <div class="col-12 col-sm-12">
+                            <input class="form-control form-item" id="additionalRemarks" name="additionalRemarks" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="mb-2 row" id="startDateDiv">
+                        <label for="startDate" class="col-12 col-sm-12 form-item form-label">Start Date:</label>
+                        <div class="col-12 col-sm-12">
+                            <input class="form-control form-item" id="startDate" name="startDate" autocomplete="off"
+                                readonly>
+                        </div>
+                    </div>
+                    <div class="mb-2 row" id="estimatedTripDurationDiv">
+                        <label for="estimatedTripDuration" class="col-12 col-sm-12 form-item form-label">Estimated Trip
+                            Duration:</label>
+                        <div class="col-12 col-sm-12">
+                            <input class="form-control form-item" id="estimatedTripDuration" name="estimatedTripDuration"
+                                autocomplete="off" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3 row" id="noOfTripsDiv">
+                        <label for="noOfTrips" class="col-12 col-sm-12 form-item form-label">No. of Trips:</label>
+                        <div class="col-12 col-sm-12">
+                            <input type="number" class="form-control form-item" id="noOfTrips" name="noOfTrips" autocomplete="off" readonly>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="row">
+                <div class="trip-btn to-add-btn" style="display: none;">
+                    <label id="add-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Add New Trip</label>
+                </div>
+            </div>
+        </div>
+        <div class="trip-div" style="display:none;">
+            <div class="info-nav trip-info-nav up">
+                <label style="font-weight:bolder;" class="col-4 col-sm-4">Trip</label>
+                <label class="col-5 col-sm-5"></label>
+                <img src="/images/indent/mobileRsp/up.svg">
+            </div>
+            <div class = "info-form trip-info-form">
+                <form id="trip-info-form">
+                    <div class="mb-2 row">
+                        <label for="catetory" class="col-12 col-sm-12 form-item form-label">Category:</label>
+                        <div class="col-12 col-sm-12" id="catetoryDiv">
+                        </div>
+                    </div>
+                    <div class="mb-2 row">
+                        <label for="serviceType" class="col-12 col-sm-12 form-item form-label">Resource Type:</label>
+                        <div class="col-12 col-sm-12">
+                            <select class="form-control form-item" id="serviceType" name="serviceType">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-2 row">
+                        <label for="serviceMode" class="col-12 col-sm-12 form-item form-label">Service Mode:</label>
+                        <div class="col-12 col-sm-12">
+                            <select class="form-control form-item" id="serviceMode" name="serviceMode">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-2 row">
+                        <label for="typeOfVehicle" class="col-12 col-sm-12 form-item form-label">Resource:</label>
+                        <div class="col-12 col-sm-12">
+                            <select class="form-control form-item" id="typeOfVehicle" name="typeOfVehicle" onchange="changeTypeOfVehicle()">
+                            </select>
+                        </div>
+                    </div>
+                    <div id="vehicle-row" class="mb-2 row">
+                        <label for="noOfVehicle" class="col-12 col-sm-12 form-item form-label">No. Of Resource:</label>
+                        <div class="col-12 col-sm-12" style="margin-left: 3%;width: 94.1%;">
+                            <input type="number" class="form-control" id="noOfVehicle" name="noOfVehicle" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))"
+                                autocomplete="off">
+                        </div>
+                    </div>
+                    <div id="driver-row" style="display: none;">
+                        <div class="mb-2 row" style="display: flex;">
+                            <label for="driver" class="form-item form-label" style="width: 15%;">Driver:</label>
+                            <div style="width: 50%;">
+                                <input style="margin-top: 7px;" type="checkbox" id="driver" name="driver" onclick="OnCheckDriver($(this).prop('checked'))">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-2 row noOfDriver" style="display: none;">
+                        <label for="noOfDriver" id="noOfVehiclelabel" class="col-12 col-sm-12 form-item form-label">No. Of Driver:</label>
+                        <div class="col-12 col-sm-12">
+                            <input type="number" oninput="checkDriverNum();" class="form-control form-item" id="noOfDriver" name="noOfDriver" 
+                                autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="mb-2 row">
+                        <label for="pickupDestination" class="col-12 col-sm-12 form-item form-label">Reporting Location:</label>
+                        <div class="col-12 col-sm-12" style="display: flex;justify-content: center;align-items: center;">
+                            <select style="width: calc(94% - 40px); border-radius: 0.25rem 0 0 0.25rem;" class="form-control form-item" id="pickupDestination" name="pickupDestination">
+                                <option value=""></option>
+                            </select>
+                            <span class="duration-nuit-ele">
+                                <img src="../images/link.svg">
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mb-2 row">
+                        <label for="pickupDestination" class="col-12 col-sm-12 form-item form-label">Reporting Remarks:</label>
+                        <div class="col-12 col-sm-12">
+                            <input class="form-control form-item" id="pickupNotes" name="pickupNotes" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="mb-2 row">
+                        <label for="dropoffDestination" class="col-12 col-sm-12 form-item form-label">Destination:</label>
+                        <div class="col-12 col-sm-12" style="display: flex;justify-content: center;align-items: center;">
+                            <select style="width: calc(94% - 40px); border-radius: 0.25rem 0 0 0.25rem;" class="form-control form-item" id="dropoffDestination" name="dropoffDestination">
+                                <option value=""></option>
+                            </select>
+                            <span class="duration-nuit-ele">
+                                <img src="../images/link.svg">
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mb-2 row">
+                        <label for="pickupDestination" class="col-12 col-sm-12 form-item form-label">Destination Remarks:</label>
+                        <div class="col-12 col-sm-12">
+                            <input class="form-control form-item" id="dropoffNotes" name="dropoffNotes" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="mb-2 row">
+                        <label for="contactPerson" class="col-12 col-sm-12 form-item form-label">POC:</label>
+                        <div class="col-12 col-sm-12">
+                            <input class="form-control form-item" id="pocName" name="pocName"
+                                autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="mb-2 row">
+                        <label for="contactNumber" class="col-12 col-sm-12 form-item form-label">Mobile Number:</label>
+                        <div class="col-12 col-sm-12" style="display: flex;">
+                            <span style="margin-left: 3%; width: 16%;" class="input-group-text" id="contactNumberPrefix">+65</span>
+                            <input style="width: 78%;" type="text" class="form-control" id="contactNumber" name="contactNumber" autocomplete="off" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="info-nav more-trip-info-nav up">
+                <label style="font-weight:bolder;" class="col-4 col-sm-4">More</label>
+                <label class="col-5 col-sm-5"></label>
+                <img src="/images/indent/mobileRsp/up.svg">
+            </div>
+            <div class="info-form more-trip-info-form">
+                <form id="more-trip-info-form">
+                    <div class="mb-2 row" id="repeats-div">
+                        <label for="repeats" class="col-12 col-sm-12 form-item form-label">Recurring:</label>
+                        <div class="col-12 col-sm-12">
+                            <select class="form-control form-item" id="repeats" name="repeats">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-2 row mt-2" id="date-select"></div>
+                    <div class="mb-2 row">
+                        <label for="contactNumber" class="col-12 col-sm-12 form-item form-label">Trip Remarks:</label>
+                        <div class="col-12 col-sm-12" style="display: flex;">
+                            <textarea rows="2" class="form-control form-item" id="tripRemarks" name="tripRemarks"
+                                placeholder="<5 working days require justification" autocomplete="off" disabled></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="row">
+                <div class="add-trip-btn" style="display: none;">
+                    <div class="col-6">
+                        <div class="trip-btn back-indent-btn">
+                            <label id="add-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">cancel</label>
+                        </div>
+                    </div>
+                    <div class="col-6 confirm-add-btn" >
+                        <div class="trip-btn">
+                            <label id="add-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Add</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="trip-btn edit-trip-btn" style="display: none;">
+                    <label id="edit-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Edit</label>
+                </div>
+                <div class="trip-btn duplicate-trip-btn" style="display: none;">
+                    <label id="duplicate-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Duplicate</label>
+                </div>
+            </div>
+            <div class="bottom-space" style="width: 100%;height: 50px;">
+            </div>
+        </div>
+    </div>
+    <div class="success-page-div" style="display: none;">
+        <div class="success-div">
+            <img src="../images/create-success.svg"/>
+        </div>
+        <div class="success-info-div">
+            <div class="success-msg-div row">
+                <label></label>
+            </div>
+            <div onclick="addTripContinue()" class="add-more row" style="text-align: center;margin-top: 30px;font-size: larger;">
+                <label style="text-decoration:underline; color:rgb(51, 144, 97);">+ Add More Trips</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="trip-btn" onclick="backToIndentList();">
+                <label id="add-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Done</label>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/html" id="weeklyHtml">
+    <label id="repeatOnLabel" class="col-12 col-sm-12 form-item form-label">Repeat On:</label>
+    <div class="col-12 col-sm-12" id="week">
+        <svg class="bd-placeholder-img rounded-circle" style="margin-left: 5%;" width="30" height="30" data-week="1">
+            <rect width="100%" height="100%" fill="#e9ecef"></rect>
+            <text x="30%" y="50%" fill="#000000" dy=".3rem">M</text>
+        </svg>
+        <svg class="bd-placeholder-img rounded-circle ms-1" width="30" height="30" data-week="2">
+            <rect width="100%" height="100%" fill="#e9ecef"></rect>
+            <text x="35%" y="50%" fill="#000000" dy=".3rem">T</text>
+        </svg>
+        <svg class="bd-placeholder-img rounded-circle ms-1" width="30" height="30" data-week="3">
+            <rect width="100%" height="100%" fill="#e9ecef"></rect>
+            <text x="30%" y="50%" fill="#000000" dy=".3rem">W</text>
+        </svg>
+        <svg class="bd-placeholder-img rounded-circle ms-1" width="30" height="30" data-week="4">
+            <rect width="100%" height="100%" fill="#e9ecef"></rect>
+            <text x="35%" y="50%" fill="#000000" dy=".3rem">T</text>
+        </svg>
+        <svg class="bd-placeholder-img rounded-circle ms-1" width="30" height="30" data-week="5">
+            <rect width="100%" height="100%" fill="#e9ecef"></rect>
+            <text x="35%" y="50%" fill="#000000" dy=".3rem">F</text>
+        </svg>
+        <svg class="bd-placeholder-img rounded-circle ms-1" width="30" height="30" data-week="6">
+            <rect width="100%" height="100%" fill="#e9ecef"></rect>
+            <text x="35%" y="50%" fill="#000000" dy=".3rem">S</text>
+        </svg>
+        <svg class="bd-placeholder-img rounded-circle ms-1" width="30" height="30" data-week="7">
+            <rect width="100%" height="100%" fill="#e9ecef"></rect>
+            <text x="35%" y="50%" fill="#000000" dy=".3rem">S</text>
+        </svg>
+    </div>
+</script>
+<script type="text/html" id="periodHtml">
+    <div class="mb-2" id="preParkDateDiv" style="display: none;">
+        <label for="preParkDate" class="col-12 col-sm-12 form-item form-label">Pre-Park Date:</label>
+        <div class="col-12 col-sm-12">
+            <input class="form-control form-item" id="preParkDate" name="preParkDate" autocomplete="off">
+        </div>
+    </div>
+    <label class="col-12 col-sm-12 form-item form-label">Start Date:</label>
+    <div class="col-12 col-sm-12">
+        <input class="form-control form-item" id="periodStartDate" name="periodStartDate" autocomplete="off">
+    </div>
+    <label class="col-12 col-sm-12 form-item form-label">End Date:</label>
+    <div class="col-12 col-sm-12">
+        <input class="form-control form-item" id="periodEndDate" name="periodEndDate" autocomplete="off">
+    </div>
+</script>
+<script type="text/html" id="disposalHtml">
+    <label class="col-12 col-sm-12 form-item form-label">Execution Date:</label>
+    <div class="col-12 col-sm-12">
+        <input class="form-control form-item" id="executionDate" name="executionDate" autocomplete="off">
+    </div>
+    <label class="col-12 col-sm-12 form-item form-label">Execution Time:</label>
+    <div class="col-12 col-sm-12"  style="width: 94%;margin-left: 3%;">
+        <input class="form-control form-item" id="executionTime" name="executionTime" autocomplete="off">
+    </div>
+</script>
+<script type="text/html" id="weeklyHtmlEnd">
+    <label id="endsOnLabel" class="col-12 col-sm-12 form-item form-label">Ends On:</label>
+    <div class="col-12 col-sm-12">
+        <input class="form-control form-item" id="endsOn" name="endsOn" autocomplete="off">
+    </div>
+</script>
+<script type="text/html" id="disposalHtmlEnd">
+    <label class="col-12 col-sm-12 form-item form-label">Duration:</label>
+    <div class="col-12 col-sm-12" style="display: flex;justify-content: center;align-items: center;">
+        <input style="width: calc(94% - 40px); border-radius: 0.25rem 0 0 0.25rem;" type="number" min="1" class="form-control form-item" id="duration" name="duration" autocomplete="off" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))">
+        <span class="duration-nuit-ele">hr</span>
+    </div>
+</script>
+<script src="/mobile/indent/editTripIndex.js"></script>
+</html>

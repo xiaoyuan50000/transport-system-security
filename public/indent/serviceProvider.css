@@ -1,0 +1,79 @@
+.provider-card {
+    margin-bottom: 20px;
+    min-width: 380px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 6px rgb(112, 112, 112);
+    cursor: pointer;
+}
+
+.provider-card.selected {
+    border: 3px solid #5073c7;
+}
+
+.provider-card .provider-card-title {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    background-color: #2F8483;
+    color: white;
+    padding: 10px;
+}
+
+.provider-card .provider-card-content {
+    padding: 10px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.provider-card .provider-card-content>div{
+    height: 100px;
+}
+.provider-card .provider-card-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    margin: 20px auto;
+}
+
+.provider-card .provider-card-circle-color-1 {
+    background-color: #EE8521;
+}
+
+.provider-card .provider-card-circle-color-2 {
+    background-color: #E44068;
+}
+
+.provider-card .provider-card-circle-color-3 {
+    background-color: #4BCAF6;
+}
+
+.provider-card .provider-card-circle label {
+    line-height: 40px;
+    color: white;
+    font-size: 30px;
+}
+
+.provider-card .provider-card-content .calender-row>div {
+    border-right: solid 1px rgb(220, 220, 220);
+}
+
+.provider-card hr {
+    background-color: rgb(150, 150, 150);
+    height: 3px;
+    border-radius: 2px;
+}
+
+.choose::after{
+    background: url('data:image/svg+xml,<svg fill="%2323C159" t="1657598427236" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3118" width="16" height="16"><path d="M512 1024C230.4 1024 0 793.6 0 512S230.4 0 512 0s512 230.4 512 512-230.4 512-512 512z m0-938.667c-234.667 0-426.667 192-426.667 426.667s192 426.667 426.667 426.667 426.667-192 426.667-426.667S746.667 85.333 512 85.333z" p-id="3119"></path><path d="M469.333 682.667c-12.8 0-21.333-4.267-29.866-12.8l-128-128c-17.067-17.067-17.067-42.667 0-59.734s42.666-17.066 59.733 0l128 128c17.067 17.067 17.067 42.667 0 59.734-8.533 8.533-17.067 12.8-29.867 12.8z" p-id="3120"></path><path d="M469.333 682.667c-12.8 0-21.333-4.267-29.866-12.8-17.067-17.067-17.067-42.667 0-59.734l256-256c17.066-17.066 42.666-17.066 59.733 0s17.067 42.667 0 59.734l-256 256c-8.533 8.533-17.067 12.8-29.867 12.8z" p-id="3121"></path></svg>') center no-repeat;
+    content: "";
+    position: absolute;
+    width: 32px;
+    height: 23px;
+    left: 23px;
+}
+.unchoose::after{
+    background: url('data:image/svg+xml,<svg fill="%23FA6A6D" t="1657598794123" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3361" width="16" height="16"><path d="M512 1024C230.4 1024 0 793.6 0 512S230.4 0 512 0s512 230.4 512 512-230.4 512-512 512z m0-938.667c-234.667 0-426.667 192-426.667 426.667s192 426.667 426.667 426.667 426.667-192 426.667-426.667S746.667 85.333 512 85.333z" p-id="3362"></path><path d="M341.333 725.333c-12.8 0-21.333-4.266-29.866-12.8-17.067-17.066-17.067-42.666 0-59.733L652.8 311.467c17.067-17.067 42.667-17.067 59.733 0s17.067 42.666 0 59.733L371.2 712.533c-8.533 8.534-17.067 12.8-29.867 12.8z" p-id="3363"></path><path d="M682.667 725.333c-12.8 0-21.334-4.266-29.867-12.8L311.467 371.2c-17.067-17.067-17.067-42.667 0-59.733s42.666-17.067 59.733 0L712.533 652.8c17.067 17.067 17.067 42.667 0 59.733-8.533 8.534-17.066 12.8-29.866 12.8z" p-id="3364"></path></svg>') center no-repeat;
+    content: "";
+    position: absolute;
+    width: 32px;
+    height: 23px;
+    left: 23px;
+}

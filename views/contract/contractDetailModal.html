@@ -1,0 +1,128 @@
+<div class="modal fade" id="contractDetailModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0">
+            <div class="modal-header modal-header-background">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row m-2">
+                    <select class="form-select" id="serviceMode" style="display: none;">
+                        <% for(var i=0; i < serviceModeList.length; i++){ %>
+                            <option value="<%- serviceModeList[i].id %>">
+                                <%- serviceModeList[i].serviceTypeName %>(<%- serviceModeList[i].serviceModeName %>)
+                            </option>
+                            <% } %>
+                    </select>
+                    <div class="col-8 offset-2">
+                        <form id="contractDetail-modal-form">
+                            <div class="mb-2 row" style="display: none;">
+                                <label for="contractNo" class="col-sm-5 col-form-label">Contract:</label>
+                                <div class="col-sm-7">
+                                    <select class="form-select" name="contractNo">
+                                        <option value="<%- contract.contractNo %>" selected><%- contract.contractNo %></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="contractPartNo" class="col-sm-5 col-form-label">Contract Part No.:</label>
+                                <div class="col-sm-7">
+                                    <select class="form-select" name="contractPartNo">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="startPoint" class="col-sm-5 col-form-label">Start Point:</label>
+                                <div class="col-sm-7">
+                                    <div class="position-relative">
+                                        <input type="text" class="form-select" name="startPoint" autocomplete="off" readonly id="startPointModal">
+                                        <div class="search-select shadow">
+                                            <input type="text" class="form-control" autocomplete="off" id="search1" placeholder="Search">
+                                            <div class="form-search-select">
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="endPoint" class="col-sm-5 col-form-label">End Point:</label>
+                                <div class="col-sm-7">
+                                    <div class="position-relative">
+                                        <input type="text" class="form-select" name="endPoint" autocomplete="off" readonly id="endPointModal">
+                                        <div class="search-select shadow">
+                                            <input type="text" class="form-control" autocomplete="off" id="search2" placeholder="Search">
+                                            <div class="form-search-select">
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="startDate" class="col-sm-5 col-form-label">Start Date:</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" name="startDate" autocomplete="off" id="contract-detial-start-date">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="endDate" class="col-sm-5 col-form-label">End Date:</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" name="endDate" autocomplete="off" id="contract-detial-end-date">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label class="col-sm-5 col-form-label">Service Mode:</label>
+                                <div class="col-sm-7 position-relative">
+                                    <input class="form-control" name="serviceMode">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="type" class="col-sm-5 col-form-label">Type:</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" name="type" autocomplete="off">
+                                </div>
+                            </div>
+                            <!-- <div class="mb-2 row">
+                                <label for="category" class="col-sm-5 col-form-label">Category:</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" name="category" autocomplete="off">
+                                </div>
+                            </div> -->
+                            <div class="mb-2 row">
+                                <label for="maxTrips" class="col-sm-5 col-form-label">Max Trips:</label>
+                                <div class="col-sm-7">
+                                    <input type="number" class="form-control" name="maxTrips" autocomplete="off" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="maxTripsPerDay" class="col-sm-5 col-form-label">Max Trips Per Day:</label>
+                                <div class="col-sm-7">
+                                    <input type="number" class="form-control" name="maxTripsPerDay" autocomplete="off" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="maxTripsPerMonth" class="col-sm-5 col-form-label">Max Trips Per Month:</label>
+                                <div class="col-sm-7">
+                                    <input type="number" class="form-control" name="maxTripsPerMonth" autocomplete="off" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row justify-content-center pt-3">
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                    <div class="col-auto" id="modal-confirm-1">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/contract/contractDetailModal.js"></script>
+
+<script src="/contract/contractDetailModal-DateSelecor.js"></script>

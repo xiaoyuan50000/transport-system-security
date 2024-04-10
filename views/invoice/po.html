@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>
+        <%=title%>
+    </title>
+    <!-- css -->
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/javascripts/datatables/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/javascripts/jquery-confirm/jquery-confirm.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+    <link rel="stylesheet" href="/indent/indent.css">
+
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <style>
+        .indents-title {
+            font-size: 18px;
+            font-weight: 600;
+            padding-bottom: 15px;
+        }
+
+        .nav-link {
+            color: #204B4D;
+            font-weight: 500;
+            padding: 0.2rem 0rem;
+        }
+
+        .nav-item>.active {
+            border-bottom: 4px solid #308860 !important;
+        }
+
+        .nav-item {
+            display: flex;
+            padding: 0rem 15px 0 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid h-100 p-0 m-0">
+        <div class="shadow scroll-fixed-top">
+            <div class="row h-100 mx-1 justify-content-around">
+                <div class="col align-self-center py-3">
+                    <!-- <h3 class="indents-title main-color pt-3">Purchase Order</h3> -->
+                    <ul class="nav" id="indent-action">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-indent-action="1">Monthly</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-indent-action="2">Indent</a>
+                        </li>
+                    </ul>
+                    <div class="row m-0 mt-3 search-filter justify-content-around align-items-center" id="indent-filter">
+                        <div class="col row p-0">
+                            <div class="col-auto">
+                                <select class="form-select" id="service_provider">
+                                    <option value="">All Service Provider</option>
+                                    <% for(var i=0; i < list.length; i++){ %>
+                                        <option value="<%- list[i].id %>">
+                                            <%- list[i].name %>
+                                        </option>
+                                        <% } %>
+                                </select>
+                            </div>
+                
+                            <div class="col-auto">
+                                <select class="form-select" id="month">
+                                    <option value="">All Month</option>
+                                    <option value="01">01</option>
+                                    <option value="02">02</option>
+                                    <option value="03">03</option>
+                                    <option value="04">04</option>
+                                    <option value="05">05</option>
+                                    <option value="06">06</option>
+                                    <option value="07">07</option>
+                                    <option value="08">08</option>
+                                    <option value="09">09</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <input class="form-control" id="indentId" placeholder="Indent ID">
+                            </div>
+                            <div class="col-auto">
+                                <input type="text" class="form-control" name="execution-date" id="execution-date" placeholder="Execution Date" autocomplete="off">
+                            </div>
+                            <div class="col-auto">
+                                <input type="text" class="form-control" name="created-date" id="created-date" placeholder="Created Date" autocomplete="off">
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-system" id="search-btn">Search</button>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-clear" name="clean-all">Clear all</button>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <button class="btn btn-sm btn-white rounded-pill" onclick="XLSXBulkDownload(this)">
+                                    <img class="me-2" src="../images/xlsx.svg"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="body-bottom">
+            <div class="row m-0 p-3">
+                <div class="table-common table-shadow">
+                    <table class="table table-invoice pb-2 fixed-table">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('detail.html') -%>
+        <!-- js -->
+        <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+        <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/javascripts/datatables/jquery.dataTables.min.js"></script>
+        <script src="/javascripts/datatables/dataTables.bootstrap4.min.js"></script>
+        <script src="/javascripts/axios/axios.min.js"></script>
+        <script src="/javascripts/layui/layui.js"></script>
+        <script src="/javascripts/moment.min.js"></script>
+        <script src="/javascripts/jquery-confirm/jquery-confirm.js"></script>
+        <script src="/javascripts/jquery-confirm/custom-confirm.js"></script>
+        <script src="/js/pageHelper.js"></script>
+        <script src="/invoice/invoiceCommon.js"></script>
+
+        <script src="/invoice/po.js"></script>
+        <script type="text/javascript" src="../resize.js"></script>
+
+</body>
+
+</html>

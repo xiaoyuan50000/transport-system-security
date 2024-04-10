@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Contract Info</title>
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/javascripts/datatables/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/contract/contract.css">
+    <link rel="stylesheet" href="/javascripts/jquery-confirm/jquery-confirm.css">
+    <link rel="stylesheet" href="/javascripts/multiple-select/multiple-select.css">
+</head>
+
+<body>
+    <div class="container-fluid h-100 p-4 m-0">
+        <div class="row m-0 table-common table-shadow" style="padding: 10px;">
+            <div class="col-4">
+                <div class="row my-3">
+                    <div class="col-3">Contract No:</div>
+                    <div class="col-6">
+                        <label id="contractNo"><%- contract.contractNo %></label>
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col-3">Contract Name:</div>
+                    <div class="col-6">
+                        <label><%- contract.name %></label>
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col-3">Start Date:</div>
+                    <div class="col-6">
+                        <label id="contract-start-date"><%- contract.startDate %></label>
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col-3">End Date:</div>
+                    <div class="col-6">
+                        <label id="contract-end-date"><%- contract.endDate %></label>
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col-3">Extension Date:</div>
+                    <div class="col-6">
+                        <label id="contract-extension-date"><%- contract.extensionDate %></label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="row my-3">
+                    <div class="col-4">Company:</div>
+                    <div class="col-6">
+                        <label><%- company %></label>
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col-4">Po Type:</div>
+                    <div class="col-6">
+                        <label><%- contract.poType %></label>
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col-4">Performance Grade:</div>
+                    <div class="col-6">
+                        <label><%- contract.performanceMatrix %></label>
+                    </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col-4">Status:</div>
+                    <div class="col-6">
+                        <label><%- contract.status %></label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <% if(contract.isInvalid == '0'){%>
+                    <div class="float-end" id="btn-action">
+    
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="body-bottom mt-3 position-relative">
+            <div class="btn table-collapse-btn w-100 table-shadow" data-bs-toggle="collapse" href="#collapse3" role="button" aria-expanded="true">
+                <div class="float-start">
+                    <label class="collapse-title">Contract Balance</label>
+                </div>
+            </div>
+            <div class="collapse show" id="collapse3">
+                <div class="row m-0">
+                    <div class="table-collapse-common table-shadow">
+                        <table class="table contract-balance-table pb-2 w-100">
+    
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="body-bottom mt-3 position-relative">
+            <% if(contract.isInvalid == '0' && roleName != 'RF'){%>
+            <div class="add-btn">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-trip rounded-pill" data-bs-toggle="modal" data-bs-target="#contractDetailModal" data-bs-action="new">+ Add</button>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-trip rounded-pill ms-2" onclick="bulkDeleteDetail()">- Delete</button>
+                </div>
+            </div>
+            <% } %>
+            <div class="btn table-collapse-btn w-100 table-shadow" data-bs-toggle="collapse" href="#collapse1" role="button" aria-expanded="true">
+                <div class="float-start">
+                    <label class="collapse-title">Contract Detail</label>
+                </div>
+            </div>
+            <div class="collapse show" id="collapse1">
+                <div class="row m-0">
+                    <div class="table-collapse-common table-shadow">
+                        <table class="table contract-detail-table pb-2 w-100">
+    
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form class="filter-div my-3">
+            <div class="row align-items-center">
+                <div class="col-auto filter-div-btn">
+                    <button type="button" class="btn btn-charge-type active" data-value="Trip,Hour" data-charge-type="1">Trip/Hour</button>
+                    <button type="button" class="btn btn-charge-type" data-value="Block_OTBlock" data-charge-type="3">Block_OTBlock</button>
+                    <button type="button" class="btn btn-charge-type" data-value="Block_OTHourly" data-charge-type="4">Block_OTHourly</button>
+                    <button type="button" class="btn btn-charge-type" data-value="DailyTrip" data-charge-type="6">Daily Trip</button>
+                    <button type="button" class="btn btn-charge-type" data-value="Daily,Weekly,Monthly,Yearly" data-charge-type="5">Mix</button>
+                    <button type="button" class="btn btn-charge-type" data-value="Block_Daily,Block_Daily_1,Block_Daily_2" data-charge-type="7">Block_Daily</button>
+                    <button type="button" class="btn btn-charge-type" data-value="Monthly" data-charge-type="8">Monthly</button>
+                    <button type="button" class="btn btn-charge-type" data-value="Block_Mix" data-charge-type="9">Block_Mix</button>
+                </div>
+            </div>
+            <div class="row align-items-center mt-2">
+            </div>
+        </form>
+        
+        <div class="body-bottom position-relative">
+            <% if(contract.isInvalid == '0' && roleName != 'RF'){%>
+            <div class="add-btn">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-trip rounded-pill" data-bs-toggle="modal" data-bs-target="#contractRateModal" data-bs-action="new">+ Add</button>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-trip rounded-pill ms-2" onclick="bulkDeleteRate()">- Delete</button>
+                </div>
+            </div>
+            <% } %>
+            <div class="btn table-collapse-btn w-100 table-shadow" data-bs-toggle="collapse" href="#collapse2" role="button" aria-expanded="true">
+                <div class="float-start">
+                    <label class="collapse-title">Contract Rate</label>
+                </div>
+            </div>
+            <div class="collapse show" id="collapse2">
+                <div class="row m-0">
+                    <div class="table-collapse-common table-shadow">
+                        <table class="table contract-rate-table pb-2 w-100">
+    
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+    <script src="/javascripts/axios/axios.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/javascripts/datatables/jquery.dataTables.min.js"></script>
+    <script src="/javascripts/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="/javascripts/layui/layui.js"></script>
+    <script src="/moment/moment.js"></script>
+    <script src="/js/pageHelper.js"></script>
+    <script src="/javascripts/jquery-confirm/jquery-confirm.js"></script>
+    <script src="/javascripts/jquery-confirm/custom-confirm.js"></script>
+    <script src="/javascripts/multiple-select/multiple-select.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/contract/contractCommon.js"></script>
+    <script src="/contract/contractDetail.js"></script>
+    <script src="/contract/contractRate.js"></script>
+    <script src="/contract/contractBalance.js"></script>
+    <script type="text/javascript" src="../../resize.js"></script>
+
+    <%- include('contractDetailModal.html') -%>
+    <%- include('contractRateModal.html') -%>
+</body>
+
+</html>

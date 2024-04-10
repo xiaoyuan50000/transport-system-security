@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <!-- css -->
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <style>
+        body {
+            background-color: #EFEFEF;
+        }
+
+        .dashboard-top {
+            height: 60px;
+            background-color: #ffffff !important;
+            border-top: 2px solid #ffffff;
+            color: black;
+            margin: 0 0 20px 0;
+        }
+
+        .dashboard-top select {
+            min-width: 200px;
+            border-radius: 80px;
+            border: 1px solid #000000;
+            color: #000000;
+        }
+
+        .box-shadow {
+            box-shadow: rgba(0, 0, 0, 0.25) 0px 1px 4px;
+        }
+
+        .dashboard-content {
+            padding: 10px 20px;
+        }
+
+        .dashboard-module {
+            margin-bottom: 10px;
+        }
+
+        .title-div {
+            background-color: #ffffff;
+            height: 40px;
+            line-height: 40px;
+            color: black;
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .title-dashboard {
+            background-color: #204B4D !important;
+            color: white !important;
+            margin-bottom: 0px !important;
+        }
+
+        .dashboard-card {
+            background-color: #ffffff;
+        }
+
+        .dashboard-card .background-1 {
+            background-color: #BBD095;
+        }
+
+        .dashboard-card .background-2 {
+            background-color: #9CB0D6;
+        }
+
+        .dashboard-card .background-3 {
+            background-color: #95D0CE;
+        }
+
+        .dashboard-card .background-4 {
+            background-color: #DFAAE6;
+        }
+
+        .dashboard-card .background-5 {
+            background-color: #D0D095;
+        }
+
+        .dashboard-card-title {
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+            color: #000000;
+        }
+
+        .dashboard-card-content {
+            position: relative;
+            height: 150px;
+            line-height: 150px;
+            text-align: center;
+            font-size: 30px;
+        }
+
+        .color-1 {
+            color: #2FA6C3;
+        }
+
+        .color-2 {
+            color: #147B14;
+        }
+
+        .color-3 {
+            color: #4076C0;
+        }
+
+        .color-4 {
+            color: #DE6F35;
+        }
+
+        .color-5 {
+            color: #B537AC;
+        }
+
+        .color-6 {
+            color: #CACACA;
+        }
+
+        sub {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        sup {
+            font-size: 32px;
+        }
+
+        .slash {
+            color: #AAAAAA;
+            font-size: 40px;
+        }
+
+        .dashboard-card-title label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .container-chart {
+            height: 140px;
+            /*min-width: 200px;*/
+        }
+
+        .custom-col-last {
+            width: 40% !important;
+        }
+        .d-text{
+            width: 70px;
+        }
+
+        .container-modal {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: rgb(0 0 0 / 70%);
+            z-index: 9;
+        }
+        .container-modal .container-chart {
+            height: 90%;
+            width: 90%;
+            max-width: none;
+            margin: 1em auto;
+        }
+
+        #container-expenditure-contracts-info {
+            overflow-y: auto;
+            position: absolute;
+            top: 0; 
+            line-height: normal; 
+            right: 15px; 
+            font-size: initial;
+            display:none;
+        }
+        .container-modal #container-expenditure-contracts-info {
+            display: block !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid h-100 p-0 m-0">
+        <div class="dashboard-content">
+            <div class="dashboard-module">
+                <div class="title-div box-shadow title-dashboard">
+                    <label>Dashboard</label>
+                </div>
+                <div class="row align-items-center dashboard-top box-shadow">
+                    <div class="col-auto">
+                        <div><label>Units:</label></div>
+                    </div>
+                    <div class="col-auto">
+                        <div>
+                            <select class="form-select" id="unit-select">
+                                <option value="">All</option>
+                                <% for(var i=0; i < units.length; i++){ %>
+                                    <option value="<%- units[i].id %>">
+                                        <%- units[i].groupName %>
+                                    </option>
+                                    <% } %>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div><label>TSP:</label></div>
+                    </div>
+                    <div class="col-auto">
+                        <div>
+                            <select class="form-select" id="tsp-select">
+                                <option value="">All</option>
+                                <% for(var i=0; i < serviceProviders.length; i++){ %>
+                                    <option value="<%- serviceProviders[i].id %>">
+                                        <%- serviceProviders[i].name %>
+                                    </option>
+                                    <% } %>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div><label>Month:</label></div>
+                    </div>
+                    <div class="col-auto">
+                        <div>
+                            <select class="form-select" id="month-select">
+        
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div><label>Year:</label></div>
+                    </div>
+                    <div class="col-auto">
+                        <div>
+                            <select class="form-select" id="year-select">
+        
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row row-cols-5">
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-1">
+                                <label>Contract Value Balance</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <label class="color-1">$<span id="contract-balance">0</span></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-1">
+                                <label>Total Expenditure By Month</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <div class="chart-container">
+                                    <div class="container-chart" id="container-expenditure-month"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-1">
+                                <label>Expenditure By Purpose</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <div class="chart-container">
+                                    <div class="container-chart" id="container-expenditure-purpose"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-1">
+                                <label>Total Expenditure (Surcharge)</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <div class="chart-container">
+                                    <div class="container-chart" id="container-expenditure-surcharge"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-1">
+                                <label>Expenditure By Contracts</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <div class="container-chart position-relative" id="container-expenditure-contracts">
+                                    
+                                </div>
+                            </div>
+                            <!-- <div class="row m-0">
+                                <div class="col-7">
+                                    <div class="dashboard-card-content">
+                                        <div class="container-chart" id="container-expenditure-contracts"></div>
+                                    </div>
+                                </div>
+                                <div class="col-5 align-self-center">
+                                    <div id="container-expenditure-contracts-info" style="max-height: 140px; overflow-y: auto;">
+                                        
+                                    </div>
+                                </div>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-module">
+                <div class="title-div box-shadow">
+                    <label>Yet To Fulfil</label>
+                </div>
+                <div class="row row-cols-5">
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-2">
+                                <label>Total Resource</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <label class="color-2" id="yet-to-fulfil-total-buses">0</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-2">
+                                <label>Total Indents</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <label class="color-3" id="yet-to-fulfil-total-indents">0</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-2">
+                                <label>Total Resource With Late Indent Surcharges</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <sup class="color-4" id="yet-to-fulfil-incur-surcharge">0</sup>
+                                <span class="slash">/</span>
+                                <sub class="color-2" id="yet-to-fulfil-incur-surcharge-pct">0%</sub>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-2">
+                                <label>Total Resource With Late Indents</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <sup class="color-5" id="yet-to-fulfil-from-units">0</sup>
+                                <span class="slash">/</span>
+                                <sub class="color-2" id="yet-to-fulfil-from-units-pct">0%</sub>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-2">
+                                <label>Indents By Purpose</label>
+                            </div>
+                            <div class="row m-0">
+                                <div class="col-7">
+                                    <div class="dashboard-card-content">
+                                        <div class="container-chart" id="container-yet-to-fulfil-purpose"></div>
+                                    </div>
+                                </div>
+                                <div class="col-5 align-self-center">
+                                    <div>
+                                        <div class="mb-2 d-flex">
+                                            <div class="d-text"><span>Exercise:</span></div>
+                                            <div><span id="yet-to-fulfil-exercise">0</span></div>
+                                        </div>
+                                        <div class="mb-2 d-flex">
+                                            <div class="d-text"><span>Ops:</span></div>
+                                            <div><span id="yet-to-fulfil-ops">0</span></div>
+                                        </div>
+                                        <div class="mb-2 d-flex">
+                                            <div class="d-text"><span>Training:</span></div>
+                                            <div><span id="yet-to-fulfil-training">0</span></div>
+                                        </div>
+                                        <div class="mb-2 d-flex">
+                                            <div class="d-text"><span>Admin:</span></div>
+                                            <div><span id="yet-to-fulfil-admin">0</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-module">
+                <div class="title-div box-shadow">
+                    <label>Fulfilment</label>
+                </div>
+                <div class="row row-cols-5">
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-3">
+                                <label>Total Resource</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <label class="color-2" id="fulfilment-total-buses">0</label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-3">
+                                <label>Total Indents</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <label class="color-3" id="fulfilment-total-indents">0</label>
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-3">
+                                <label>Indents By Purpose</label>
+                            </div>
+                            <div class="row m-0">
+                                <div class="col-7">
+                                    <!-- <div class="dashboard-card-content" style="line-height: 0 !important;">
+                                        <div class="container-chart" id="container-fulfilment-purpose"
+                                            style="height: 115px !important;"></div>
+                                        <div style="height: 25px; line-height:25px;"><span>Total: <label class="color-3" id="fulfilment-total-indents">0</label></span></div>
+                                    </div> -->
+                                    <div class="dashboard-card-content">
+                                        <div class="container-chart" id="container-fulfilment-purpose"></div>
+                                    </div>
+                                </div>
+                                <div class="col-5 align-self-center">
+                                    <div>
+                                        <div class="mb-2 d-flex">
+                                            <div class="d-text"><span>Exercise:</span></div>
+                                            <div><span id="fulfilment-exercise">0</span></div>
+                                        </div>
+                                        <div class="mb-2 d-flex">
+                                            <div class="d-text"><span>Ops:</span></div>
+                                            <div><span id="fulfilment-ops">0</span></div>
+                                        </div>
+                                        <div class="mb-2 d-flex">
+                                            <div class="d-text"><span>Training:</span></div>
+                                            <div><span id="fulfilment-training">0</span></div>
+                                        </div>
+                                        <div class="mb-2 d-flex">
+                                            <div class="d-text"><span>Admin:</span></div>
+                                            <div><span id="fulfilment-admin">0</span></div>
+                                        </div>
+                                        <div class="mb-2 d-flex" style="font-size: 30px;">
+                                            <div class="d-text"><span>Total:</span></div>
+                                            <div><label class="color-3" id="fulfilment-total-indents">0</label></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-3">
+                                <label>Total Late Arrival Resource</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <sup class="color-4" id="fulfilment-late-arrival">0</sup>
+                                <span class="slash">/</span>
+                                <sub class="color-2" id="fulfilment-late-arrival-pct">0%</sub>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-3">
+                                <label>Total No Show Resource</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <sup class="color-5" id="fulfilment-noshow">0</sup>
+                                <span class="slash">/</span>
+                                <sub class="color-2" id="fulfilment-noshow-pct">0%</sub>
+                            </div>
+                        </div>
+                    </div> -->
+
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-3">
+                                <label>Indents By TSP</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <div class="chart-container">
+                                    <div class="container-chart" id="container-fulfilment-bus-company"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-3">
+                                <label>Indents by Contract / Category</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <div class="chart-container">
+                                    <div class="container-chart" id="container-fulfilment-contract"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="dashboard-module">
+                <div class="title-div box-shadow">
+                    <label>Feedback / Incident</label>
+                </div>
+                <div class="row row-cols-5">
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-4">
+                                <label>Total No. Of Bus With Near Miss</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <label class="color-6" id="feedback-total-buses">0</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-4">
+                                <label>Bus With Incident</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <label class="color-6" id="feedback-total-incidents">0</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-4">
+                                <label>Bus Company With Near Miss</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <div class="container-chart" id="container-near-miss"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col custom-col-last">
+                        <div class="dashboard-card box-shadow">
+                            <div class="dashboard-card-title background-4">
+                                <label>Bus Company With Incident</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <div class="container-chart" id="container-incident"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+            <div class="dashboard-module">
+                <div class="title-div box-shadow">
+                    <label>Users Performance</label>
+                </div>
+                <div class="row row-cols-3">
+                    <div class="col">
+                        <div class="dashboard-card box-shadow mb-2">
+                            <div class="dashboard-card-title background-5">
+                                <label>Total Indent with Late Indent Surcharge</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <sup class="color-4" id="performance-late-indent">0</sup>
+                                <span class="slash">/</span>
+                                <sub class="color-2" id="performance-late-indent-pct">0%</sub>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow mb-2">
+                            <div class="dashboard-card-title background-5">
+                                <label>Total Indent with Late Amendment & Cancellation Surcharge</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <sup class="color-4" id="performance-late-amendment">0</sup>
+                                <span class="slash">/</span>
+                                <sub class="color-2" id="performance-late-amendment-pct">0%</sub>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow mb-2">
+                            <div class="dashboard-card-title background-5">
+                                <label>Total Indent with No Show</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <sup class="color-4" id="performance-noshow-indent">0</sup>
+                                <span class="slash">/</span>
+                                <sub class="color-2" id="performance-noshow-indent-pct">0%</sub>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow mb-2">
+                            <div class="dashboard-card-title background-5">
+                                <label>Late Indent with Surcharge</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <div class="chart-container">
+                                    <div class="container-chart" id="container-late-indents"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow mb-2">
+                            <div class="dashboard-card-title background-5">
+                                <label>Indents Amended with Surcharge</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <div class="chart-container">
+                                    <div class="chart-container">
+                                        <div class="container-chart" id="container-bus-amended"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="dashboard-card box-shadow mb-2">
+                            <div class="dashboard-card-title background-5">
+                                <label>Indents Cancellation with Surcharge</label>
+                            </div>
+                            <div class="dashboard-card-content">
+                                <div class="chart-container">
+                                    <div class="chart-container">
+                                        <div class="container-chart" id="container-bus-cancellation"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="/javascripts/axios/axios.min.js"></script>
+    <script type="text/javascript" src="/moment/moment.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="../javascripts/highchart-9.1.2/highcharts.js"></script>
+    <script type="text/javascript" src="../javascripts/highchart-9.1.2/highcharts-more.js"></script>
+
+    <script type="text/javascript" src="/dashboard/dashboard.js"></script>
+    <script type="text/javascript" src="../../resize.js"></script>
+
+</body>
+
+</html>

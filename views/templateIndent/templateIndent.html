@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/javascripts/datatables/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/icon/iconfont.css">
+    <link rel="stylesheet" type="text/css" href="../javascripts/jquery-confirm/jquery-confirm.css">
+    <link rel="stylesheet" href="/indent/indent.css">
+    <link rel="stylesheet" href="/indent/history.css">
+</head>
+
+<body>
+    <div class="container-fluid h-100 p-0 m-0">
+        <div class="shadow">
+            <div class="row mx-0 justify-content-around py-3">
+                
+                <div class="col-12" id="new-indent-div">
+                    <div class="row justify-content-around">
+                        <div class="col" id="indent-filter">
+                            <div class="row align-items-center">
+
+                                <div class="col-auto">
+                                    <input class="form-control" name="templateName" id="templateName"
+                                        oninput="FilterOnChange()" placeholder="Template Indent Name">
+                                </div>
+                                <div class="col-auto">
+                                    <select class="form-select" name="category" id="categoy"
+                                        onchange="FilterOnChange()">
+                                        <option value="">Category: All</option>
+                                        <option value="CV">CV</option>
+                                        <option value="MV">MV</option>
+                                    </select>
+                                </div>
+                                <div class="col-auto">
+                                    <select class="form-select" name="resource" id="resource"
+                                        onchange="FilterOnChange()">
+                                        <option value="">Resource: All</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-auto">
+                                    <button class="btn btn-clear" name="clean-all" onclick="cleanFilterData()">Clear
+                                        all</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="body-bottom">
+            <div class="row m-0" style="padding: 10px;">
+                <div class="table-common table-shadow">
+                    <table class="table template-indent-table pb-2 w-100">
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editTemplateIndentModal" data-bs-backdrop="static" tabindex="-1"
+        aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0">
+                <div class="modal-header modal-header-background">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row m-2">
+                        <div class="card card-body">
+                            <form id="template-indent-right-form">
+                                <div class="row">
+                                    <div>
+                                        <div class="mb-2 row">
+                                            <label for="category" class="col-sm-5 col-form-label">Category:</label>
+                                            <div class="col-sm-7" id="template-indent-category-radio">
+
+                                            </div>
+                                        </div>
+                                        <div class="mb-2 row">
+                                            <label for="serviceType" class="col-sm-5 col-form-label">Resource
+                                                Type:</label>
+                                            <div class="col-sm-7">
+                                                <select class="form-select" name="serviceType">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div id="template-indent-content">
+                                            <div class="mb-2 row">
+                                                <label for="serviceMode" class="col-sm-5 col-form-label">Service
+                                                    Mode:</label>
+                                                <div class="col-sm-7">
+                                                    <select class="form-select" name="serviceMode">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2 row">
+                                                <label for="typeOfVehicle"
+                                                    class="col-sm-5 col-form-label">Resource:</label>
+                                                <div class="col-sm-7">
+                                                    <select class="form-select" name="typeOfVehicle">
+                                                        <option value=""></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2 row" id="template-indent-vehicle-row">
+                                                <label for="noOfVehicle" class="col-sm-5 col-form-label">No. Of
+                                                    Resource:</label>
+                                                <div class="col-sm-7" style="float: right;">
+                                                    <input type="number" min="1" class="form-control" name="noOfVehicle"
+                                                        onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))"
+                                                        autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="mb-2 row" id="template-indent-driver-row"
+                                                style="display: none;">
+                                                <label class="col-sm-5 col-form-label">Driver:</label>
+                                                <div class="col-sm-7 align-self-center" style="float: right;">
+                                                    <input class="form-check-input mt-0" type="checkbox" name="driver">
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-2 row noOfDriver" style="display: none;">
+                                                <label for="noOfDriver" class="col-sm-5 col-form-label">No. Of
+                                                    Driver:</label>
+                                                <div class="col-sm-7" style="float: right;">
+                                                    <input type="number" min="1" class="form-control" name="noOfDriver"
+                                                        autocomplete="off">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center pt-3">
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                        <div class="col-auto action-button">
+                            <button type="button" class="btn btn-system" id="edit-btn">Edit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+    <script src="../javascripts/axios/axios.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/javascripts/datatables/jquery.dataTables.min.js"></script>
+    <script src="/javascripts/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="/javascripts/layui/layui.js"></script>
+    <script src="/moment/moment.js"></script>
+    <script src="/js/pageHelper.js"></script>
+    <script src="/js/review.js"></script>
+    <script src="../javascripts/jquery-confirm/jquery-confirm.js"></script>
+    <script src="../javascripts/jquery-confirm/custom-confirm.js"></script>
+    <script src="/schedule/colors.js"></script>
+
+    <script src="/templateIndent/templateIndent.js"></script>
+    <script type="text/javascript" src="../resize.js"></script>
+
+</body>
+
+</html>

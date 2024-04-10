@@ -1,0 +1,71 @@
+<script type="text/html" id="previewHtml">
+    <div class="row m-0 px-5 pt-5 pb-4">
+        <div class="mb-4 row text-center">
+            <h3 class="fw-bold">Announcement</h3>
+        </div>
+        <div class="mb-3 row">
+            <label class="fw-bold">From 1 Feb onwards, you may choose to log an issue via</label>
+        </div>
+        <div class="row">
+            <p>1. Send issue via <a class="text-decoration-none fw-bold" href="https://mobiushelpdesk.on.spiceworks.com/portal" target="_blank">web portal</a></p>
+            <p>2. Send email to <b>help@mobiushelpdesk.on.spiceworks.com</b></p>
+            <div class="mb-1"><label>3. Call OCC helpdesk</label></div>
+            <div class="mb-1">
+                <label>&nbsp;&nbsp;&nbsp;</label>
+                <label class="text-secondary">Primary OCC contact no.</label>&nbsp;<b>+65 88780365</b>
+            </div>
+            <div class="mb-1">
+                <label>&nbsp;&nbsp;&nbsp;</label>
+                <label class="text-secondary">Secondary OCC contact no.</label>&nbsp;<b>+65 88780866</b></div>
+        </div>
+        <div class="mt-5 row justify-content-center">
+            <div class="col-auto">
+                <button class="btn btn-sm btn-preview-close btn-announcement" id="close-preview">Close</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="editAnnouncementHtml">
+    <div class="row m-0 px-5 pt-5 pb-4">
+        <div class="mb-4 row text-center">
+            <h3 class="fw-bold">Edit Announcement</h3>
+        </div>
+        <div class="row">
+            <div class="col-6"><span class="windowLabel span">HTML</span></div>
+            <div class="col-6"><span class="windowLabel span">PREVIEW</span></div>
+        </div>
+        <div class="row" style="height: 400px; overflow-y:auto;">
+            <div class="col-6 p-2">
+                <textarea class="form-control w-100 h-100" id="text-announcement" style="font-size: 13px;"></textarea>
+                <span class="hidden" style="color: red;" id="text-announcement-error">*Content cannot be empty.</span>
+            </div>
+            <div class="col-6 p-2">
+                <div class="w-100 h-100" style="border:1px solid grey;" id="preview"></div>
+            </div>
+        </div>
+        <div class="mt-5 row justify-content-center">
+            <div class="col-auto">
+                <button class="btn btn-sm btn-secondary btn-announcement" id="close-announcement">Cancel</button>
+            </div>
+            <div class="col-auto ms-2">
+                <button class="btn btn-sm btn-preview-close btn-announcement" id="save-announcement">Save</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="announcementHtml">
+    <div class="row m-0 px-5 pt-5 pb-4">
+        <div class="mb-4 row text-center">
+            <h3 class="fw-bold">Announcement</h3>
+        </div>
+        <div id="announcement">
+        </div>
+        <div class="mt-5 row justify-content-center">
+            <div class="col-auto">
+                <button class="btn btn-sm btn-preview-close btn-announcement">Close</button>
+            </div>
+        </div>
+    </div>
+</script>

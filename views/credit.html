@@ -1,0 +1,110 @@
+<!-- css -->
+<link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="../javascripts/datatables/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="../javascripts/jquery-confirm/jquery-confirm.css">
+<link rel="stylesheet" href="../credit/credit.css">
+<link rel="stylesheet" href="../stylesheets/style.css">
+<!-- js -->
+<script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../javascripts/datatables/jquery.dataTables.min.js"></script>
+<script src="../javascripts/datatables/dataTables.bootstrap4.min.js"></script>
+<script src="../javascripts/axios/axios.min.js"></script>
+<script src="../javascripts/jquery-confirm/jquery-confirm.js"></script>
+<script src="../javascripts/jquery-confirm/custom-confirm.js"></script>
+<script src="../javascripts/highchart-9.1.2/highcharts.js"></script>
+<script src="../javascripts/highchart-9.1.2/highcharts-more.js"></script>
+
+<script src="../credit/credit.js"></script>
+<script src="../js/pageHelper.js"></script>
+
+<body>
+    <div class="container-fluid">
+        <div class="row justify-content-between m-2 bg-white shadow-sm rounded credit-header">
+            <div class="col-md-4">
+                <span class="fontsize20 font-weight-bold ml-3">Credit</span>
+            </div>
+            <div class="col-auto">
+                <div class="row credit-header align-items-center">
+                    <div class="col-auto">
+                        <select class="form-control">
+                            <option value="">Transport Company Name</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-primary ml-3 mr-3">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row m-2 bg-white shadow-sm rounded credit-body">
+            <div class="col-md-4">
+                <div class="row m-3">
+                    <div class="col-md-5">
+                        <div class="row h-100">
+                            <div class="col align-self-center">
+                                <div id="container1"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="row h-100">
+                            <div class="col align-self-center">
+                                <div>
+                                    <img src="../credit/images/warn.png"><span
+                                        class="credit-body-number align-middle">42/140</span>
+                                </div>
+                                <div><span class="credit-waring">Pending/Allocated</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row m-3">
+                    <div class="col-md-5">
+                        <div class="row h-100">
+                            <div class="col align-self-center">
+                                <div id="container2"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="row h-100">
+                            <div class="col align-self-center">
+                                <img src="../credit/images/warn.png"><span
+                                    class="credit-body-number align-middle">50/140</span>
+                                <div><span class="credit-waring">Charged/Allocated</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row m-3">
+                    <div class="col-md-5">
+                        <div class="row h-100">
+                            <div class="col align-self-center">
+                                <div id="container3"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="row h-100">
+                            <div class="col align-self-center">
+                                <img src="../credit/images/warn.png"><span
+                                    class="credit-body-number align-middle">63/140</span>
+                                <div><span class="credit-waring">Spent/Allocated</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row m-2 bg-white shadow-sm rounded credit-foot" style="overflow-y: auto;">
+
+        </div>
+    </div>
+</body>

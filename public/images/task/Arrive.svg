@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15">
+  <g id="Arrive" transform="translate(-258 -240)">
+    <g id="group_10071" data-name="group 10071" transform="translate(-15275 -8175)">
+      <circle id="rock_729" data-name="rock 729" cx="7.5" cy="7.5" r="7.5" transform="translate(15533 8415)" fill="#fff"/>
+    </g>
+    <g id="group_10057" data-name="group 10057" transform="translate(-50.243 -182)">
+      <path id="rate_8042" data-name="rate 8042" d="M164.492,66.687a3.743,3.743,0,0,0-7.192,1.456c0,.857.6,2.068,1.8,3.6a24.725,24.725,0,0,0,1.762,2.02.259.259,0,0,0,.369,0,25.516,25.516,0,0,0,1.762-2.019c1.193-1.53,1.8-2.741,1.8-3.6A3.711,3.711,0,0,0,164.492,66.687Z" transform="translate(154.7 360.336)" fill="#4EB981"/>
+      <path id="rate_8043" data-name="rate 8043" d="M15478.568,8478.047l1.454,1.274,2.32-2.321" transform="translate(-15164.532 -8049.2)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="360" height="215" viewBox="0 0 360 215">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.368" y1="0.057" x2="0.457" y2="0.851" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#40c993"/>
+      <stop offset="1" stop-color="#08794d"/>
+    </linearGradient>
+    <clipPath id="clip-path">
+      <rect id="6608" data-name=" 6608" width="360" height="215" transform="translate(0 0.131)" stroke="#707070" stroke-width="1" fill="url(#linear-gradient)"/>
+    </clipPath>
+  </defs>
+  <g id="bg-2" transform="translate(0 -0.131)" clip-path="url(#clip-path)" style="isolation: isolate">
+    <g id="b_g" data-name="b g" transform="translate(-79.282 0.237)" opacity="0.636">
+      <path id="a" d="M10117.735,13039.321s-23.55,172.3-254.405,164.385,0,121.925,0,121.925l285.817-40.274Z" transform="translate(-9673.48 -13039.321)" stroke="#fff" stroke-width="12" fill="url(#linear-gradient)"/>
+      <g id="a-2" data-name="a" transform="translate(0 78.981)" stroke="#fff" stroke-width="12" fill="url(#linear-gradient)">
+        <circle cx="102.617" cy="102.617" r="102.617" stroke="none"/>
+        <circle cx="102.617" cy="102.617" r="96.617" fill="none"/>
+      </g>
+      <g id="a-3" data-name="a" transform="translate(102.617 166.457)" stroke="#fff" stroke-width="12" fill="url(#linear-gradient)">
+        <circle cx="103.037" cy="103.037" r="103.037" stroke="none"/>
+        <circle cx="103.037" cy="103.037" r="97.037" fill="none"/>
+      </g>
+    </g>
+  </g>
+</svg>

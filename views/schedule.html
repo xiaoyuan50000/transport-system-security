@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+    <link rel="stylesheet" href="/stylesheets/schedule.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/icon/iconfont.css">
+    <link rel="stylesheet" type="text/css" href="../javascripts/tui.calendar-master/tui-time-picker.css">
+    <link rel="stylesheet" type="text/css" href="../javascripts/tui.calendar-master/tui-date-picker.css">
+    <link rel="stylesheet" type="text/css" href="../javascripts/tui.calendar-master/tui-calendar.css">
+    <link rel="stylesheet" type="text/css" href="../javascripts/tui.calendar-master/default.css">
+    <link rel="stylesheet" type="text/css" href="../javascripts/tui.calendar-master/icons.css">
+    <link rel="stylesheet" type="text/css" href="../javascripts/jquery-confirm/jquery-confirm.css">
+    <style>
+        .tui-full-calendar-popup-container{
+            width: inherit !important;
+        }
+        .tui-full-calendar-section-detail {
+            max-height: 300px;
+            overflow-y: auto;
+            width: max-content;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="row w-100 h-100">
+        <div class="col-auto p-5" style="background-color: #F0F0F0;" id="left">
+            <!-- <div style="padding: 16px" class="text-center">
+                <input type="file" class="custom-file-input d-none" required>
+                <button type="button" class="btn btn-primary" id="upload">Upload Schedule</button>
+            </div> -->
+            <div class="pb-3">
+                <button type="button" class="btn btn-system" id="create-request-btn">New Request</button>
+            </div>
+            <div id="lnb-calendars" class="lnb-calendars">
+                <div id="lnb-calendars-viewall">
+                    <div class="lnb-calendars-item">
+                        <label>
+                            <input class="tui-full-calendar-checkbox-square" type="checkbox" value="all" checked>
+                            <span></span>
+                            <label>View all</label>
+                        </label>
+                    </div>
+                </div>
+                <div id="calendarList" class="lnb-calendars-d1">
+                </div>
+            </div>
+        </div>
+        <div class="col-10 p-4">
+            <div id="menu" class="p-3">
+                <span id="renderRange" class="render-range pe-1"></span>
+                <span class="dropdown">
+                    <button id="dropdownMenu-calendarType" class="btn btn-sm move-btn dropdown-toggle" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i id="calendarTypeIcon" class="calendar-icon ic_view_month" style="margin-right: 4px;"></i>
+                        <span id="calendarTypeName">Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu-calendarType">
+                        <!--<li role="presentation">
+                            <a class="dropdown-menu-title" role="menuitem" data-action="toggle-daily">
+                                <i class="calendar-icon ic_view_day"></i>Daily
+                            </a>
+                        </li>-->
+                        <li role="presentation">
+                            <a class="dropdown-item" role="menuitem" data-action="toggle-monthly">
+                                <i class="calendar-icon ic_view_month"></i>Monthly
+                            </a>
+                        </li>
+                        <li role="presentation">
+                            <a class="dropdown-item" role="menuitem" data-action="toggle-weekly">
+                                <i class="calendar-icon ic_view_week"></i>Weekly
+                            </a>
+                        </li>
+                    </ul>
+                </span>
+                <span id="menu-navi" style="margin-left: 10px;">
+                    <button type="button" class="btn btn-sm move-today move-btn"
+                        data-action="move-today">Today</button>
+                    <button type="button" class="btn btn-sm move-day move-btn rounded-circle"
+                        data-action="move-prev">
+                        <i class="calendar-icon ic-arrow-line-left" data-action="move-prev"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm move-day move-btn rounded-circle"
+                        data-action="move-next">
+                        <i class="calendar-icon ic-arrow-line-right" data-action="move-next"></i>
+                    </button>
+                </span>
+            </div>
+            <div id="calendar"></div>
+        </div>
+
+    </div>
+    <%- include('requestModal.html') -%>
+
+    <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+    <script src="../javascripts/axios/axios.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/javascripts/layui/layui.js"></script>
+    <script src="../javascripts/tui.calendar-master/tui-code-snippet.min.js"></script>
+    <script src="../javascripts/tui.calendar-master/tui-time-picker.min.js"></script>
+    <script src="../javascripts/tui.calendar-master/tui-date-picker.min.js"></script>
+    <script src="../javascripts/moment.min.js"></script>
+    <script src="../javascripts/tui.calendar-master/tui-calendar.js"></script>
+    <script src="../javascripts/jquery-confirm/jquery-confirm.js"></script>
+    <script src="../javascripts/jquery-confirm/custom-confirm.js"></script>
+
+    <script src="../schedule/colors.js"></script>
+    <script src="../schedule/templates.js"></script>
+    <script src="../schedule/calendars.js"></script>
+    <script src="../schedule/schedule.js"></script>
+    <script src="../schedule/app.js"></script>
+
+    <script src="/job/job-common.js"></script>
+</body>
+
+</html>

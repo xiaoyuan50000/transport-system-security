@@ -1,0 +1,91 @@
+body {
+    background-image: url("../images/login/bg.svg");
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+.login-div {
+    margin: auto; 
+    top: 0; 
+    left: 0; 
+    bottom: 0;
+    right: 0;
+    height: 380px; 
+    width: 950px; 
+    border-radius: 20px;
+    min-width: 600px;
+}
+.login-div label {
+    margin-bottom: 0;
+}
+.login-content {
+    margin: auto; 
+    position: relative; 
+    width: 90%;
+    color: gray;
+    font-weight: 500;
+}
+.btn-login {
+    border-radius: 20px;
+}
+.login-bg {
+    background-image: url("../images/login/bg.png");
+    background-size: 100% 100%;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    image-rendering: -webkit-optimize-contrast;
+}
+.login-bg>div {
+    /* background-color: rgb(40, 40, 40);  */
+    height: 100%; 
+    /* opacity: 0.8;  */
+    border-bottom-right-radius: 20px; 
+    border-top-right-radius: 20px;
+    text-align: center;
+}
+.login-bg img {
+    width: 120px;
+    z-index: 9999;
+}
+.btn-login {
+    background-color: black;
+    border-color: black;
+    border-radius: 20px;
+    font-size: 15px;
+}
+.btn-login:hover, .btn-login-singpass:hover {
+    background-color: #3A5EC5; 
+    border-color: #3A5EC5;
+}
+.btn-login-singpass {
+    background-color: #A12426;
+    border-color: #A12426;
+    border-radius: 20px;
+    font-size: 15px;
+}
+.btn-register-account {
+    background-color: #204B4D;
+    border-color: #204B4D;
+    border-radius: 20px;
+    font-size: 15px;
+}
+input.form-control {
+    border-width: 0;
+    border-bottom: solid 2px rgb(200, 200, 200);
+    border-radius: 0;
+    color: gray;
+}
+.form-control:focus{
+    border-color:#3A5EC5;
+    box-shadow: none;
+    color: #3A5EC5;
+}
+.label-focus {
+    color: #3A5EC5;
+}
+
+.div-img {
+    position: relative;
+    top: 12%;
+}

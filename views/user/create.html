@@ -1,0 +1,137 @@
+<div class="modal fade" id="CreateUserModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0">
+            <div class="modal-header modal-header-background">
+                <h5 class="modal-title" id="exampleModalLabel">User Management</h5>
+                <button type="button" class="btn-close btn-close-white btn-cancel"></button>
+            </div>
+            <div class="modal-body">
+                <form class="needs-validation was-validated" id="user-form" novalidate>
+                    <input class="hidden" type="text" id="user-id" name="id">
+                    <div class="row p-3">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">NRIC</label>
+                                <input type="text" class="form-control" name="nric" autocomplete="off" required
+                                    oninput="check(this)" id="user-nric">
+                                <div class="invalid-feedback">
+                                    NRIC is mandatory.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">Name</label>
+                                <input type="text" class="form-control" name="username" autocomplete="off" required
+                                    oninput="check(this)" id="user-username">
+                                <div class="invalid-feedback">
+                                    Name is mandatory.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Mobile Number</label>
+                                <input type="text" class="form-control" name="mobileNumber" autocomplete="off" required
+                                    onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))"
+                                    oninput="check(this)" id="user-mobileNumber">
+                                <div class="invalid-feedback">
+                                    Mobile Number is mandatory.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="text" class="form-control" name="email" autocomplete="off" required
+                                    oninput="check(this)" id="user-email">
+                                <div class="invalid-feedback">
+                                    Email is mandatory.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Operationally Ready Date (ORD)</label>
+                                <input type="text" class="form-control" name="ord" autocomplete="off" required
+                                    oninput="check(this)" id="user-ord">
+                                <div class="invalid-feedback">
+                                    ORD is mandatory.
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Password</label>
+                                <input type="password" class="form-control" name="password" autocomplete="off" required
+                                    oninput="check(this)" id="user-password">
+                                <div class="invalid-feedback">
+                                    Password is mandatory.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" name="confirmPassword" autocomplete="off"
+                                    required oninput="check(this)" id="user-confirmPassword">
+                                <div class="invalid-feedback">
+                                    Confirm Password is mandatory.
+                                </div>
+                            </div>
+                        </div> -->
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Role</label>
+                                <select class="form-select" name="role">
+                                    <option value=""></option>
+                                    <% for(var i=0; i < role.length; i++){ %>
+                                        <option value="<%- role[i].id %>"><%- role[i].roleName %></option>
+                                        <% } %>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12" id="group">
+                            <div class="mb-3">
+                                <label class="form-label">Group</label>
+                                <select class="form-select" name="group">
+                                    <option value=""></option>
+                                    <% for(var i=0; i < group.length; i++){ %>
+                                        <option value="<%- group[i].id %>"><%- group[i].groupName %></option>
+                                        <% } %>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12" id="serviceProvider" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Service Provider</label>
+                                <select class="form-select" multiple name="serviceProvider" style="min-height: 200px;">
+                                    <option value=""></option>
+                                    <% for(var i=0; i < serviceProvider.length; i++){ %>
+                                        <option value="<%- serviceProvider[i].id %>"><%- serviceProvider[i].name %>
+                                        </option>
+                                        <% } %>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12" id="platformType">
+
+                        </div>
+                    </div>
+                    <div class="row p-3">
+                    </div>
+
+                    <div class="row justify-content-center pt-3">
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-outline-secondary btn-cancel">Cancel</button>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-system btn-save">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

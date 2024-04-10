@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Wallet</title>
+    <!-- css -->
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/javascripts/datatables/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/budget/style.css">
+    <style>
+        body {
+            background-color: #F3F3F3;
+        }
+    </style>
+</head>
+
+<body data-id="<%= walletId%>">
+    <div class="container-fluid h-100 p-0 m-0">
+        <div class="wallet-top">
+            <div class="row mb-3" id="wallet-search">
+                <div class="col-3">
+                    <select class="form-select" name="funding">
+                        <option value="">Central/Unit</option>
+                        <option value="Central">Central</option>
+                        <option value="Unit">Unit</option>
+                    </select>
+                </div>
+                <div class="col-3">
+                    <input class="form-control" type="text" name="walletName" autocomplete="off" placeholder="Wallet Name">
+                </div>
+            </div>
+            <div class="row m-0 p-0 position-relative">
+                <img id="l-scroll-btn" src="../images/budget/left.svg">
+                <img id="r-scroll-btn" src="../images/budget/right.svg">
+                <div class="p-0 table-wrappler" id="table-wrappler">
+                    <table class="wallet-table w-100"></table>
+                </div>
+            </div>
+        </div>
+        <div class="wallet-content">
+            <div class="row h-100">
+                <div class="col-xxl-5 col-xl-5 col-lg-5 col-md-12 col-sm-12">
+                    <div class="wallet-detail-container card-shadow">
+                        <div class="wallet-detail-title">
+                            <div class="ps-3">
+                                <span class="fw-bold" id="wallet-detail-name"></span>
+                            </div>
+                            <div>
+                                <img class="me-2" role="button" id="income-btn" style="width: 25px;" src="../images/budget/income.svg">
+                                <img class="me-2" role="button" id="payout-btn" style="width: 25px;" src="../images/budget/payout.svg">
+                                <button class="me-2 btn btn-sm btn-seemore" id="see-amount-records">
+                                    <img style="width: 16px;" src="../images/budget/more.svg">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="wallet-detail-content p-5">
+                            <div class="row g-0">
+                                <div class="col-4">
+                                    <div><img style="width: 25px;" src="../images/budget/Actual-1.svg"></div>
+                                    <div><span class="fw-bold">Actual</span></div>
+                                    <div class="mt-1 mb-2 wallet-detail-describe"><span class="describe-color">(Total - Spent)</span></div>
+                                    <div class="momey-income-color fw-bold"><span>$ </span><span id="wallet-detail-actual">00.00</span></div>
+                                </div>
+                                <div class="col-4">
+                                    <div><img style="width: 25px;" src="../images/budget/Holding-1.svg"></div>
+                                    <div><span class="fw-bold">Holding</span></div>
+                                    <div class="mt-1 mb-2 wallet-detail-describe"></div>
+                                    <div class="momey-income-color fw-bold"><span>$ </span><span id="wallet-detail-holding">00.00</span></div>
+                                </div>
+                                <div class="col-4">
+                                    <div><img style="width: 25px;" src="../images/budget/Projection-1.svg"></div>
+                                    <div><span class="fw-bold">Projection</span></div>
+                                    <div class="mt-1 mb-2 wallet-detail-describe"><span class="describe-color">(Total - Spent- Holding)</span></div>
+                                    <div class="momey-income-color fw-bold"><span>$ </span><span id="wallet-detail-projection">00.00</span></div>
+                                </div>
+                            </div>
+                            <div class="row my-2"><div class="col-12"><hr></div></div>
+                            <div class="row">
+                                <div class="col-auto">
+                                    <select class="form-select" name="month" onchange="ChangeChartsInfo()">
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row align-items-center mt-2">
+                                <div id="wallet-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xxl-7 col-xl-7 col-lg-7 col-md-12 col-sm-12">
+                    <div class="wallet-detail-container card-shadow">
+                        <div class="wallet-detail-title">
+                            <div class="ps-3">
+                                <span class="fw-bold">Latest Transactions</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="p-4">
+                                <table class="table latestTransaction-table w-100 px-5"></table>
+                                <div class="w-100 text-center" id="seemore">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/html" id="walletCardHtml">
+        <div class="wallet-card w-create card-shadow" data-index="{{index}}" data-id="{{id}}" onclick="{{clickEvent}}">
+            <div class="row w-100 align-items-center mb-4">
+                <div class="col-12">
+                    <div class="w-inline">
+                        <img src="../images/budget/Wallet.svg">
+                        <span class="fw-bold">{{walletName}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row w-100">
+                <div class="col-6">
+                    <div class="w-inline">
+                        <img src="../images/budget/Spent.svg">
+                        <span class="describe-color">Spent</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="w-inline">
+                        <img src="../images/budget/Projection-2.svg">
+                        <span class="describe-color">Actual</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <span class="pl-1 momey-income-color mt-2 fw-bold">{{spent}}</span>
+                </div>
+                <div class="col-6">
+                    <span class="pl-1 momey-income-color mt-2 fw-bold">{{actual}}</span>
+                </div>
+            </div>
+        </div>
+    </script>
+    <%- include('walletModal.html') -%>
+
+    <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="/javascripts/datatables/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/javascripts/datatables/dataTables.bootstrap4.min.js"></script>
+    <script type="text/javascript" src="/javascripts/axios/axios.min.js"></script>
+    <script type="text/javascript" src="/moment/moment.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="../javascripts/highchart-9.1.2/highcharts.js"></script>
+    <script type="text/javascript" src="../javascripts/highchart-9.1.2/highcharts-more.js"></script>
+    <script type="text/javascript" src="/js/pageHelper.js"></script>
+    <script type="text/javascript" src="/budget/wallet-charts.js"></script>
+    <script type="text/javascript" src="/budget/wallet.js"></script>
+    <script type="text/javascript" src="/budget/latest-transactions.js"></script>
+    <script type="text/javascript" src="../resize.js"></script>
+
+</body>
+
+</html>

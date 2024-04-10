@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>Service Provider</title>
+		<link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/javascripts/datatables/dataTables.bootstrap4.min.css">
+		<link rel="stylesheet" href="/stylesheets/style.css">
+		<link rel="stylesheet" href="/indent/serviceProvider.css">
+
+		<script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+		<script type="text/javascript" src="/axios/dist/axios.min.js"></script>
+		<script type="text/javascript" src="/javascripts/datatables/jquery.dataTables.min.js"></script>
+		<script type="text/javascript" src="/javascripts/datatables/dataTables.bootstrap4.min.js"></script>
+		<script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	</head>
+
+	<body>
+		<div class="container-fluid p-5 pt-3">
+			<div class="row justify-content-between">
+				<div class="col-auto">
+					<h3>Service Provider</h3>
+				</div>
+				<div class="col-auto">
+					<div class="row align-items-center">
+						<div class="col-auto">
+							<select class="form-select">
+								<option value="1">Performance A</option>
+								<option value="2">Performance B</option>
+								<option value="3">Performance C</option>
+							</select>
+						</div>
+						<div class="col-auto px-0">
+							<label class="ms-4" style="font-size: 18px;">Price:</label>
+						</div>
+						<div class="col-auto">
+							<img style="cursor: pointer;" class="order-price" src="./images/provider/Price 1.svg" data-order="asc">
+						</div>
+						<div class="col-auto">
+							<img style="cursor: pointer;" class="order-price" src="./images/provider/Price 2.svg" data-order="desc">
+						</div>
+					</div>
+				</div>
+					
+			</div>
+			
+			<div class="row mt-2" id="service-provider-content">
+				
+			</div>
+		</div>
+		<%- include('../indent/serviceProviderTemplate.html') -%>
+		<!-- <script>
+			const GetAll = async function(sortBy, sort){
+				await axios.post('/getAllServiceProvider',{sortBy: sortBy, sort:sort}).then(res=>{
+					$("#service-provider-content").empty()
+					for(var item of res.data.data){
+						let html = $("#serviceProviderHtml").html()
+						.replace("{{NO.}}", item.name)
+						.replace("{{price}}", item.perTrip)
+						.replace("{{vehicleType}}", item.typeOfVehicle)
+						.replace("{{contractRateId}}", item.id)
+						.replace("{{isSelected}}", "")
+						.replace("{{category}}", item.category.substr(item.category.length - 1, 1))
+						$("#service-provider-content").append(html)
+					}
+				})
+			}
+			$(".order-price").on("click",function(){
+				let order = $(this).data("order")
+				GetAll("perTrip", order)
+			})
+			GetAll()
+		</script> -->
+	</body>
+</html>

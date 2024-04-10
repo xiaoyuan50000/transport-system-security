@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/javascripts/datatables/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/icon/iconfont.css">
+    <link rel="stylesheet" type="text/css" href="../javascripts/jquery-confirm/jquery-confirm.css">
+    <link rel="stylesheet" href="/indent/indent.css">
+    <link rel="stylesheet" href="/indent/history.css">
+    <style>
+        .layui-laydate-list>li:last {
+            display: none;
+        }
+       .layui-laydate-list>li {
+            width: 50%;
+        }
+        .layui-laydate-list ol {
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid h-100 p-0 m-0">
+        <div class="shadow scroll-fixed-top">
+            <div class="row mx-0 justify-content-around py-3">
+                <div class="col-12 align-self-center">
+                    <!-- <div class="indents-title main-color">Tasks</div> -->
+                    <ul class="nav" id="indent-action">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-indent-action="1">All jobs</a>
+                            <span class="badge bg-transparent" id="all-count">0</span>
+                        </li>
+                        <li class="nav-item task-nav-item-pendingmy" style="display: none;">
+                            <a class="nav-link" href="#" data-indent-action="2">Pending my action</a>
+                            <span class="badge bg-transparent" id="pending-count">0</span>
+                        </li>
+                    </ul>
+                    <div class="col-12 pt-3" id="new-indent-div">
+                        <div class="row justify-content-around">
+                            <div class="col" id="indent-filter">
+                                <div class="row align-items-center">
+                                    <div class="col-auto pe-0">
+                                        <select class="form-select" name="task-status" id="task-status">
+                                            <option value="">Task Status: All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-auto pe-0">
+                                        <select class="form-select" name="indent-vehicle-type" id="indent-vehicle-type">
+                                            <option value="">Resource: All</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-auto pe-0">
+                                        <input type="text" class="form-control" name="execution-date" id="execution-date" placeholder="Execution Date" autocomplete="off">
+                                    </div>
+                                    <div class="col-auto pe-0">
+                                        <input type="text" class="form-control input-width" name="created-date" id="created-date" placeholder="Created Date" autocomplete="off">
+                                    </div>
+                                    <div class="col-auto pe-0">
+                                        <input type="text" class="form-control input-width" name="trip-no" id="trip-no" placeholder="Trip ID" autocomplete="off">
+                                    </div>
+                                    <div class="col-auto pe-0">
+                                        <div class="position-relative" id="unit1">
+                                            <input type="text" class="form-select input-width" id="indent-unit" name="indent-unit" autocomplete="off" readonly placeholder="Unit">
+                                            <div class="unit-search-select shadow">
+                                                <input type="text" class="form-control" autocomplete="off" id="search-unit1" placeholder="Search">
+                                                <div class="form-search-select">
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto pe-0">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="mvCheckbox">
+                                            <label class="form-check-label" for="mvCheckbox" style="margin-top: 3px;">
+                                              MV
+                                            </label>
+                                          </div>
+                                    </div>
+                                    <div class="col-auto pe-0">
+                                        <select id="batchAssignTspSelect" onchange="reloadJobList()" class="form-select">
+                                        </select>
+                                    </div>
+                                    <div class="col-auto pe-0" style="display: none;">
+                                        <select id="hubSelect" class="form-select" disabled>
+                                        </select>
+                                    </div>
+                                    <div class="col-auto pe-0" style="display: none;">
+                                        <select id="nodeSelect" onchange="reloadJobList()" class="form-select" disabled>
+                                        </select>
+                                    </div>
+                                    <div class="col-auto pe-0">
+                                        <button class="btn btn-clear" name="clean-all">Clear all</button>
+                                    </div>
+                                    <div class="col-auto assign-tsp-div">
+                                        <button class="btn btn-system new-indent-btn" onclick="bulkAssignTsp()">Assign TSP</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="body-bottom">
+            <div class="row m-0" style="padding: 10px;">
+                <div class="table-common table-shadow">
+                    <table class="table jobTask-table pb-2 w-100 fixed-table" >
+                        
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('template.html') -%>
+
+    <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+    <script src="../javascripts/axios/axios.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/javascripts/datatables/jquery.dataTables.min.js"></script>
+    <script src="/javascripts/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="/javascripts/layui/layui.js"></script>
+    <script src="/moment/moment.js"></script>
+    <script src="/js/pageHelper.js"></script>
+    <script src="../javascripts/jquery-confirm/jquery-confirm.js"></script>
+    <script src="../javascripts/jquery-confirm/custom-confirm.js"></script>
+    <script src="/job/job-common.js"></script>
+    <script src="/schedule/colors.js"></script>
+    
+    <script src="/indent/jobTaskFilter.js"></script>
+    <script src="/indent/dateSelector.js"></script>
+    <script src="/indent/indentAction2.js"></script>
+    <script src="/js/userValidation.js"></script>
+    <script src="/indent/jobTask.js"></script>
+    <script src="/indent/commonEditTask.js"></script>
+    <script src="/indent/commonIndent.js"></script>
+    <script src="/indent/jobTask-index.js"></script>
+    <script type="text/javascript" src="../resize.js"></script>
+
+
+</body>
+
+
+
+</html>

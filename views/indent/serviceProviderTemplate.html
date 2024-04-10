@@ -1,0 +1,64 @@
+<script type="text/html" id="serviceProviderHtml">
+    <div class="col-4">
+        <div class="provider-card {{isSelected}}">
+            <div class="provider-card-title">
+                <label>{{NO.}}</label>
+            </div>
+            <div class="provider-card-content">
+                <input type="hidden" value="{{contractPartNo}}">
+                <div class="row py-2 text-center align-items-center calender-row">
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-7">
+                                <img class="my-2" src="/images/provider/Performance Grading.svg"><br>
+                                <label>Performance</label>
+                            </div>
+                            <div class="col-5">
+                                <div class="provider-card-circle provider-card-circle-color-2">
+                                <label>{{category}}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6" style="border-right: 0;">
+                        <div class="row align-items-center text-center">
+                            <div class="col-4">
+                                <img src="/images/provider/price.svg">
+                            </div>
+                            <div class="col-8 fw-bold">
+                                <div><label>${{price}}</label></div>
+                                <div><label>(Per Trip)</label></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row py-1 text-center align-items-center calender-row">
+                    <div class="col-6 h-100 align-items-center text-center">
+                        <div class="row align-items-center h-100">
+                            <div class="col-auto ps-5 pe-0">
+                                <img src="/images/provider/bus.svg">
+                            </div>
+                            <div class="col-6 ps-0">
+                                <label class="fw-bold">{{vehicleType}}</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6" style="border-right: 0;">
+                        <div class="row align-items-center text-center">
+                            <div class="col-4">
+                                <img src="/images/provider/Last Incident.svg">
+                            </div>
+                            <div class="col-8">
+                                <div><label>Last Incident</label></div>
+                                <div><label>12/05/2022</label></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+

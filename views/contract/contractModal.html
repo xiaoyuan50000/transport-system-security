@@ -1,0 +1,216 @@
+<div class="modal fade" id="contractModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0">
+            <div class="modal-header modal-header-background">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row m-2">
+                    <div class="col-6">
+                        <form id="contract-modal-form">
+                            <div class="mb-2 row">
+                                <label for="contractNo" class="col-sm-4 col-form-label">Contract No.:</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="contractNo" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="contractName" class="col-sm-4 col-form-label">Contract Name:</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="contractName" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="startDate" class="col-sm-4 col-form-label">Start Date:</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="startDate" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="endDate" class="col-sm-4 col-form-label">End Date:</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="endDate" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="extensionDate" class="col-sm-4 col-form-label">Extension Date:</label>
+                                <div class="col-sm-8" id="extensionDate-div">
+                                    <input class="form-control" name="extensionDate" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="serviceProvider" class="col-sm-4 col-form-label">Company:</label>
+                                <div class="col-sm-8">
+                                    <select class="form-select" name="serviceProvider" id="modal-company">
+                                        <option value=""></option>
+                                        <% for(var i=0; i < serviceProviderList.length; i++){ %>
+                                            <option value="<%- serviceProviderList[i].id %>">
+                                                <%- serviceProviderList[i].name %>
+                                            </option>
+                                        <% } %>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-2 row">
+                                <label for="serviceMode" class="col-sm-4 col-form-label">Service Mode:</label>
+                                <div class="col-sm-8 position-relative">
+                                    <!-- <select class="form-select" multiple name="serviceMode" style="min-height: 200px;">
+                                        <% for(var i=0; i < serviceModeList.length; i++){ %>
+                                            <option value="<%- serviceModeList[i].id %>">
+                                                <%- serviceModeList[i].serviceTypeName %>(<%- serviceModeList[i].serviceModeName %>)
+                                            </option>
+                                            <% } %>
+                                    </select> -->
+                                    <input class="form-control" name="serviceMode">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="poType" class="col-sm-4 col-form-label">PO Type:</label>
+                                <div class="col-sm-8 position-relative">
+                                    <input class="form-control" name="poType">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label class="col-sm-4 col-form-label">Performance Matrix:</label>
+                                <div class="col-sm-8">
+                                    <ul class="list-group text-center">
+                                        <li class="list-group-item" style="background-color: rgb(212, 233, 233);">
+                                            <div class="row align-items-center">
+                                                <div class="col-4">Performance Grading</div>
+                                                <div class="col-4">Service Level</div>
+                                                <div class="col-4">No. Of "No Show" Trips</div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="row align-items-center">
+                                                <div class="col-4">A</div>
+                                                <div class="col-4"><input type="text" class="form-control" name="serviceLevelA" autocomplete="off"></div>
+                                                <div class="col-4"><input type="text" class="form-control" name="noshowTripsA" autocomplete="off"></div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="row align-items-center">
+                                                <div class="col-4">B</div>
+                                                <div class="col-4"><input type="text" class="form-control" name="serviceLevelB" autocomplete="off"></div>
+                                                <div class="col-4"><input type="text" class="form-control" name="noshowTripsB" autocomplete="off"></div>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <div class="row align-items-center">
+                                                <div class="col-4">C</div>
+                                                <div class="col-4"><input type="text" class="form-control" name="serviceLevelC" autocomplete="off"></div>
+                                                <div class="col-4"><input type="text" class="form-control" name="noshowTripsC" autocomplete="off"></div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="allocateCM" class="col-sm-4 col-form-label">Allocate CM:</label>
+                                <div class="col-sm-8 position-relative">
+                                    <select class="form-select" name="allocateCM">
+                                        <% for(var i=0; i < roleCMList.length; i++){ %>
+                                            <option value="<%- roleCMList[i].id %>"><%- roleCMList[i].username %></option>
+                                        <% } %>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-6">
+                        <div class="mb-2 row align-items-center">
+                            <label class="col-sm-5 col-form-label">Spending Alert Yellow:</label>
+                            <div class="col-sm-6">
+                                <div id="slide-yellow" class="demo-slider" data-value="0"></div>
+                            </div>
+                            <div class="col-sm-1">
+                                <span id="slide-yellow-value" style="color: #E9C341;">0</span>
+                            </div>
+                        </div>
+                        <div class="mb-2 row align-items-center">
+                            <label class="col-sm-5 col-form-label">Spending Alert Orange:</label>
+                            <div class="col-sm-6">
+                                <div id="slide-orange" class="demo-slider" data-value="0"></div>
+                            </div>
+                            <div class="col-sm-1">
+                                <span id="slide-orange-value" style="color: #FF8040;">0</span>
+                            </div>
+                        </div>
+                        <div class="mb-2 row align-items-center">
+                            <label class="col-sm-5 col-form-label">Spending Alert Red:</label>
+                            <div class="col-sm-6">
+                                <div id="slide-red" class="demo-slider" data-value="0"></div>
+                            </div>
+                            <div class="col-sm-1">
+                                <span id="slide-red-value" style="color: #FF0000;">0</span>
+                            </div>
+                        </div>
+                        <div class="mb-2 row rounded-2 m-0" style="border: 1px solid #dee2e6;">
+                            <table class="table table-borderless" id="annual-table">
+                                <thead>
+                                    <tr>
+                                        <td></td>
+                                        <td>Start Date</td>
+                                        <td>End Date</td>
+                                        <td>Total</td>
+                                        <td><button type="button" class="btn btn-outline-dark w-100" onclick="AddAnnualContract()" id="btn-add-balance">+</button></td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Total Contract</td>
+                                        <td><input class="form-control" value="" disabled id="total-start-date"></td>
+                                        <td><input class="form-control" value="" disabled id="total-end-date"></td>
+                                        <td><input autocomplete="off" class="form-control" value="" oninput="CheckOnInput(this)" id="total-value"></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center pt-3">
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                    <div class="col-auto" id="modal-confirm">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="AnnualTableHtml">
+    <thead>
+        <tr>
+            <td></td>
+            <td>Start Date</td>
+            <td>End Date</td>
+            <td>Total</td>
+            <td><button type="button" class="btn btn-outline-dark w-100" onclick="AddAnnualContract()" id="btn-add-balance">+</button></td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Total Contract</td>
+            <td><input class="form-control" value="" disabled id="total-start-date"></td>
+            <td><input class="form-control" value="" disabled id="total-end-date"></td>
+            <td data-id=""><input autocomplete="off" class="form-control" value="" oninput="CheckOnInput(this)" id="total-value" ></td>
+            <td></td>
+        </tr>
+    </tbody>
+</script>
+
+<script type="text/html" id="AnnualTrHtml">
+    <tr>
+        <td>Annual Contract</td>
+        <td><input class="form-control" value="" id="annual-start-date-{{id}}" disabled></td>
+        <td><input class="form-control" value="" id="annual-end-date-{{id}}" readonly></td>
+        <td data-id="{{contract-balance-id}}"><input autocomplete="off" class="form-control" value="" oninput="CheckOnInput(this)" id="annual-total-{{id}}" ></td>
+        <td><button type="button" class="btn btn-outline-dark w-100" onclick="DeleteAnnualRow(this)">-</button></td>
+    </tr>
+</script>

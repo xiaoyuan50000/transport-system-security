@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <link rel="icon" href="data:;base64,=">
+    <link rel="stylesheet" href="/stylesheets/mobile.css">
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+    <link rel="stylesheet" href="/stylesheets/icon/iconfont.css">
+    <link rel="stylesheet" href="/javascripts/jquery-confirm/jquery-confirm.css">
+
+    <script src="/javascripts/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/javascripts/axios/axios.min.js"></script>
+    <script src="/javascripts/moment.min.js"></script>
+    <script src="/javascripts/layui/layui.js"></script>
+    <script src="/javascripts/jquery-confirm/jquery-confirm.js"></script>
+    <script src="/javascripts/jquery-confirm/custom-confirm.js"></script>
+
+    <script src="/job/job-common.js"></script>
+    <script src="/mobile/indent/editIndent.js"></script>
+    <script src="/mobile/common.js"></script>
+    <title><%= title%></title>
+    <style>
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .index-head {
+            height: 60px;
+            background-color: #204b4d;
+            margin: 0;
+        }
+        .create-nav {
+            width: 90%;
+            height: 35px;
+            border: 1px solid #4EB981;
+            border-radius: 20px;
+            margin-top: 15px;
+            margin-left: 5%;
+        }
+        .create-info-item {
+            width: 50%;
+            height: 34px;
+            border-radius: 20px;
+            color: #6ab196;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .create-info-item.active {
+            background-color: #4EB981;
+            background-size: 100%;
+            color: white;
+        }
+        .info-nav {
+            width: 94%;
+            height: 30px;
+            background-color: #c0f4e0;
+            background-size: 100%;
+            border-radius: 5px;
+            margin-top: 15px;
+            margin-left: 3%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .info-nav label {
+            margin: 0px;
+            padding: 0px;
+        }
+        .content-div {
+            width: 100vw;
+            height: calc(100% - 115px);
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        .info-div {
+            width: 94%;
+            margin-left: 3%;
+            border: 1px solid white;
+            border-radius: 5px;
+            background-color: white;
+            margin-top: 20px;
+        }
+        .form-item {
+            width: 94%;
+            margin-left: 3%;
+        }
+        .form-label {
+            margin-top: 5px;
+            margin-bottom: 2px;
+        }
+        .indent-opt-btn {
+            width: 80%;
+            height: 33px;
+            border: 1px solid #204b4d;
+            background-color: #204b4d;
+            border-radius: 20px;
+            margin-top: 20px;
+            margin-left: 10%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body style="background-color: #f3f3f3;">
+    <div class="index-head row">
+        <div class="row" style="width: 100%; height: 60px; margin: 0;">
+            <div class="col-1 col-sm-1" style="display: flex;justify-content: center;align-items: center;">
+                <label onclick="backToIndentList();" style="color: white;font-weight:bolder;font-size: xx-large;margin-bottom: 3px;">
+                    <img style="padding: 0 5px;" src="/images/indent/mobileRsp/left.svg">
+                </label>
+            </div>
+            <div class="col-10 col-sm-10" style="display: flex;justify-content: center;align-items: center;">
+                <label class="edit-indent-title-label" style="color: white;font-weight:bolder;font-size: large; margin-bottom: 0px;">
+                </label>
+            </div>
+            <div class="col-1 col-sm-1" style="text-align: right;"></div>
+        </div>
+    </div>
+    <div class="content-div">
+        <div class="info-div">
+            <div class = "info-form base-info-form">
+                <form id="base-task-form">
+                    <div id="groupSelect" class="mb-2 row">
+
+                    </div>
+                    <div class="mb-2 row">
+                        <label for="purposeType" class="col-12 col-sm-12 form-item form-label">Purpose:</label>
+                        <div class="col-12 col-sm-12">
+                            <select class="form-control form-item" id="purposeType" name="purposeType">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-2 row">
+                        <label for="remarks" class="col-12 col-sm-12 form-item form-label">Activity Name:</label>
+                        <div class="col-12 col-sm-12">
+                            <input class="form-control form-item" id="additionalRemarks" name="additionalRemarks" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="mb-2 row" id="startDateDiv">
+                        <label for="startDate" class="col-12 col-sm-12 form-item form-label">Start Date:</label>
+                        <div class="col-12 col-sm-12">
+                            <input class="form-control form-item" id="startDate" name="startDate" autocomplete="off"
+                                readonly>
+                        </div>
+                    </div>
+                    <div class="mb-2 row" id="estimatedTripDurationDiv">
+                        <label for="estimatedTripDuration" class="col-12 col-sm-12 form-item form-label">Estimated Trip
+                            Duration:</label>
+                        <div class="col-12 col-sm-12">
+                            <input class="form-control form-item" id="estimatedTripDuration" name="estimatedTripDuration"
+                                autocomplete="off" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3 row" id="noOfTripsDiv">
+                        <label for="noOfTrips" class="col-12 col-sm-12 form-item form-label">No. of Trips:</label>
+                        <div class="col-12 col-sm-12">
+                            <input type="number" class="form-control form-item" id="noOfTrips" name="noOfTrips" autocomplete="off" readonly>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="/mobile/indent/editIndentIndex.js"></script>
+</html>

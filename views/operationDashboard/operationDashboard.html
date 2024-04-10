@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ops Report</title>
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+    <style>
+        body {
+            background-color: #EFEFEF;
+        }
+
+        .dashboard-top {
+            height: 60px;
+            background-color: #ffffff !important;
+            border-top: 2px solid #ffffff;
+            color: black;
+            margin: 0 0 20px 0;
+        }
+
+        .dashboard-top select {
+            min-width: 200px;
+            border-radius: 80px;
+            border: 1px solid #000000;
+            color: #000000;
+        }
+
+        .box-shadow {
+            box-shadow: rgba(0, 0, 0, 0.25) 0px 1px 4px;
+        }
+
+        .dashboard-content {
+            padding: 10px 20px;
+        }
+
+        .dashboard-module {
+            margin-bottom: 10px;
+        }
+
+        .title-div {
+            background-color: #ffffff;
+            min-height: 40px;
+            color: black;
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: grid;
+            align-items: center;
+        }
+        .title-dashboard {
+            background-color: #204B4D !important;
+            color: white !important;
+            margin-bottom: 0px !important;
+        }
+
+        .select-top {
+            margin-top: 0.5rem;
+            float: right;
+        }
+        .operation-detail-container {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            background-color: white;
+        }
+        .operation-detail-title {
+            padding-top: 0.7rem;
+            background-color: #D4E9E9;
+            height: 40px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            text-align: center;
+        }
+        #operation-Resources-name, .operation-detail-title2 span {
+            color: #204B4D;
+            font-size: 1.1rem;
+        }
+        .operation-detail-title2 {
+            padding-top: 0.7rem;
+            height: 40px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .operation-detail-title3 {
+            padding-top: 0.7rem;
+            height: 40px;
+            background-color: #F3F9F9;
+            border-radius: 8px;
+        }
+        .operation-chart-title {
+            padding-top: 0.7rem;
+            background-color: #F3F9F9;
+            height: 40px;
+            text-align: center;
+        }
+        .purposeTotal-chart, .serviceTypeTotal-chart, .purposeTotalByGroup-chart, 
+        .addLateIndentByGroup-chart, .cancalLateIndent-chart, .moneyServiceType1-chart, .moneyServiceType2-chart {
+            position: relative;
+            height: 300px;
+            line-height: 300px;
+            text-align: center;
+            font-size: 30px;
+        }
+        .lateIndentByGroup-chart {
+            /* padding-top: 2rem; */
+            height: 270px;
+            line-height: 240px;
+        }
+
+        .total-resoures-indent {
+            color: #80B359;
+        }
+
+        .total-money {
+            color: red;
+            font-size: 1rem;
+        }
+        .Key-Events {
+            border-bottom: 1px solid gray; 
+            cursor: pointer;
+            line-height: 0.5rem;
+            color: #80B359;
+        }
+        #operation-detail-name {
+            padding-left: 2rem;
+        }
+        /* .modal-content {
+            min-height: 430px;
+            min-width: 1110px;;
+        } */
+        .modal-body {
+            overflow: scroll;
+            width: 100%;
+        }
+        .modal-dialog {
+            width: fit-content;
+        }
+        
+       .purposeTotalByGroup-all-chart, .addLateIndentByGroup-all-chart, 
+       .cancalLateIndent-all-chart, .lateIndentByGroup-all-chart, .moneyServiceType-all-chart,
+       .serviceTypeTotal-all-chart, .purposeTotal-all-chart {
+            position: relative;
+            height: 420px;
+            line-height: 420px;
+            text-align: center;
+            font-size: 30px;
+       }
+       
+       .loading {
+            --uib-size: 2.8rem;
+            --uib-speed: .9s;
+            --uib-color: #757575;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            height: var(--uib-size);
+            width: var(--uib-size);
+        }
+
+        .loading__dot {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100%;
+            width: 100%;
+        }
+
+        .loading__dot::before {
+            content: '';
+            height: 20%;
+            width: 20%;
+            border-radius: 50%;
+            background-color: var(--uib-color);
+            transform: scale(0);
+            opacity: 0.5;
+            animation: pulse0112 calc(var(--uib-speed) * 1.111) ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(18, 31, 53, 0.3);
+        }
+
+        .loading__dot:nth-child(2) {
+            transform: rotate(45deg);
+        }
+
+        .loading__dot:nth-child(2)::before {
+            animation-delay: calc(var(--uib-speed) * -0.875);
+        }
+
+        .loading__dot:nth-child(3) {
+            transform: rotate(90deg);
+        }
+
+        .loading__dot:nth-child(3)::before {
+            animation-delay: calc(var(--uib-speed) * -0.75);
+        }
+
+        .loading__dot:nth-child(4) {
+            transform: rotate(135deg);
+        }
+
+        .loading__dot:nth-child(4)::before {
+            animation-delay: calc(var(--uib-speed) * -0.625);
+        }
+
+        .loading__dot:nth-child(5) {
+            transform: rotate(180deg);
+        }
+
+        .loading__dot:nth-child(5)::before {
+            animation-delay: calc(var(--uib-speed) * -0.5);
+        }
+
+        .loading__dot:nth-child(6) {
+            transform: rotate(225deg);
+        }
+
+        .loading__dot:nth-child(6)::before {
+            animation-delay: calc(var(--uib-speed) * -0.375);
+        }
+
+        .loading__dot:nth-child(7) {
+            transform: rotate(270deg);
+        }
+
+        .loading__dot:nth-child(7)::before {
+            animation-delay: calc(var(--uib-speed) * -0.25);
+        }
+
+        .loading__dot:nth-child(8) {
+            transform: rotate(315deg);
+        }
+
+        .loading__dot:nth-child(8)::before {
+            animation-delay: calc(var(--uib-speed) * -0.125);
+        }
+
+        @keyframes pulse0112 {
+            0%,
+            100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container-fluid h-100 p-0 m-0">
+        <div class="dashboard-content">
+            <div class="dashboard-module">
+                <div class="title-div box-shadow title-dashboard">
+                    <div class="row">
+                        <div class="col-xl-8 col-lg-8 col-md-8 col-sm-6" style="padding-top: 0.5rem;padding-left: 20%;">
+                            Commercial Vehicles Operation Summary
+                        </div>
+                        <div class="col-xl-2 col-lg-2 col-md-2 col-sm-3">
+                            <select class="form-select" id="unit-select" style="font-size: 0.8rem;">
+                                <option>Bus</option>
+                                <option>Non-Bus</option>
+                            </select>
+                        </div>
+                        <div class="col-xl-2 col-lg-2 col-md-2 col-sm-3" style="padding-right: 1rem;">
+                            <input class="form-control range-date" placeholder="Date Range" lay-key="1" layui-laydate-id="1" style="font-size: 0.8rem;">
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+            <div class="row dashboard-module">
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
+                    <div class="operation-detail-container card-shadow">
+                        <div class="operation-detail-title">
+                           <span class="fw-bold" id="operation-Resources-name">Total No.of Resources Indented <span class="total-resoures-indent"></span></span>
+                        </div>
+                        <div class="operation-detail-content">
+                           <div class="row">
+                                <div class="col-6" style="padding-right: 0;border-right: 1px solid #d8f0f0;">
+                                    <div class="operation-chart-title">
+                                        <span class="fw-bold">Breakdown By Purpose</span>
+                                    </div>
+                                    <div class="purposeTotal-chart">
+
+                                    </div>
+                                    <div class="cancalLateIndent-div">
+                                        <div class="operation-chart-title" style="border-top: 1px solid #d8f0f0;">
+                                            <span class="fw-bold">Most Late Cancellation By Unit</span>
+                                         </div>
+                                         <div class="cancalLateIndent-chart">
+    
+                                         </div>
+                                    </div>
+                                     
+                                </div>
+                                <div class="col-6" style="padding-left: 0;">
+                                    <div class="operation-chart-title">
+                                        <span class="fw-bold">Utilisation By Platform</span>
+                                     </div>
+                                     <div class="serviceTypeTotal-chart">
+
+                                     </div>
+                                     <div class="moneyServiceType1-div">
+                                        <div class="operation-chart-title" style="border-top: 1px solid #d8f0f0;">
+                                            <span class="fw-bold">Expenditure By Platform</span>
+                                         </div>
+                                         <div class="moneyServiceType1-chart">
+    
+                                         </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 moneyServiceType2-div">
+                                    <div class="operation-chart-title" style="border-top: 1px solid #d8f0f0;">
+                                        <span class="fw-bold">Expenditure By Platform</span>
+                                     </div>
+                                     <div class="moneyServiceType2-chart">
+
+                                     </div>
+                                </div>
+                           </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
+                    <div class="operation-detail-container card-shadow">
+                        <div class="operation-detail-title"></div>
+                        <div class="operation-detail-content">
+                            <div class="row">
+                                <div class="col-6" style="padding-right: 0;border-right: 1px solid #d8f0f0;">
+                                    <div class="operation-chart-title">
+                                        <span class="fw-bold">Most Resources Indents By Units</span>
+                                     </div>
+                                     <div class="purposeTotalByGroup-chart">
+
+                                     </div>
+                                </div>
+                            
+                                <div class="col-6" style="padding-left: 0;">
+                                    <div class="operation-chart-title">
+                                        <span class="fw-bold">Late Created indents By Units</span>
+                                     </div>
+                                     <div class="addLateIndentByGroup-chart">
+
+                                     </div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <div class="operation-chart-title" style="border-top: 1px solid #d8f0f0;">
+                                        <span class="fw-bold">Most Late Indents By Units</span>
+                                     </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <!-- style="position: absolute;right: 1rem;" -->
+                                            <div class="align-items-center select-top" style="margin-right: 0.5rem;height: 40px;display: flex;">
+                                                <span class="range-date2" style="white-space: nowrap;padding-right: 2rem;font-weight: 600;font-size: 1rem;"></span>
+                                                <select class="form-select" id="most-select">
+                                                    <option value=""></option>
+                                                </select>
+                                             </div>
+                                        </div>
+                                         
+                                         <div class="col-12 lateIndentByGroup-chart">
+    
+                                         </div>
+                                    </div>
+                                   
+                                </div>
+                               
+                           </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="purposeTotalModal">
+                <div class="modal-dialog modal-xl modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-body">
+                    <div class="row">
+                        <div class="col purposeTotal-all-chart"></div>
+                    </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="serviceTypeTotalModal">
+                <div class="modal-dialog modal-xl modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-body">
+                    <div class="row">
+                        <div class="col serviceTypeTotal-all-chart"></div>
+                    </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="moneyServiceTypeModal">
+                <div class="modal-dialog modal-xl modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-body">
+                    <div class="row">
+                        <div class="col moneyServiceType-all-chart"></div>
+                    </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="purposeTotalByGroupModal">
+                <div class="modal-dialog modal-xl modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-body">
+                    <div class="row">
+                        <div class="col purposeTotalByGroup-all-chart"></div>
+                    </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div class="modal fade" id="addLateIndentByGroupModal">
+            <div class="modal-dialog modal-xl modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                <div class="modal-body">
+                <div class="row">
+                    <div class="col addLateIndentByGroup-all-chart"></div>
+                </div>
+                </div>
+                </div>
+            </div>
+            </div>
+            <div class="modal fade" id="cancalLateIndentModal">
+            <div class="modal-dialog modal-xl modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                <div class="modal-body">
+                <div class="row">
+                    <div class="col cancalLateIndent-all-chart"></div>
+                </div>
+                </div>
+                </div>
+            </div>
+            </div>
+            <div class="modal fade" id="lateIndentByGroupModal">
+            <div class="modal-dialog modal-xl modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                <div class="modal-body">
+                <div class="row">
+                    <div class="col lateIndentByGroup-all-chart"></div>
+                </div>
+                </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="row dashboard-module">
+                
+                <div class="col-12">
+                    <div class="operation-detail-container card-shadow">
+                        <div class="operation-detail-title2">
+                            <span class="fw-bold ps-3">Summary Statement - Based On</span>
+                        </div>
+                        <div class="row" style="padding-bottom: 3rem;">
+                            <div class="operation-detail-content">
+                                <div class="row" style="padding-left: 0.5rem;padding-right: 0.5rem;">
+                                    <div class="col-xl-3 col-lg-5 col-md-12 col-sm-12">
+                                        <div class="operation-detail-title3">
+                                            <span class="fw-bold" id="operation-detail-name">Total Expenditure <span class="total-money"></span></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-9 col-lg-7 col-md-12 col-sm-12">
+                                        <div class="operation-detail-title3">
+                                            <span class="fw-bold" id="operation-detail-name">Key Events: 
+                                                <span class="Key-Events text-truncate" data-row="0">
+                                                   
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                               
+                            </div>
+                            
+                        </div>
+                    </div>
+                  
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="/javascripts/axios/axios.min.js"></script>
+    <script type="text/javascript" src="/moment/moment.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="../javascripts/highchart-9.1.2/highcharts.js"></script>
+    <script type="text/javascript" src="../javascripts/highchart-9.1.2/highcharts-more.js"></script>
+    
+    <script src="/javascripts/layui/layui.js"></script>
+    <script type="text/javascript" src="../echarts/dist/echarts.min.js"></script>
+
+    <script src="/dashboard/ops-report.js"></script>
+    <script type="text/javascript" src="../../resize.js"></script>
+
+</body>
+</html>

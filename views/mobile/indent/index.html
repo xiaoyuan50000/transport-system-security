@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <link rel="icon" href="data:;base64,=">
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/javascripts/jquery-confirm/jquery-confirm.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+
+    <script src="/javascripts/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/javascripts/axios/axios.min.js"></script>
+    <script src="/javascripts/moment.min.js"></script>
+    <script src="/javascripts/layui/layui.js"></script>
+    <script src="/javascripts/jquery-confirm/jquery-confirm.js"></script>
+    <script src="/javascripts/jquery-confirm/custom-confirm.js"></script>
+
+    <script src="/mobile/indent/indent.js"></script>
+    <script src="/mobile/common.js"></script>
+    <title><%= title%></title>
+    <style>
+        .index-head {
+            height: 60px;
+            background-color: #204b4d;
+            margin: 0;
+        }
+        .condition-btn {
+            width: fit-content;
+            min-width: 80px;
+            margin-left: 2% !important;
+            height: 30px;
+            border-radius: 20px;
+            border: 1px solid #2bb982;
+            background-color: white;
+            margin: 0px;
+            text-align: center;
+            padding-top: 6px;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        .condition-btn.active {
+            background-color: #4EB981;
+        }
+        .tms-mobile-nav {
+            width: 100vw;
+            position: absolute;
+            bottom: 0;
+            text-align: center;
+            height: 90px;
+            border-top: 0;
+            background-color: #ffffff;
+        }
+        .tms-nav td {
+            cursor: pointer;
+        }
+        .nav-tab-label {
+            color: #696969;
+            font-size: 18;
+            margin-bottom: 2px;
+        }
+        .nav-tab-label.native {
+            color: #2bb982;
+            font-size: 20;
+        }
+        .nav-tab-img-indent {
+            width: 50px;
+            padding: 0 5px;
+        }
+        .nav-tab-img-task {
+            width: 50px;
+            padding: 0 5px;
+        }
+        .querycondition {
+            width: 100vw;
+            margin: 0;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            height: 130px;
+        }
+        .item-div-list {
+            height: calc(100vh - 312px);
+            padding-bottom: 100px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: 1px;
+        }
+        ::-webkit-scrollbar {
+            width: 1px;
+            height: 1px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 1px;
+            background: grey;
+        }
+        .item-div {
+            margin-top: 1em;
+            border: solid 1px white;
+            box-shadow: 0 0 2px white;
+            border-radius: 5px;
+            background-color: white;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+        .nav-statu-label {
+            font-size: 14px; 
+            text-align: right; 
+            padding: 0px;
+            margin-right: 10px;
+        }
+        .nav-img {
+        }
+        .action-btn {
+            width: 80px;
+            height: 30px;
+            border-radius: 5px;
+            border: 1px solid #dcdcdc;
+            margin: 5px 5px 5px 0px;
+            background-color: white;
+            display: flex;
+            justify-content : flex-start;
+            align-items : center
+        }
+        .action-btn img {
+            width: 22px;
+            margin-left: 5px;
+        }
+        .action-btn label {
+            width: 80%;
+            color: #999999;
+            margin-left: 5px;
+        }
+
+        .info-nav {
+            width: 94%;
+            height: 55px;
+            background-color: white;
+            background-size: 100%;
+            border-radius: 5px;
+            margin-top: 10px;
+            margin-left: 3%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .info-nav.active {
+            border-radius: 5px 5px 0 0;
+        }
+        .indent-content {
+            width: 94%;
+            background-color: white;
+            background-size: 100%;
+            border-radius: 0 0 5px 5px;
+            margin-left: 3%;
+        }
+        .action-btn-div {
+            border-radius: 0 0 5px 5px;
+        }
+        .task-info-div {
+            padding-top: 10px;
+        }
+        .load-more-data {
+            width: 94%;
+            height: 30px;
+            background-color: grey;
+            background-size: 100%;
+            color: white;
+            border-radius: 0 0 5px 5px;
+            margin-top: 15px;
+            margin-left: 3%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .refresh-page-div {
+            position: absolute;
+            bottom: 90px;
+            right: 3%;
+        }
+        .service-provider-div {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .bulk-opt-div{
+            width: 94%;
+            margin-left: 3%;
+            margin-top: 10px;
+            display: flex;
+            justify-content: left;
+            align-items: center;
+            height: 40px;
+        }
+        .bulk-opt-btn{
+            max-width: 24%;
+            height: 30px;
+            border-radius: 5px;
+            border: 1px solid #204b4d;
+            margin: 2px 2px 2px 2px;
+            background-color: #204b4d;
+            display: flex;
+            justify-content:flex-start;
+            align-items : center
+        }
+        .bulk-opt-btn img {
+            width: 22px;
+            margin-left: 5px;
+        }
+        .bulk-opt-btn label {
+            width: calc(100% - 22px);
+            color: white;
+            margin-left: 5px;
+            font-size: 14px;
+        }
+        .bulk-trip-selector {
+            background-color: white;
+        }
+        .bulk-trip-selector.active {
+            background-image: url("../images/trip-selected.svg");
+        }
+        .trip-selector {
+            background-color: white;
+        }
+        .trip-selector.active {
+            background-image: url("../images/trip-selected.svg");
+        }
+        .urgent-indent-selector {
+            background-color: white;
+        }
+        .urgent-indent-selector.active {
+            background-image: url("../images/trip-selected.svg");
+        }
+        .info-nav-right {
+            display: flex;
+            justify-content : flex-end;
+            align-items : center
+        }
+        .add-inddent-div {
+            width: 100vw;
+            position: absolute;
+            bottom: 110px;
+            text-align: center;
+            height: 40px;
+            z-index: 999;
+            display: flex;
+        }
+        .add-indent-btn-div {
+            width: 80%; 
+            margin-left: 10%; 
+            height: 40px; 
+            background-color: #2bb982; 
+            border-radius: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+        }
+        .add-indent-btn-div.disable {
+            background-color: #bebebe !important;
+        }
+    </style>
+</head>
+<body style="background-color: #f3f3f3;overflow: hidden;">
+    <div class="index-head row">
+        <div class="row" style="width: 100%; height: 60px; margin: 0;">
+            <div class="col-3" style="display: flex;justify-content: right;align-items: center;">
+                <img src="">
+            </div>
+            <div class="col-6" style="text-align: center;">
+                <label class="page-title-label" style="color: white;font-weight:bolder;font-size: x-large; margin-top: 15px;">Activity</label>
+            </div>
+            <div class="col-3" style="display: flex;justify-content: right;align-items: center; right: 0px;">
+                <!-- <img class="add-indent-btn" onclick="toAddIndentPage();" style="display:none;width: 30px;margin-right: 3px;" 
+                    src="/images/add.svg" /> -->
+                <img id="logout" style="width: 16px;margin-right: 3px;margin-left:15px;" src="/images/logout.svg">
+                <span class="role-name-span" style="color: white;margin-top: 3px;"></span>
+            </div>
+        </div>
+    </div>
+    <div class="querycondition">
+        <table style="text-align: center; width: 100%;">
+            <tr><td><div style="height: 3px;"></div></td></tr>
+            <tr>
+                <div class="indent-action-div" style="width: 100%; justify-content: center;align-items: center; padding-top: 10px;">
+                    <label class="condition-btn active" data-indent-action="1">All</label>
+                    <label class="condition-btn" data-indent-action="2">Pending Action</label>
+                    <label class="condition-btn" data-indent-action="3">Today's</label>
+                    <!-- <label class="condition-btn" data-indent-action="4">Urgent</label> -->
+                </div>
+            </tr>
+            <tr><td><div></div></td></tr>
+            <tr style="border: 10px solid white;">
+                <td style="text-align: right;padding-top: 5px;">
+                    <div onclick="sortByField(this);" style="width: 15px;display: flex;align-items: center;justify-content: flex-end;width: 100%;height: 30px;">
+                        <div class="exeDateSordDiv" style="height: 100%;width: 15px;">
+                            <img style="width: 12px;height: 12px;margin-top: 8px;" data-sort="none" class="sortele none" src="/images/indent/mobileRsp/sort-all.svg">
+                        </div>
+                        <label style="margin-right: 5px;">Exe:</label>
+                    </div>
+                </td>
+                <td style="text-align: left;padding-top: 5px;padding-right: 10px;">
+                    <input style="height: 30px; font-size: 14px;" class="form-control form-item" id="exe-date" name="exe-date" autocomplete="off">
+                </td>
+                <td style="text-align: right;padding-top: 5px;">
+                    <div onclick="sortByField(this);" style="width: 15px;display: flex;align-items: center;justify-content: flex-end;width: 100%;height: 30px;">
+                        <div class="createDateSordDiv" style="height: 100%;width: 15px;">
+                            <img style="width: 12px;height: 12px;margin-top: 8px;" data-sort="none" class="sortele all" src="/images/indent/mobileRsp/sort-all.svg">
+                        </div>
+                        <label style="margin-right: 5px;">Created:</label>
+                    </div>
+                </td>
+                <td style="text-align: left;padding-top: 5px;padding-right: 10px;"> 
+                    <input style="height: 30px; font-size: 14px;" class="form-control form-item" id="create-date" name="create-date" autocomplete="off">
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 20%; text-align: right;">
+                    <label style="margin-right: 5px;">Status:</label>
+                </td>
+                <td style="width: 30%; text-align: left;padding-right: 10px;">
+                    <select style="height: 30px; font-size: 14px;" id="indent-status" name="indent-status" class="condition-select form-select form-control">
+                    </select>
+                </td>
+                <td class="unit-filter-condition" style="display: none;width: 15%; text-align: right;"> 
+                    <label style="margin-right: 5px;">Unit:</label>  
+                </td>
+                <td class="unit-filter-condition" style="display: none;width: 30%;text-align: left;padding-right: 10px;">
+                    <select style="height: 30px; font-size: 14px;" id="group" name="group" class="condition-select form-select form-control">
+                    </select>
+                </td>
+            </tr>
+            <tr><td><div style="height: 15px;"></div></td></tr>
+        </table>
+    </div>
+    <div class="bulk-opt-div">
+        <div class="col-3 bulk-opt-btn bulk-approve" style="display: none;" onclick="approve()">
+            <img src="/images/indent/action/approve-white.svg">
+            <label>Approve</label>
+        </div>
+        <div class="col-3 bulk-opt-btn bulk-endorse" style="display: none;">
+            <img src="/images/indent/action/endorse-white.svg">
+            <label>Endorse</label>
+        </div>
+        <div class="col-3 bulk-opt-btn bulk-reject" style="display: none;" onclick="confirmOpt('Reject')">
+            <img src="/images/indent/action/reject-white.svg">
+            <label>Reject</label>
+        </div>
+        <div class="col-3 bulk-opt-btn bulk-cancel" style="display: none;" onclick="confirmOpt('Cancel')">
+            <img src="/images/indent/action/cancel-white.svg">
+            <label>Cancel</label>
+        </div>
+    </div>
+    <div class="col-12 col-sm-12 col-md-12 item-div-list">
+    </div>
+    <!-- <div class="refresh-page-div">
+        <img src="/images/indent/mobileRsp/refresh.svg">
+    </div> -->
+    <div class="col-12 add-inddent-div" style="display: none;">
+        <div class="col-5" style="height: 40px; margin-top: 10px;">
+            <div class="add-indent-btn-div add-common-indent-btn" onclick="toAddIndentPage();">
+                <label id="add-indent-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Indent</label>
+            </div>
+        </div>
+        <!-- <div class="col-7" style="height: 40px; margin-top: 10px;">
+            <div class="add-indent-btn-div add-urgent-indent-btn" onclick="toAddUrgentIndentPage();">
+                <label id="add-urgent-indent-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Urgent Indent</label>
+            </div>
+        </div> -->
+    </div>
+    <div class="tms-mobile-nav">
+        <table class="tms-mobile-nav-table" style="width: 100%;height: 100%;">
+            <tr class="col-12">
+                <td class="upcomming-btn nav-indent"><img class="nav-tab-img-indent" src="/images/indent/mobileRsp/Indent-active.svg"></td>
+                <td class="new-btn nav-indent" style="display: none;"><img class="nav-tab-img-indent" src="/images/add-white.svg"></td>
+                <td class="past-btn nav-indent"><img class="nav-tab-img-indent" src="/images/history-mobile.svg"></td>
+            </tr>
+            <tr class="col-12">
+                <td class="upcomming-btn nav-indent"><label class="nav-tab-label native">Activity</label></td>
+                <td class="new-btn nav-indent" style="display: none;"><label class="nav-tab-label">New</label></td>
+                <td class="past-btn nav-indent"><label class="nav-tab-label">History</label></td>
+            </tr>
+        </table>
+    </div>
+</body>
+<script src="/mobile/indent/index.js"></script>
+
+</html>

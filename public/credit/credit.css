@@ -1,0 +1,82 @@
+body{
+    background-color: #ABABAB;
+}
+
+.credit-header{
+    height: 60px;
+    line-height: 60px;
+}
+
+.credit-body{
+    height: 190px;
+}
+
+.credit-body-number{
+    font-size: 30px;
+    color: #4B4E58;
+    margin-left: 15px;
+}
+.credit-body-span{
+    font-size: 24px;
+    color: #4B4E58;
+}
+
+.credit-foot{
+    height: calc(100% - 86px - 60px - 160px);
+}
+
+.credit-waring{
+    margin-left: calc(48px + 15px);
+}
+
+.progress{
+    margin-top: 10px;
+    height: 8px;
+}
+
+.pending-color{
+    color: #21AEFF;
+}
+
+.withhold-color{
+    color: #77D500;
+}
+
+.charge-color{
+    color: #FF941A;
+}
+
+.bd-card{
+    background-color: #F8F8F8;
+}
+.card-height{
+    height: 190px;
+    margin-bottom: 10px;
+}
+.bg-pending {
+    background-color: #21AEFF !important;
+}
+
+.bg-withhold {
+    background-color: #77D500 !important;
+}
+
+.bg-charge {
+    background-color: #FF941A !important;
+}
+
+ul{
+    list-style-type :none;
+    display: flex;
+    padding-left: 0;
+}
+ul li:nth-child(1){
+    width: 30%;
+}
+ul li:nth-child(2){
+    width: 50%;
+}
+ul li:nth-child(3){
+    width: 10%;
+    padding-left: 10px;
+}

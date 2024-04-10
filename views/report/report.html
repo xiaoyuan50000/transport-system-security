@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Report</title>
+    <!-- css -->
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/javascripts/datatables/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/javascripts/jquery-confirm/jquery-confirm.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+    <link rel="stylesheet" href="/indent/indent.css">
+
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <style>
+        .indents-title {
+            font-size: 18px;
+            font-weight: 600;
+            padding-bottom: 15px;
+        }
+
+        .nav-link {
+            color: #204B4D;
+            font-weight: 500;
+            font-size: 16px;
+            padding: 0.2rem 0rem;
+        }
+
+        .nav-item>.active {
+            border-bottom: 4px solid #308860 !important;
+        }
+
+        .nav-item {
+            display: flex;
+            padding: 0rem 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid h-100 p-0 m-0">
+        <div class="shadow">
+            <div class="row h-100 mx-1 justify-content-around py-3">
+                <div class="row search-filter justify-content-around align-items-center" id="indent-filter">
+                    <div class="col row p-0">
+                        <div class="col-auto">
+                            <select class="form-select" id="month">
+                                <option value="-1">Month: All</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <button class="btn btn-sm btn-white rounded-pill" onclick="XLSXBulkDownload(this)">
+                                    <img class="me-2" src="../images/xlsx.svg"></button>
+                            </div>
+                        </div>
+                    </div>
+        
+                </div>
+            </div>
+        </div>
+        <div class="body-bottom">
+            <div class="row m-0 p-3">
+                <div class="table-common table-shadow">
+                    <table class="table table-report pb-2">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- js -->
+    <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/javascripts/datatables/jquery.dataTables.min.js"></script>
+    <script src="/javascripts/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="/javascripts/axios/axios.min.js"></script>
+    <script src="/javascripts/layui/layui.js"></script>
+    <script src="/javascripts/moment.min.js"></script>
+    <script src="/js/pageHelper.js"></script>
+
+    <script src="/report/report.js"></script>
+    <script type="text/javascript" src="../../resize.js"></script>
+
+</body>
+
+</html>

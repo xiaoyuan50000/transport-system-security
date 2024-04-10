@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/javascripts/datatables/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/icon/iconfont.css">
+    <link rel="stylesheet" type="text/css" href="../javascripts/jquery-confirm/jquery-confirm.css">
+    <link rel="stylesheet" href="/indent/indent.css">
+    <link rel="stylesheet" href="/indent/history.css">
+
+</head>
+
+<body data-type="<%=type%>">
+    <div class="container-fluid h-100 p-0 m-0">
+        <div class="shadow">
+            <div class="row mx-0 justify-content-around py-3">
+                <div class="col-12 align-self-end">
+                    <div class="indents-title main-color">Indents</div>
+                </div>
+
+                <div class="col-12" id="new-indent-div">
+                    <div class="row justify-content-around">
+                        <div class="col" id="indent-filter">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <select class="form-select" name="indent-status" id="indent-status">
+                                        <option value="">Indent Status: All</option>
+                                    </select>
+                                </div>
+                                <div class="col-auto">
+                                    <select class="form-select" name="indent-vehicle-type" id="indent-vehicle-type">
+                                        <option value="">Resource: All</option>
+                                    </select>
+                                </div>
+                                <div class="col-auto">
+                                    <input type="text" class="form-control" name="execution-date" id="execution-date" placeholder="Execution Date" autocomplete="off">
+                                </div>
+                                <div class="col-auto">
+                                    <input type="text" class="form-control input-width" name="created-date" id="created-date" placeholder="Created Date" autocomplete="off">
+                                </div>
+                                <div class="col-auto">
+                                    <input type="text" class="form-control input-width" name="indent-id" id="indent-id" placeholder="Indent ID" autocomplete="off">
+                                </div>
+                                <div class="col-auto">
+                                    <div class="position-relative" id="unit1">
+                                        <input type="text" class="form-select input-width" id="indent-unit" name="indent-unit" autocomplete="off" readonly placeholder="Unit">
+                                        <div class="unit-search-select shadow">
+                                            <input type="text" class="form-control" autocomplete="off" id="search-unit1" placeholder="Search">
+                                            <div class="form-search-select">
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <button class="btn btn-clear" name="clean-all">Clear all</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="body-bottom">
+            <div class="row m-0" style="padding: 10px;">
+                <div class="table-common table-shadow">
+                    <table class="table indent-table pb-2 w-100">
+                        
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <%- include('actionHistory.html') -%>
+    <%- include('driver.html') -%>
+    <%- include('template.html') -%>
+    <%- include('../requestModal.html') -%>
+
+    <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+    <script src="../javascripts/axios/axios.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/javascripts/datatables/jquery.dataTables.min.js"></script>
+    <script src="/javascripts/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="/javascripts/layui/layui.js"></script>
+    <script src="/moment/moment.js"></script>
+    <script src="/js/pageHelper.js"></script>
+    <script src="../javascripts/jquery-confirm/jquery-confirm.js"></script>
+    <script src="../javascripts/jquery-confirm/custom-confirm.js"></script>
+    <script src="/job/job-common.js"></script>
+    <script src="/schedule/colors.js"></script>
+    
+    <script src="/indent/indentFilter.js"></script>
+    <script src="/indent/rolePermission.js"></script>
+    <script src="/indent/dateSelector.js"></script>
+    <script src="/indent/addRequest.js"></script>
+    <script src="/indent/indent2.js"></script>
+    <script src="/indent/indentAction2.js"></script>
+    <script src="/indent/refresh.js"></script>
+    <script src="/js/userValidation.js"></script>
+    <script src="/indent/driver2.js"></script>
+    <script src="/indent/indentHistory2.js"></script>
+
+	<%- include('../chat/chat.html') -%>
+</body>
+
+</html>

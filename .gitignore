@@ -1,0 +1,7 @@
+.idea
+.vscode
+logs
+node_modules
+public/map/Tiles
+package-lock.json
+public/chat/upload

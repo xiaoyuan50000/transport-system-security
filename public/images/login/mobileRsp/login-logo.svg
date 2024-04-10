@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="116" height="116" viewBox="0 0 116 116">
+  <defs>
+    <filter id="a" x="0" y="0" width="116" height="116" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-opacity="0.161"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="logo" transform="translate(-8734 -14746)">
+    <g transform="matrix(1, 0, 0, 1, 8734, 14746)" filter="url(#a)">
+      <rect id="a-2" data-name="a" width="98" height="98" rx="8" transform="translate(9 6)" fill="#e8f3ff"/>
+    </g>
+    <g id="a-3" data-name="a" transform="translate(8593.164 14519)">
+      <g id="a-4" data-name="a" transform="translate(-9 -219)">
+        <g id="a-5" data-name="a" transform="translate(-10488.893 -13029.452)">
+          <rect id="a-6" data-name="a" width="9.104" height="79.333" rx="4.552" transform="translate(10714.825 13492.452) rotate(45)" fill="#f0903c"/>
+          <rect id="a-7" data-name="a" width="9.104" height="79.333" rx="4.552" transform="translate(10658.729 13513.604) rotate(-45)" fill="#aa609d"/>
+          <rect id="a-8" data-name="a" width="9.104" height="79.333" rx="4.552" transform="translate(10728.62 13506.246) rotate(45)" fill="#ee6d58"/>
+          <rect id="a-9" data-name="a" width="9.104" height="79.333" rx="4.552" transform="translate(10672.523 13499.81) rotate(-45)" fill="#9bc245"/>
+          <rect id="a-10" data-name="a" width="9.104" height="24.903" rx="4.552" transform="translate(10704.387 13502.892) rotate(45)" fill="#f0903c"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

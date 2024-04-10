@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 31 30">
+  <g id="_11" data-name="11" transform="translate(-200 -80.395)">
+    <g id="_4471" data-name="4471" transform="translate(140.305 59.57)">
+      <g id="_2457" data-name="2457" transform="translate(59.695 20.825)" fill="none" stroke="#fff" stroke-width="2.5">
+        <rect width="8" height="30" rx="4" stroke="none"/>
+        <rect x="1.25" y="1.25" width="5.5" height="27.5" rx="2.75" fill="none"/>
+      </g>
+      <g id="_2458" data-name="2458" transform="translate(70.695 28.825)" fill="none" stroke="#fff" stroke-width="2.5">
+        <rect width="9" height="22" rx="4.5" stroke="none"/>
+        <rect x="1.25" y="1.25" width="6.5" height="19.5" rx="3.25" fill="none"/>
+      </g>
+      <g id="_2459" data-name="2459" transform="translate(82.695 35.825)" fill="none" stroke="#fff" stroke-width="2.5">
+        <rect width="8" height="15" rx="4" stroke="none"/>
+        <rect x="1.25" y="1.25" width="5.5" height="12.5" rx="2.75" fill="none"/>
+      </g>
+    </g>
+  </g>
+</svg>

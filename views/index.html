@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title%></title>
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./javascripts/jquery-confirm/jquery-confirm.css">
+    <link rel="stylesheet" href="./stylesheets/index.css">
+    <link rel="stylesheet" href="./stylesheets/style.css">
+    <style>
+        .dropdown-toggle::after{
+            content: none !important;
+        }
+        .btn-announcement {
+            width: 120px;
+            height: 40px;
+            border-radius: 20px;
+        }
+        .loading {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            opacity: 0.7;
+            top: 0;
+        }
+        .tab-top-right-count {
+            border: 2px solid #EF4746;
+            background: #BF1E2E;
+            width: 8px;
+            height: 8px;
+            border-radius: 100%;
+            position: absolute;
+            top: 25px;
+            right: 72px;
+            color: #fff;
+            text-align: center;
+            font-weight: bold;
+        }
+        .nav-item img {
+            width: 32px;
+            height: 32px;
+        }
+        .nav-link {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        .dropstart .dropdown-toggle::before {
+            display: none !important;
+        }
+        .dropdown-menu li a img{
+            width: 30px;
+            height: 30px;
+        }
+
+        
+    </style>
+</head>
+<body data-user="<%= userinfo%>">
+  
+<nav class="navbar navbar-expand-lg navbar-light bg-black">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse w-100 clearfix" id="navbarSupportedContent">
+        <div class="col-md-10">
+            <ul class="navbar-nav mr-auto">
+                <li style="display: flex; align-items: center; padding-right: 10px;"><a href="#"><img src="../images/login/logo.svg" style="width: 60px;height:60px;"></a></li>
+                <li class="nav-item" data-target="TASK">
+                    <img src="../images/task.svg">
+                    <a class="nav-link" href="#">INDENT</a>
+                </li>
+                <li class="nav-item" data-target="JOB">
+                    <img src="../images/schedule.svg">
+                    <a class="nav-link" href="#">JOB</a>
+                </li>
+                <!-- <li class="nav-item" data-target="MOBIUSTASK">
+                    <img src="../images/Mobius task.svg">
+                    <a class="nav-link px-0" href="#">ATMS TASK</a>
+                </li> -->
+                <li class="nav-item" data-target="URGENTTASK">
+                    <img src="../images/task.svg">
+                    <a class="nav-link px-0" href="#">URGENT</a>
+                </li>
+                <li class="nav-item" data-target="INITIALPO">
+                    <img src="../images/Initial PO.svg">
+                    <a class="nav-link" href="#">INITIAL PO</a>
+                </li>
+                <li class="nav-item" data-target="OPEN">
+                    <img src="../images/open.svg">
+                    <a class="nav-link" href="#">ENDORSE</a>
+                </li>
+                <!-- <li class="nav-item" data-target="SCHEDULE">
+                    <img src="../images/schedule.svg">
+                    <a class="nav-link" href="#">SCHEDULE</a>
+                </li> -->
+                <!-- <li class="nav-item" data-target="MONITOR">
+                    <img src="../images/monitor.svg">
+                    <a class="nav-link" href="#">MONITOR</a>
+                </li>
+                <li class="nav-item" data-target="ROUTES">
+                    <img src="../images/routes.svg">
+                    <a class="nav-link" href="#">ROUTES</a>
+                </li>
+                <li class="nav-item" data-target="CREDIT">
+                    <img src="../images/credit.svg">
+                    <a class="nav-link" href="#">CREDIT</a>
+                </li>
+                <li class="nav-item" data-target="KEYTAG">
+                    <img src="../images/tag.svg">
+                    <a class="nav-link" href="#">KEYTAG</a>
+                </li>
+                <li class="nav-item" data-target="PROVIDER">
+                    <img src="../images/Provider.svg">
+                    <a class="nav-link" href="#">PROVIDER</a>
+                </li> -->
+                <li class="nav-item" data-target="ARBITRATION">
+                    <img src="../images/arbitration.svg">
+                    <a class="nav-link" href="#">ARBITRATION</a>
+                </li>
+                <li class="nav-item" data-target="INVOICE">
+                    <img src="../images/PO.svg">
+                    <a class="nav-link" href="#">PO</a>
+                </li>
+                <li class="nav-item" data-target="HISTORY">
+                    <img src="../images/history-line.svg">
+                    <a class="nav-link" href="#">HISTORY</a>
+                </li>
+                <li class="nav-item" data-target="CONTRACT" id="target-contract">
+                    <img src="../images/contract.svg">
+                    <a class="nav-link" href="#">CONTRACT</a>
+                </li>
+                <li class="nav-item" data-target="FUEL">
+                    <img src="../images/fuel.svg">
+                    <a class="nav-link" href="#">FUEL</a>
+                </li>
+                <li class="nav-item" data-target="BUDGET">
+                    <img src="../images/budget/budget.svg">
+                    <a class="nav-link" href="#">BUDGET</a>
+                </li>
+                <li class="nav-item" data-target="DASHBOARD">
+                    <img src="../images/Dashboard.svg">
+                    <a class="nav-link" href="#">DASHBOARD</a>
+                </li>
+                <li class="nav-item" data-target="OPERATIONDASHBOARD">
+                    <img src="../images/Ops REPORT.svg">
+                    <a class="nav-link" href="#">Ops Report</a>
+                </li>
+                <li class="nav-item" data-target="REPORT">
+                    <img src="../images/Report.svg">
+                    <a class="nav-link" href="#">REPORT</a>
+                </li>
+                <li class="nav-item" data-target="TEMPLATE">
+                    <img src="../images/task.svg">
+                    <a class="nav-link" href="#">TEMPLATES</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-2">
+            <ul class="right-menu list-group" style="display: flex; list-style: none; position: relative;justify-content: end;align-items: end; margin-right: 5px;">
+                <li>
+                    <ul style="display: flex; list-style: none; position: relative;justify-content: end;align-items: center; margin: 0;">
+                        <li class="me-2 setting">
+                            
+                        </li>
+                        <!-- <li class="text-center phone24h">
+                            <a class="btn p-0 me-2 btn-phone24h" href="#" role="button">
+                                <img src="../images/phone24h.svg">
+                            </a>
+                        </li> -->
+                        <!-- <li class="text-center">
+                            <img src="../images/person.svg"><br>
+                        </li> -->
+                        <!-- <li><label id="username" style="color: white; margin-left: 10px;">User</label></li> -->
+                        <li>
+                            <label style="color: white; margin: 0 15px;">|</label>
+                        </li>
+                        <li><img style="cursor: pointer" src="../images/logout.svg" id="logout"></li>
+                    </ul>
+                </li>
+                <li>
+                    <ul style="display: flex; list-style: none; position: relative;justify-content: end;align-items: center; margin: 0;">
+                        <li><label id="username" style="color: white;">User</label></li>
+                    </ul>
+                </li>
+                
+                
+            </ul>
+        </div>
+
+
+    </div>
+</nav>
+<div aria-live="polite" aria-atomic="true" class="position-relative">
+    <div class="toast-container top-0 end-0 p-3"></div>
+</div>
+<iframe class="iframe-container" id="iframe-container" src="">
+    
+</iframe>
+
+<script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="./javascripts/jquery-confirm/jquery-confirm.js"></script>
+<script src="./javascripts/jquery-confirm/custom-confirm.js"></script>
+<script src="./javascripts/axios/axios.min.js"></script>
+<script src="/javascripts/moment.min.js"></script>
+<script src="/js/userValidation.js"></script>
+<script src="/js/date.js"></script>
+
+<script type="text/html" id="changePwdHtml">
+    <div class="row p-2 w-100">
+        <div class="col-auto">
+            <form class="needs-validation was-validated" novalidate id="changePwd-form">
+                <label class="my-2">Old Password</label>
+                <input class="form-control mb-2" type="password" placeholder="old password" name="oldPassword" 
+                autocomplete="off" required oninput="checkChangePwdFormInput(this)" id="oldPassword">
+                <div class="invalid-feedback mb-2">
+                    Please enter old password.(Default: Last 4 NRIC + 1st 4 digit of Mobile No.)
+                </div>
+                <label class="my-2">New Password</label>
+                <input class="form-control mb-2" type="password" placeholder="password" name="password" 
+                autocomplete="off" required oninput="checkChangePwdFormInput(this)" id="password">
+                <div class="invalid-feedback mb-2">
+                    Please enter a new password.
+                </div>
+                <label class="mb-2">Confirm Password</label>
+                <input class="form-control mb-2" type="password" placeholder="confirm password" name="confirmPassword" 
+                autocomplete="off" required oninput="checkChangePwdFormInput(this)" id="confirmPassword">
+                <div class="invalid-feedback mb-2">
+                    Please re-enter your new password.
+                </div>
+            </form>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="emailHtml">
+    <div class="row p-2 w-100">
+        <div class="col-auto">
+            <form class="needs-validation was-validated" novalidate id="email-form">
+                <input class="form-control mb-2" type="text" placeholder="email" name="email" id="email" autocomplete="off" required oninput="checkEmailFormInput(this)">
+                <div class="invalid-feedback mb-2">
+                    Email is mandatory.
+                </div>
+            </form>
+        </div>
+    </div>
+</script>
+<%- include('preview.html') -%>
+
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="index.js"></script>
+</body>
+</html>

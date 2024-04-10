@@ -1,0 +1,1 @@
+var currentSystemType = "POC";

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AES</title>
+</head>
+
+<body>
+    <div>
+        <label>Enter Text:</label>
+        <input type="text">
+        <button onclick="Encrypt()">Encrypt</button>
+    </div>
+    <div style="margin-top: 10px;">
+        <label>Encrypt Text:</label>
+        <textarea cols="50" rows="10"></textarea>
+    </div>
+
+    <div style="margin-top: 10px;">
+        <label>Upload Indent:</label>
+        <input type="file" class="custom-file-input">
+    </div>
+
+    <div style="margin-top: 15px;">
+        <label>Upload Contract:</label>
+        <input type="file" class="contract-file-input">
+    </div>
+
+    <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+    <script src="../javascripts/axios/axios.min.js"></script>
+    <script src="/invoice/aes.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>
+    </title>
+    <!-- css -->
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+
+    <style>
+        .color1 {
+            color: #0D83DD;
+        }
+        .color2 {
+            color: #A7A7A7;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+        .padding-lr {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .invoice-table {
+            border-top: 4px solid #0D83DD;
+            padding: 10px;
+        }
+        table {
+            font-size: 0.8rem;
+        }
+        table>tbody>tr {
+            height: 60px;
+            border-bottom: 1px solid #EBEBEB;
+        }
+
+        table>tbody>tr>th {
+            color: #0D83DD;
+        }
+        table>tbody>tr>th:nth-child(1), table>tbody>tr>td:nth-child(1) {
+            width: fit-content;
+        }
+        table>tbody>tr>th:nth-child(7), table>tbody>tr>td:nth-child(7) {
+            text-align: right;
+            width: fit-content;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid h-100 m-0">
+        <div class="row align-items-center text-white padding-lr" style="height: 200px; background: #0D83DD;">
+            <div class="col-6">
+                <span style="font-size: 48px;">INVOICE</span>
+            </div>
+            <div class="col-3">
+                <div class="text-right">
+                    <div><span>12456789</span></div>
+                    <div><span>12456789</span></div>
+                    <div><span>12456789</span></div>
+                </div>
+            </div>
+            <div class="col-3 pe-0">
+                <div class="text-right">
+                    <div><span>12456789</span></div>
+                    <div><span>12456789</span></div>
+                    <div><span>12456789</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row text-black my-5 padding-lr">
+            <div class="col-4">
+                <div class="mb-2 color2"><span>Billed To</span></div>
+                <div><span>Client Name</span></div>
+                <div><span>Client Address</span></div>
+                <div><span>City, State, County</span></div>
+                <div><span>ZIP CODE</span></div>
+            </div>
+            <div class="col-4">
+                <div class="mb-2 color2"><span>Invoice Number</span></div>
+                <div><span><%= result.invoiceNumber %></span></div>
+                <div class="pt-4 mb-2 color2"><span>Date Of Issue</span></div>
+                <div><span><%= result.dateOfIssue %></span></div>
+            </div>
+            <div class="col-4 pe-0">
+                <div class="text-right">
+                    <div class="mb-2 color2"><span>Invoice Total</span></div>
+                    <div><span class="color1" style="font-size: 40px;">$<%= result.totalPrice %></span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="invoice-table">
+            <table class="w-100">
+                <tbody>
+                    <tr>
+                        <th>Indent ID</th>
+                        <th>Execution Date</th>
+                        <th>Service Mode</th>
+                        <th>Duration</th>
+                        <th>Rate</th>
+                        <th>Surcharge</th>
+                        <th>Total</th>
+                    </tr>
+                    <% for(var i=0; i < result.list.length; i++){ %>
+                        <tr>
+                            <td class="fw-bold"><%- result.list[i].requestId %></td>
+                            <td>
+                                <div class="fw-bold"><span><%- result.list[i].executionDate %></span></div>
+                            </td>
+                            <td class="fw-bold"><%- result.list[i].serviceMode %></td>
+                            <td class="fw-bold"><%- result.list[i].duration %></td>
+                            <td class="fw-bold"><%- result.list[i].rate %></td>
+                            <td class="fw-bold"><%- result.list[i].surcharge %></td>
+                            <td class="fw-bold"><%- result.list[i].total %></td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row text-black my-4 align-items-end padding-lr">
+            <div class="col-5">
+                <div class="mb-2 color2"><span>Invoice Terms</span></div>
+                <div class="fw-bold"><span>Please pay your invoice</span></div>
+            </div>
+            <div class="col-7 fw-bold">
+                <div class="row mx-0 mb-3">
+                    <div class="col-6 text-right">
+                        <span class="color1">Subtotal</span>
+                    </div>
+                    <div class="col-6 pe-0 text-right">
+                        <span class="">$0</span>
+                    </div>
+                </div>
+                <div class="row mx-0 mb-3">
+                    <div class="col-6 text-right">
+                        <span class="color1">Tax</span>
+                    </div>
+                    <div class="col-6 pe-0 text-right">
+                        <span class="">$0</span>
+                    </div>
+                </div>
+                <div class="row mx-0 mb-5">
+                    <div class="col-6 text-right">
+                        <span class="color1">Total</span>
+                    </div>
+                    <div class="col-6 pe-0 text-right">
+                        <span class="">$<%= result.totalPrice %></span>
+                    </div>
+                </div>
+                <div class="row mx-0">
+                    <div class="col-6 text-right">
+                        <span class="color1">Amount Due (USD)</span>
+                    </div>
+                    <div class="col-6 pe-0 text-right">
+                        <span class="">$<%= result.totalPrice %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,54 @@
+{
+  "appenders": {
+    "info": {
+      "type": "dateFile",
+      "filename": "./logs/info/info",
+      "pattern": "yyyy-MM-dd.log",
+      "numBackups": 180,
+      "compress": true,
+      "alwaysIncludePattern": true
+    },
+    "error": {
+      "type": "dateFile",
+      "filename": "./logs/error/error",
+      "pattern": "yyyy-MM-dd.log",
+      "numBackups": 180,
+      "compress": true,
+      "alwaysIncludePattern": true
+    },
+    "MQInfo": {
+      "type": "dateFile",
+      "filename": "./logs/activemq/info",
+      "pattern": "yyyy-MM-dd.log",
+      "numBackups": 180,
+      "compress": true,
+      "alwaysIncludePattern": true
+    },
+    "SystemSendTo3rdInfo": {
+      "type": "dateFile",
+      "filename": "./logs/systemSendTo3rd/info",
+      "pattern": "yyyy-MM-dd.log",
+      "numBackups": 180,
+      "compress": true,
+      "alwaysIncludePattern": true
+    },
+    "SystemReceiveFrom3rdInfo": {
+      "type": "dateFile",
+      "filename": "./logs/systemReceiveFrom3rd/info",
+      "pattern": "yyyy-MM-dd.log",
+      "numBackups": 180,
+      "compress": true,
+      "alwaysIncludePattern": true
+    },
+    "stdout": {
+      "type": "console"
+    }
+  },
+  "categories": {
+    "default": { "appenders": ["info", "stdout"], "level": "info" },
+    "error": { "appenders": ["error", "stdout"], "level": "error" },
+    "MQInfo": { "appenders": ["MQInfo", "stdout"], "level": "info" },
+    "SystemSendTo3rdInfo": { "appenders": ["SystemSendTo3rdInfo", "stdout"], "level": "info" },
+    "SystemReceiveFrom3rdInfo": { "appenders": ["SystemReceiveFrom3rdInfo", "stdout"], "level": "info" }
+  }
+}

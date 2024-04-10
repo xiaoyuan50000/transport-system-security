@@ -1,0 +1,658 @@
+<div class="modal fade" id="contractRateModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width: 1500px;">
+        <div class="modal-content border-0">
+            <div class="modal-header modal-header-background">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                
+                <form id="contractRate-modal-form">
+                    <div class="row m-2">
+                        <div class="col-3">
+                            <div class="mb-2 row" style="display: none;">
+                                <label class="col-sm-5 col-form-label">Contract:</label>
+                                <div class="col-sm-7">
+                                    <select class="form-select" name="contractNo">
+                                        <option value="<%- contract.contractNo %>" selected><%- contract.contractNo %></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label class="col-sm-5 col-form-label">Resource:</label>
+                                <div class="col-sm-7">
+                                    <select class="form-select" name="vehicleType">
+                                        <option value=""></option>
+                                        <% for(var i=0; i < resourceList.length; i++){ %>
+                                            <option value="<%- resourceList[i].vehicleType %>">
+                                                <%- resourceList[i].vehicleType %>
+                                            </option>
+                                            <% } %>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- <div class="mb-2 row">
+                                <label class="col-sm-5 col-form-label">Funding:</label>
+                                <div class="col-sm-7 position-relative">
+                                    <select class="form-select" name="funding" multiple>
+                                        <option value="Central">Central</option>
+                                        <option value="Unit">Unit</option>
+                                    </select>
+                                    <input class="form-control" name="funding">
+                                </div> 
+                            </div> -->
+                            <div class="mb-2 row">
+                                <label class="col-sm-5 col-form-label">Contract Type:</label>
+                                <div class="col-sm-7">
+                                    <select class="form-select" name="chargeType">
+                                        <option value=""></option>
+                                        <option value="1">Trip</option>
+                                        <option value="2">Hour</option>
+                                        <option value="3">Block_OTBlock</option>
+                                        <option value="4">Block_OTHourly</option>
+                                        <option value="5">Mix</option>
+                                        <option value="6">DailyTrip</option>
+                                        <option value="7">Block_Daily</option>
+                                        <option value="8">Monthly</option>
+                                        <option value="9">Block_Mix</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-9">
+                            <div class="card card-body">
+                                <div class="row">
+                                    <div class="col-6 px-5" style="border-right: 1px solid #dee2e6;" id="chargeTypeForm">
+                                        
+                                    </div>
+                                    <div class="col-6 ps-5" id="chargeTypeRightForm">
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="row justify-content-center pt-3">
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                    <div class="col-auto" id="modal-confirm-2">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="SurchargeHtml">
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Surcharge:</label>
+        <div class="col-sm-7">
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">&lt;4h:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="surcharge0To4" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">4-12h:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="surcharge4To12" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">12-24h:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="surcharge12To24" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">24-48h:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="surcharge24To48" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Depart Waiting Fee:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="departWaitingFee" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row" id="transCostSurcharge">
+        
+    </div>
+</script>
+
+
+<script type="text/html" id="TripHourHtml">
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Base Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="basePrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Driver Fee:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="driverFee" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Weekend Fee:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="weekendFee" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Peak Fee:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="peakFee" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Late Fee:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="lateFee" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="BlockOTBlockHtml">
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Block Period:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="blockPeriod" autocomplete="off" onpaste="return false" oninput="this.value=InputPositiveInteger(this.value)">
+                <span class="input-group-text">H</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Block Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="blockPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Block Hourly Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="blockHourlyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Overtime Block Period:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="overTimeBlockPeriod" autocomplete="off" onpaste="return false" oninput="this.value=InputPositiveInteger(this.value)">
+                <span class="input-group-text">H</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Overtime Block Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="overTimeBlockPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="BlockOTHourlyHtml">
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Block Period:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="blockPeriod" autocomplete="off" onpaste="return false" oninput="this.value=InputPositiveInteger(this.value)">
+                <span class="input-group-text">H</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Block Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="blockPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Block Hourly Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="blockHourlyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Overtime Hourly Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="overTimeHourlyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="MixHtml">
+    <div class="mb-3 row">
+        <label class="col-sm-5 col-form-label">Transport Cost:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="transportCost" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row rounded-2" style="border: 1px solid #dee2e6;">
+        <table class="table table-borderless" id="mix-table">
+            <thead>
+                <tr>
+                    <td></td>
+                    <td>Base Price</td>
+                    <td>Driver Fee</td>
+                    <td>Weekend Fee</td>
+                    <td><button type="button" class="btn btn-outline-dark w-100" onclick="AddMixPrice()">+</button></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Daily</td>
+                    <td><input class="form-control" value="" oninput="CheckOnInput(this)"></td>
+                    <td><input class="form-control" value="" oninput="CheckOnInput(this)"></td>
+                    <td><input class="form-control" value="" oninput="CheckOnInput(this)"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Weekly</td>
+                    <td><input class="form-control" value="" oninput="CheckOnInput(this)"></td>
+                    <td><input class="form-control" value="" oninput="CheckOnInput(this)"></td>
+                    <td><input class="form-control" value="" oninput="CheckOnInput(this)"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Monthly</td>
+                    <td><input class="form-control" value="" oninput="CheckOnInput(this)"></td>
+                    <td><input class="form-control" value="" oninput="CheckOnInput(this)"></td>
+                    <td><input class="form-control" value="" oninput="CheckOnInput(this)"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Yearly</td>
+                    <td><input class="form-control" value="" oninput="CheckOnInput(this)"></td>
+                    <td><input class="form-control" value="" oninput="CheckOnInput(this)"></td>
+                    <td><input class="form-control" value="" oninput="CheckOnInput(this)"></td>
+                    <td><button type="button" class="btn btn-outline-dark w-100" onclick="DeleteMixRow(this)">-</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</script>
+
+<script type="text/html" id="MixTrHtml">
+    <tr>
+        <td>{{chargeType}}</td>
+        <td><input class="form-control" value=""></td>
+        <td><input class="form-control" value=""></td>
+        <td><input class="form-control" value=""></td>
+        <td><button type="button" class="btn btn-outline-dark w-100" onclick="DeleteMixRow(this)">-</button></td>
+    </tr>
+</script>
+
+<script type="text/html" id="DailyTripHtml">
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Daily Trip Time:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="dailyTripTime" autocomplete="off" onpaste="return false" id="dailyTripTime">
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row rounded-2" style="border: 1px solid #dee2e6;">
+        <table class="table table-borderless text-center" id="daily-trip-table">
+            <thead>
+                <tr>
+                    <td>Per Day Trips</td>
+                    <td>Per Trip Price</td>
+                    <td><button type="button" class="btn btn-outline-dark w-100" onclick="AddDailyTripPrice()">+</button></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="0" readonly>
+                            <span class="input-group-text">-</span>
+                            <input type="text" class="form-control" onpaste="return false" oninput="OnInputDailyTripPrice(this)" onblur="OnBlurDailyTripPrice(this)">
+                        </div>
+                    </td>
+                    <td><input class="form-control" value=""></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Per Day Max Trips:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="perDayMaxTrips" autocomplete="off" onpaste="return false" oninput="this.value=InputPositiveInteger(this.value)">
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Per Trip Price(Exceeding):</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="exceedPerTripPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="DailyTripTrHtml">
+    <tr>
+        <td>
+            <div class="input-group">
+                <input type="text" class="form-control" value="{{value}}" readonly>
+                <span class="input-group-text">-</span>
+                <input type="text" class="form-control" onpaste="return false" oninput="OnInputDailyTripPrice(this)" onblur="OnBlurDailyTripPrice(this)">
+            </div>
+        </td>
+        <td><input class="form-control" value=""></td>
+        <td><button type="button" class="btn btn-outline-dark w-100" onclick="DeleteDailyTripRow(this)">-</button></td>
+    </tr>
+</script>
+
+<script type="text/html" id="TranscostHtml">
+    <label class="col-sm-5 col-form-label">TransCost Surcharge:</label>
+    <div class="col-sm-7">
+        <div class="input-group">
+            <input class="form-control" name="transCostSurcharge" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+            <span class="input-group-text">$</span>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="NeedSurchargeLabelHtml">
+    <label class="col-sm-12 mb-2 col-form-label">Indent approved &lt;4hr till Execution Date:</label>
+</script>
+
+<script type="text/html" id="BlockDailyHtml">
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Block Period:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="blockPeriod" autocomplete="off" onpaste="return false" oninput="this.value=InputPositiveInteger(this.value)">
+                <span class="input-group-text">H</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Block Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="blockPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Block Hourly Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="blockHourlyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Overtime Block Period:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="overTimeBlockPeriod" autocomplete="off" onpaste="return false" oninput="this.value=InputPositiveInteger(this.value)">
+                <span class="input-group-text">H</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Overtime Block Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="overTimeBlockPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Overtime Hourly Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="overTimeHourlyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Daily Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="dailyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Monthly Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="monthlyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)" disabled="disabled">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="NeedSurchargeBlockDailyHtml">
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Need Surcharge:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input type="checkbox" class="form-check-input" name="needSurcharge" onclick="NeedSurchargeClick(this)">
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="MontlyHtml">
+    <div class="row">
+        <label class="col-sm-5 col-form-label">Monthly Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="monthlyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="BlockMixHtml">
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Block Period:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="blockPeriod" autocomplete="off" onpaste="return false" oninput="this.value=InputPositiveInteger(this.value)">
+                <span class="input-group-text">H</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Block Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="blockPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Block Hourly Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="blockHourlyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Overtime Block Period:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="overTimeBlockPeriod" autocomplete="off" onpaste="return false" oninput="this.value=InputPositiveInteger(this.value)">
+                <span class="input-group-text">H</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Overtime Block Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="overTimeBlockPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Overtime Hourly Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="overTimeHourlyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Daily Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="dailyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Weekly Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="weeklyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Monthly Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="monthlyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Transport Cost:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="transportCost" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="HourlyOptionHtml">
+    <div class="my-3" style="height:1px; border-bottom: 1px solid #c8c8c8"></div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Hourly Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="hourlyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)" placeholder="Optional">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Daily Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="dailyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)" placeholder="Optional">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Weekly Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="weeklyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)" placeholder="Optional">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-5 col-form-label">Monthly Price:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <input class="form-control" name="monthlyPrice" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)" placeholder="Optional">
+                <span class="input-group-text">$</span>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script src="/contract/contractRateModal.js"></script>

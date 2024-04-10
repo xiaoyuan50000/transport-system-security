@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mobius Tasks</title>
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/javascripts/datatables/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="../javascripts/jquery-confirm/jquery-confirm.css">
+    <style>
+        table.dataTable {
+            margin-top: 0 !important;
+        }
+        .mobius-task-table thead tr th {
+            border: 1px solid #dee2e6;
+        }
+        .indents-title {
+            font-size: 18px;
+            font-weight: 600;
+            padding-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid h-100 p-0 m-0">
+        <div class="shadow">
+            <div class="row mx-0 justify-content-around py-3">
+                <div class="col-12 align-self-end">
+                    <div class="indents-title main-color ps-3">Mobius Tasks</div>
+                </div>
+            </div>
+        </div>
+        <div class="body-bottom">
+            <div class="row m-0" style="padding: 10px;">
+                <div class="table-common table-shadow p-0">
+                    <table class="table mobius-task-table pb-2 w-100 text-center">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" style="border-top-left-radius: 8px;">S/N</th>
+                                <th rowspan="2">Hub</th>
+                                <th rowspan="2">Node</th>
+                                <th rowspan="2">Indent ID</th>
+                                <th rowspan="2">Purpose</th>
+                                <th rowspan="2">Activity Name</th>
+                                <th colspan="2">Resource</th>
+                                <th colspan="4">Execution Time</th>
+                                <th colspan="2">Location</th>
+                                <th colspan="3" style="border-top-right-radius: 8px;">POC Details</th>
+                            </tr>
+                            <tr>
+                                <th>Type of Vehicle</th>
+                                <th>Required TO</th>
+                                <th>Start Date</th>
+                                <th>Start Time</th>
+                                <th>End Date</th>
+                                <th>End Time</th>
+                                <th>Reporting</th>
+                                <th>Destination</th>
+                                <th>Counducting Officer</th>
+                                <th>Contact No.</th>
+                                <th>Unit</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/javascripts/axios/axios.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="/javascripts/datatables/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/javascripts/datatables/dataTables.bootstrap4.min.js"></script>
+    <script type="text/javascript" src="/javascripts/layui/layui.js"></script>
+    <script type="text/javascript" src="/moment/moment.js"></script>
+    <script type="text/javascript" src="/js/pageHelper.js"></script>
+    <script type="text/javascript" src="/javascripts/jquery-confirm/jquery-confirm.js"></script>
+    <script type="text/javascript" src="/javascripts/jquery-confirm/custom-confirm.js"></script>
+    <script type="text/javascript" src="/mobius/task.js"></script>
+    <script src="/mobile/common.js"></script>
+    
+
+</body>
+
+</html>

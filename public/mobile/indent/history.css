@@ -1,0 +1,58 @@
+.create-nav {
+    width: 94%;
+    height: 35px;
+    border-radius: 20px;
+    margin-left: 3%;
+    margin-top: 10px;
+}
+.create-info-item {
+    height: 35px;
+    border: 1px solid #2bb982;
+    border-radius: 20px;
+    color: #6ab196;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.create-info-item.active {
+    background-color: #2bb982;
+    background-size: 100%;
+    color: white;
+}
+
+.indent-flow-div {
+    width: 94%;
+    margin-left: 3%;
+    background-color: white;
+    border: 1px solid white;
+    border-radius: 5px;
+    margin-top: 10px;
+    background-color: white; 
+    min-height: 100px;
+    overflow-x: hidden; 
+    overflow-y: auto;
+}
+.driver-flow-div {
+    overflow-x: hidden; 
+    overflow-y: auto;
+    width: 94%;
+    margin-left: 3%;
+}
+
+.flow-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flow-status-label {
+    border: 1px solid red;
+    height: 30px;
+    text-align: center;
+    padding-top: 5px;
+    border-radius: 20px;
+    margin-left: 0px;
+    margin-right: 0px;
+    width: 100%;
+    font-weight: bolder;
+}

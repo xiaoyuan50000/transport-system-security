@@ -1,0 +1,182 @@
+<script type="text/html" id="editDriverHtml">
+    <div class="row w-100">
+        <form class="mx-2 needs-validation was-validated" novalidate id="edit-driver-form">
+            <label class="my-2">POC Name</label>
+            <input class="form-control mb-2" type="text" label="POC Name" name="poc" autocomplete="off" required oninput="checkEditDriverFormInput(this)" id="edit-poc">
+            <div class="invalid-feedback mb-2">
+                POC Name is mandatory.
+            </div>
+
+            <label class="mb-2">POC Mobile Number</label>
+            <div class="input-group mb-2">
+                <span class="input-group-text">+65</span>
+                <input class="form-control" type="text" label="POC Mobile Number" name="pocMobileNumber" autocomplete="off" required oninput="checkEditDriverFormInput(this)" id="edit-pocMobileNumber">
+                <div class="invalid-feedback mb-2">
+                    POC Mobile Number is mandatory.
+                </div>
+            </div>
+            <div class="rf-div" style="display: none;">
+                <label class="mb-2">Execution Date</label>
+                <input class="form-control mb-2" type="text" label="Execution Date"  name="executionDate" autocomplete="off" id="executionDate">
+                <div class="invalid-feedback mb-2">
+                    Execution Date is mandatory.
+                </div>
+
+                <label class="mb-2">Execution Time</label>
+                <input class="form-control mb-2" type="text" label="Execution Time"  name="executionTime" autocomplete="off" id="executionTime">
+                <div class="invalid-feedback mb-2">
+                    Execution Time is mandatory.
+                </div>
+
+                <label class="mb-2">Duration</label>
+                <div class="input-group mb-2">
+                    <input class="form-control" type="number" label="Duration"  min="1" name="duration" autocomplete="off" oninput="checkEditDriverFormInput(this)" 
+                        onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))" id="edit-duration">
+                    <span class="input-group-text">hr</span>
+                    <div class="invalid-feedback mb-2">
+                        Duration is mandatory.
+                    </div>
+                </div>
+                <div class="sp-div" style="display: none;">
+                    <label class="mb-2">Service Provider</label>
+                    <div class="input-group mb-2">
+                        <select class="form-control form-item" id="serviceProvider" name="serviceProvider">
+                            <option value="" data-no=""></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+
+<script type="text/html" id="editDriverHtmlPeriod">
+    <div class="row w-100">
+        <form class="mx-2 needs-validation was-validated" novalidate id="period-edit-driver-form">
+            <label class="my-2">POC Name</label>
+            <input class="form-control mb-2" type="text" label="POC Name" name="poc" autocomplete="off" required oninput="checkEditDriverFormInput(this)" id="period-poc">
+            <div class="invalid-feedback mb-2">
+                POC Name is mandatory.
+            </div>
+
+            <label class="mb-2">POC Mobile Number</label>
+            <div class="input-group mb-2">
+                <span class="input-group-text">+65</span>
+                <input class="form-control" type="text" label="POC Mobile Number" name="pocMobileNumber" autocomplete="off" required oninput="checkEditDriverFormInput(this)" id="period-pocMobileNumber">
+                <div class="invalid-feedback mb-2">
+                    POC Mobile Number is mandatory.
+                </div>
+            </div>
+            <div class="rf-div" style="display: none;">
+                <label class="mb-2">Start Date</label>
+                <input class="form-control mb-2" type="text" label="Start Date"  name="startDate" autocomplete="off" id="period-startDate">
+                <div class="invalid-feedback mb-2">
+                    Start Date is mandatory.
+                </div>
+
+                <label class="mb-2">End Date</label>
+                <input class="form-control mb-2" type="text" label="End Date"  name="endDate" autocomplete="off" id="period-endDate">
+                <div class="invalid-feedback mb-2">
+                    End Date is mandatory.
+                </div>
+
+                <div class="sp-div" style="display: none;">
+                    <label class="mb-2">Service Provider</label>
+                    <div class="input-group mb-2">
+                        <select class="form-control form-item" name="serviceProvider">
+                            <option value="" data-no=""></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+
+<script type="text/html" id="editTaskTimeHtml">
+    <div class="row w-100">
+        <form class="mx-2" novalidate id="edit-TaskTime-form">
+            <label class="mb-2">Arrive Time:</label>
+            <input class="form-control mb-2" type="text" label="Arrive Time"  name="arriveTime" autocomplete="off" id="arriveTime">
+
+            <div class="departTime-div" style="display: none;">
+                <label class="mb-2">Depart Time:</label>
+                <input class="form-control mb-2" type="text" label="Depart Time"  name="departTime" autocomplete="off" id="departTime">
+            </div>
+            
+            <div class="endTime-div" style="display: none;">
+                <label class="mb-2">End Time:</label>
+                <input class="form-control mb-2" type="text" label="End Time"  name="endTime" autocomplete="off" id="endTime">
+            </div>
+
+            <div class="rf-time-div" style="display: none;">
+                <label class="mb-2">TSP Notified Time:</label>
+                <input class="form-control mb-2" type="text" label="TSP Notified Time"  name="tspNotifiedTime" autocomplete="off" id="tspNotifiedTime">
+
+                <label class="mb-2">TSP Amendment Notified Time</label>
+                <input class="form-control mb-2" type="text" label="TSP Amendment Notified Time"  name="tspAmendmentNotifiedTime" autocomplete="off" id="tspAmendmentNotifiedTime">
+
+                <label class="mb-2">TSP Cancellation Notified Time</label>
+                <input class="form-control mb-2" type="text" label="TSP Cancellation Notified Time"  name="tspCancellationNotifiedTime" autocomplete="off" id="tspCancellationNotifiedTime">
+            </div>
+        </form>
+    </div>
+</script>
+
+<script type="text/html" id="exportIndentHtml">
+    <div class="row w-100">
+        <form class="mx-2 needs-validation was-validated" novalidate id="export-form">
+            <div class="row" id="date-range">
+                <div class="col-6">
+                    <label class="my-2">Start Date</label>
+                    <input class="form-control mb-2" type="text" name="startDate" autocomplete="off" required oninput="checkExportFormInput(this)" id="export-startDate">
+                    <div class="invalid-feedback mb-2">
+                        Start Date is mandatory.
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label class="my-2">End Date</label>
+                    <input class="form-control mb-2" type="text" name="endDate" autocomplete="off" required oninput="checkExportFormInput(this)" id="export-endDate">
+                    <div class="invalid-feedback mb-2">
+                        End Date is mandatory.
+                    </div>
+                </div>
+    
+            </div>
+        </form>
+    </div>
+</script>
+
+<script type="text/html" id="reviewHtml">
+    <div class="row m-0 px-1 py-4">
+        <div class="row align-items-center">
+            <div class="col-8">
+                <span class="review-title"></span>
+            </div>
+            <div class="col-4">
+                <div id="review-rate"></div>
+            </div>
+            <div class="col-12">
+                <div class="review-dashed-line mt-3 mb-4"></div>
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <span class="review-question"></span>
+        </div>
+        <div class="row" id="review-list">
+            <!-- <div class="review-option"><span>Call OCC helpdesk</span><span class="float-end"><input type="checkbox" name="reviewOption"></span></div>
+            <div class="review-option"><span>Call OCC helpdesk</span><span class="float-end"><input type="checkbox" name="reviewOption"></span></div> -->
+        </div>
+        <div class="row">
+            <div class="col">
+                <textarea class="form-control" rows="3" placeholder="Leave a comment..." id="remark"></textarea>
+            </div>
+        </div>
+        <div class="mt-5 row justify-content-center">
+            <div class="col-auto">
+                <button class="btn btn-sm btn-custom" id="btn-cancel">Cancel</button>
+                <button class="btn btn-sm ms-3 btn-custom" id="btn-submit">Submit</button>
+            </div>
+        </div>
+    </div>
+</script>

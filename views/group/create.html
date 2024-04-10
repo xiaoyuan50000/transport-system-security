@@ -1,0 +1,66 @@
+<div class="modal fade" id="CreateGroupModal" data-bs-backdrop="static" tabindex="-1"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0">
+            <div class="modal-header modal-header-background">
+                <h5 class="modal-title" id="exampleModalLabel">Group Management</h5>
+                <button type="button" class="btn-close btn-close-white btn-cancel"></button>
+            </div>
+            <div class="modal-body">
+                <form class="needs-validation was-validated" id="group-form" novalidate>
+                    <input type="text" class="hidden" disabled id="groupId">
+                    <div class="row p-3">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Group Name</label>
+                                <input type="text" class="form-control" name="groupname" autocomplete="off" required
+                                    oninput="check(this)" id="groupname">
+                                <div class="invalid-feedback">
+                                    Group Name is mandatory.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row p-3">
+                        <div class="col-12">
+                            <label class="form-label">Platform Type</label>
+                            <div class="service-mode-checkbox"></div>
+                        </div>
+                    </div>
+                    <div class="row p-3">
+                        <div class="col-5">
+                            <div class="row mb-2"><label>Unassigned User</label></div>
+                            <div class="table-common table-shadow">
+                                <table class="table table-striped unassigned-user-table"></table>
+                            </div>
+                        </div>
+                        <div class="col-2 text-center align-self-center">
+                            <div>
+                                <button type="button" class="btn btn-sm btn-system" id="add-in">></button>
+                            </div>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-sm btn-system" id="remove-out"><</button>
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div class="row mb-2"><label>Assigned User</label></div>
+                            <div class="table-common table-shadow">
+                                <table class="table table-striped assigned-user-table"></table>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    <div class="row justify-content-center pt-3">
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-outline-secondary btn-cancel">Cancel</button>
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-system btn-save">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

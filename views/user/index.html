@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Manage User</title>
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/javascripts/datatables/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/icon/iconfont.css">
+    <link rel="stylesheet" type="text/css" href="../javascripts/jquery-confirm/jquery-confirm.css">
+    <link rel="stylesheet" href="/indent/indent.css">
+
+    <style>
+        body{
+            background-color: #F3F3F3;
+        }
+        .nav-link {
+            color: #204B4D;
+            font-weight: 500;
+            font-size: 16px;
+            padding: 0.2rem 0rem;
+        }
+        
+        .nav-item>.active {
+            border-bottom: 4px solid #308860 !important;
+        }
+        
+        .nav-item {
+            display: flex;
+            padding: 0rem 1rem;
+        }
+
+        .btn img {
+            height: 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid h-100 p-0 m-0">
+        <div class="shadow scroll-fixed-top">
+            <div class="row h-100 mx-0 py-3 justify-content-around" id="indent-filter">
+                <div class="col p-0 align-self-center">
+                    <ul class="nav">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-action="1">Approved Users</a>
+                        </li>
+                        <% if(approvePermission){%>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-action="2">Pending approval</a>
+                            <span class="badge bg-transparent" id="pending-action-count">0</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-action="3">Rejected</a>
+                        </li>
+                        <% } %>
+                    </ul>
+                    <div class="row mt-3 mx-1">
+                        <div class="col-auto">
+                            <button class="btn btn-system" id="add-user-btn">Add</button>
+                        </div>
+                        <div class="col-auto">
+                            <select class="form-select" id="status">
+                                <option value="">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="Lock Out">Lock Out</option>
+                                <option value="Deactivated">Deactivated</option>
+                            </select>
+                        </div>
+                        <div class="col-2">
+                            <input class="form-control" type="text" placeholder="Login Name" id="loginName" autocomplete="off">
+                        </div>
+                        <div class="col-2">
+                            <input class="form-control" type="text" placeholder="User Name" id="username" autocomplete="off">
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-system" id="search-btn">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="body-bottom">
+            <div class="row m-0 p-3">
+                <div class="table-common table-shadow">
+                    <table class="table user-table pb-2 w-100 fixed-table">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../user/create.html') -%>
+    <%- include('../user/template.html') -%>
+    <%- include('../user/viewHistory.html') -%>
+
+        <script src="/jquery/dist/jquery.min.js"></script>
+        <script src="/javascripts/axios/axios.min.js"></script>
+        <script src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/javascripts/datatables/jquery.dataTables.min.js"></script>
+        <script src="/javascripts/datatables/dataTables.bootstrap4.min.js"></script>
+        <script src="/javascripts/layui/layui.js"></script>
+        <script src="/javascripts/moment.min.js"></script>
+        <script src="/javascripts/jquery-confirm/jquery-confirm.js"></script>
+        <script src="/javascripts/jquery-confirm/custom-confirm.js"></script>
+        <script src="/js/pageHelper.js"></script>
+        <script src="/js/userValidation.js"></script>
+        <script src="/js/modal.js"></script>
+        <script src="/js/common.js"></script>
+        <script src="/user/user.js"></script>
+        <script src="/user/user-action.js"></script>
+        <script src="/user/userApproval.js"></script>
+        <script type="text/javascript" src="../resize.js"></script>
+
+</body>
+
+</html>

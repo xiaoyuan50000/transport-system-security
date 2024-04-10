@@ -1,0 +1,38 @@
+ul {
+    list-style: none;
+}
+
+.dropdown-menu {
+    min-width: 15rem !important;
+}
+
+table.dataTable thead th,
+table.dataTable thead td {
+    padding: 10px;
+}
+
+
+.btn-collapse {
+    color: #000;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.btn-collapse[aria-expanded="false"]::after {
+    display: inline-block;
+    margin-left: 0.255em;
+    color: #E2A786;
+    content: "»";
+}
+
+.btn-collapse[aria-expanded="true"]::after {
+    display: inline-block;
+    margin-left: 0.255em;
+    color: #E2A786;
+    content: "»";
+    transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+}

@@ -1,0 +1,52 @@
+body, html{
+    height: 100%;
+}
+.color-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 20px;
+}
+
+.lnb-calendars > div{
+    padding: 0 !important;
+}
+
+.dropdown-menu>li>a {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: 400;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.move-btn{
+    border: 1px solid #007bff;
+}
+
+.tui-calendar-h{
+    height: 245px !important;
+}
+
+.lnb-calendars-item {
+    padding: 12px 0 !important;
+}
+
+.lnb-calendars {
+    border-top: 1px solid #d5d5d5 !important;
+}
+#lnb-calendars-viewall{
+    border-bottom: 1px solid #d5d5d5 !important;
+}
+#left {
+    border-right: 1px solid #d5d5d5;
+}
+#calendar{
+    border: 1px solid #e5e5e5;
+}
+
+.icon-arrow::before{
+    font-size: 14px !important;
+}

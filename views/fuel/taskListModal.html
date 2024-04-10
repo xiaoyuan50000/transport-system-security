@@ -1,0 +1,30 @@
+<div class="modal fade" id="taskListModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-full modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0">
+            <div class="modal-header modal-header-background">
+                <h5 class="modal-title"></h5>
+                
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row m-2">
+                    <table class="table g10-table w-100">
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th><div class='title-input'><input type='text' class='form-control' name='date' id='date' readonly autocomplete='off' placeholder="Date"></div></th>
+                                <th><div class='title-input'><input type='text' class='form-control' name='typeOfFuel' autocomplete='off' placeholder="Type Of Fuel"></div></th>
+                                <th><div class='title-input'><input type='text' class='form-control' name='qtyReceived' autocomplete='off' onpaste='return false' oninput='CheckOnInput(this)' placeholder="Qty Received"></th>
+                                <th><div class='title-input'><input type='text' class='form-control' name='qtyIssued' autocomplete='off' onpaste='return false' oninput='CheckOnInput(this)' placeholder="Qty Issued"></div></th>
+                                <th><div class='title-input'><input type='text' class='form-control' name='balance' autocomplete='off' placeholder="Balance"></div></th>
+                                <th><div class='title-input'><input type='text' class='form-control' name='vehicleNo' autocomplete='off' placeholder="Vehicle No."></div></th>
+                                <th><div class='title-input'><input type='text' class='form-control' name='odbmeter' autocomplete='off' onpaste='return false' oninput='CheckOnInput(this)' placeholder="Odometer Reading"></div></th>
+                                <th><div class='title-input'><button class='btn btn-sm btn-trip rounded-pill' style='font-size:12px;' onclick='addTaskFuel()'>+ Add</button></div></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

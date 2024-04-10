@@ -1,0 +1,550 @@
+<div class="modal fade" id="tripModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0">
+            <div class="modal-header modal-header-background">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row m-2">
+                    <div class="col-6">
+                        <form id="base-task-form">
+                            <div class="mb-2 row" id="groupSelect">
+    
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="purposeType" class="col-sm-5 col-form-label">Purpose:</label>
+                                <div class="col-sm-7">
+                                    <select class="form-select" id="purposeType" name="purposeType">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="additionalRemarks" class="col-sm-5 col-form-label">Activity Name:</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" id="additionalRemarks" name="additionalRemarks" autocomplete="off">
+                                </div>
+                            </div>
+                            <!-- <div class="mb-2 row">
+                                <label for="poNumber" class="col-sm-5 col-form-label">PO Number:</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" id="poNumber" name="poNumber" autocomplete="off">
+                                </div>
+                            </div> -->
+                            <div class="mb-2 row">
+                                <label for="startDate" class="col-sm-5 col-form-label">Start Date:</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" id="startDate" name="startDate" autocomplete="off" disabled>
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="estimatedTripDuration" class="col-sm-5 col-form-label">Estimated Trip Duration:</label>
+                                <div class="col-sm-7">
+                                    <input class="form-control" id="estimatedTripDuration" name="estimatedTripDuration" autocomplete="off" disabled>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for="noOfTrips" class="col-sm-5 col-form-label">No. of Trips:</label>
+                                <div class="col-sm-7">
+                                    <input type="number" class="form-control" id="noOfTrips" name="noOfTrips" autocomplete="off" disabled>
+                                </div>
+                            </div>
+                            <div id="templateIndentContent">
+                                
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-6">
+                        <div class="card card-body">
+                            <form id="task-form">
+                                <div class="row">
+                                    <div>
+                                        <div class="mb-2 row">
+                                            <label for="category" class="col-sm-5 col-form-label">Category:</label>
+                                            <div class="col-sm-7" id="category-radio">
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="mb-2 row">
+                                            <label for="serviceType" class="col-sm-5 col-form-label">Resource Type:</label>
+                                            <div class="col-sm-7">
+                                                <select class="form-select" id="serviceType" name="serviceType">
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="tripContent">
+
+                                    </div>
+                                    <!-- <div class="mb-2 row">
+                                        <label for="serviceMode" class="col-sm-5 col-form-label">Service Mode:</label>
+                                        <div class="col-sm-7">
+                                            <select class="form-select" id="serviceMode" name="serviceMode">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label for="typeOfVehicle" class="col-sm-5 col-form-label">Resource:</label>
+                                        <div class="col-sm-7">
+                                            <select class="form-select" id="typeOfVehicle" name="typeOfVehicle" onchange="changeTypeOfVehicle()">
+                                                <option value=""></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label for="noOfVehicle" class="col-sm-5 col-form-label">No. Of Resource:</label>
+                                        <div class="col-sm-7" style="float: right;">
+                                            <input type="number" min="1" class="form-control" id="noOfVehicle" name="noOfVehicle" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))"
+                                                autocomplete="off">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row" id="driver-row" style="display: none;">
+                                        <label class="col-sm-5 col-form-label">Driver:</label>
+                                        <div class="col-sm-7 align-self-center" style="float: right;">
+                                            <input class="form-check-input mt-0" type="checkbox" onclick="serviceProviderChange(this)" id="driver" name="driver">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-2 row noOfDriver" style="display: none;">
+                                        <label for="noOfDriver" class="col-sm-5 col-form-label">No. Of Driver:</label>
+                                        <div class="col-sm-7" style="float: right;">
+                                            <input type="number" min="1" oninput="checkDriverNum();" class="form-control" id="noOfDriver" name="noOfDriver"
+                                                autocomplete="off">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label for="pickupDestination" class="col-sm-5 col-form-label">Reporting Location:</label>
+                                        <div class="col-sm-7">
+                                            <div class="position-relative">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-select" id="pickupDestination" name="pickupDestination" autocomplete="off" readonly>
+                                                    <div class="search-select shadow">
+                                                        <input type="text" class="form-control" autocomplete="off" id="search1" placeholder="Search">
+                                                        <div class="form-search-select">
+                                                            
+                                                        </div>
+                                                    </div>
+                                                    <span class="input-group-text" role="button">
+                                                        <img src="../images/notes.svg" onclick="AddNotes(1)">
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label for="dropoffDestination" class="col-sm-5 col-form-label">Destination:</label>
+                                        <div class="col-sm-7">
+                                            <div class="position-relative">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-select" id="dropoffDestination" name="dropoffDestination" autocomplete="off" readonly>
+                                                    <div class="search-select shadow">
+                                                        <input type="text" class="form-control" autocomplete="off" id="search2" placeholder="Search">
+                                                        <div class="form-search-select">
+                                                            
+                                                        </div>
+                                                    </div>
+                                                    <span class="input-group-text" role="button">
+                                                        <img src="../images/notes.svg" onclick="AddNotes(2)">
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label for="pocName" class="col-sm-5 col-form-label">POC:</label>
+                                        <div class="col-sm-7">
+                                            <input class="form-control" id="pocName" name="pocName"
+                                                autocomplete="off">
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row">
+                                        <label for="contactNumber" class="col-sm-5 col-form-label">Mobile
+                                            Number:</label>
+                                        <div class="col-sm-7">
+                                            <div class="input-group">
+                                                <span class="input-group-text" id="contactNumberPrefix">+65</span>
+                                                <input type="text" class="form-control" id="contactNumber" name="contactNumber" autocomplete="off" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row" id="repeats-div">
+                                        <label for="repeats" class="col-sm-5 col-form-label">Recurring:</label>
+                                        <div class="col-sm-7">
+                                            <select class="form-select" id="repeats" name="repeats">
+                                                
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2 row mt-2" id="date-select">
+                                        
+                                    </div>
+                                    <div class="mb-2 row" id="serviceProviderSelect">
+            
+                                    </div>
+                                    <div class="mb-3 row">
+                                        <label for="tripRemarks" class="col-sm-5 col-form-label">Trip Remarks:</label>
+                                        <div class="col-sm-7">
+                                            <textarea rows="2" class="form-control" id="tripRemarks" name="tripRemarks"
+                                                placeholder="<5 days require justification"
+                                                autocomplete="off" disabled></textarea>
+                                        </div>
+                                    </div> -->
+                                </div>
+                                <div id="template-indent-save">
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center pt-3" id="button1-row">
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                    <div class="col-auto action-button">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/html" id="weeklyHtml">
+    <div class="col-sm-3 mb-2">
+        <label class="col-form-label">Repeat On:</label>
+    </div>
+    <div class="col-sm-9 mb-2">
+        <div class="float-end" id="week">
+            <svg class="bd-placeholder-img rounded-circle" width="30" height="30" data-week="1">
+                <rect width="100%" height="100%" fill="#e9ecef"></rect>
+                <text x="50%" y="50%" fill="#000000" dy=".3rem">M</text>
+            </svg>
+            <svg class="bd-placeholder-img rounded-circle ms-1" width="30" height="30" data-week="2">
+                <rect width="100%" height="100%" fill="#e9ecef"></rect>
+                <text x="50%" y="50%" fill="#000000" dy=".3rem">T</text>
+            </svg>
+            <svg class="bd-placeholder-img rounded-circle ms-1" width="30" height="30" data-week="3">
+                <rect width="100%" height="100%" fill="#e9ecef"></rect>
+                <text x="50%" y="50%" fill="#000000" dy=".3rem">W</text>
+            </svg>
+            <svg class="bd-placeholder-img rounded-circle ms-1" width="30" height="30" data-week="4">
+                <rect width="100%" height="100%" fill="#e9ecef"></rect>
+                <text x="50%" y="50%" fill="#000000" dy=".3rem">T</text>
+            </svg>
+            <svg class="bd-placeholder-img rounded-circle ms-1" width="30" height="30" data-week="5">
+                <rect width="100%" height="100%" fill="#e9ecef"></rect>
+                <text x="50%" y="50%" fill="#000000" dy=".3rem">F</text>
+            </svg>
+            <svg class="bd-placeholder-img rounded-circle ms-1" width="30" height="30" data-week="6">
+                <rect width="100%" height="100%" fill="#e9ecef"></rect>
+                <text x="50%" y="50%" fill="#000000" dy=".3rem">S</text>
+            </svg>
+            <svg class="bd-placeholder-img rounded-circle ms-1" width="30" height="30" data-week="7">
+                <rect width="100%" height="100%" fill="#e9ecef"></rect>
+                <text x="50%" y="50%" fill="#000000" dy=".3rem">S</text>
+            </svg>
+        </div>
+    </div>
+    
+    <div class="col-sm-5 mb-2">
+        <label class="col-form-label mb-2">Execution Date:</label>
+    </div>
+    <div class="col-sm-7 mb-2">
+        <input class="form-control" id="executionDate" name="executionDate" autocomplete="off">
+    </div>
+    <div class="col-sm-5 mb-2">
+        <label class="col-form-label mb-2">Execution Time:</label>
+    </div>
+    <div class="col-sm-7 mb-2">
+        <input class="form-control" id="executionTime" name="executionTime" autocomplete="off">
+    </div>
+    <div class="col-sm-5 mb-2">
+        <label class="col-form-label">Ends On:</label>
+    </div>
+    <div class="col-sm-7 mb-2">
+        <input class="form-control" id="endsOn" name="endsOn" autocomplete="off">
+    </div>
+    <div class="col-sm-5 mb-2">
+        <label class="col-form-label">Duration:</label>
+    </div>
+    <div class="col-sm-7 mb-2">
+        <div class="input-group">
+            <input type="number" min="1" class="form-control" id="duration" name="duration" autocomplete="off" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))">
+            <span class="input-group-text">hr</span>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="disposalHtml">
+    <div class="col-sm-5 mb-2">
+        <label class="col-form-label mb-2">Execution Date:</label>
+    </div>
+    <div class="col-sm-7 mb-2">
+        <input class="form-control" id="executionDate" name="executionDate" autocomplete="off" readonly>
+    </div>
+    <div class="col-sm-5 mb-2">
+        <label class="col-form-label mb-2">Execution Time:</label>
+    </div>
+    <div class="col-sm-7 mb-2">
+        <input class="form-control" id="executionTime" name="executionTime" autocomplete="off" readonly>
+    </div>
+    <div class="col-sm-5 mb-2">
+        <label class="col-form-label">Duration:</label>
+    </div>
+    <div class="col-sm-7 mb-2">
+        <div class="input-group">
+            <input type="number" min="1" class="form-control" id="duration" name="duration" autocomplete="off" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))">
+            <span class="input-group-text">hr</span>
+        </div>
+    </div>
+</script>
+
+
+<script type="text/html" id="periodHtml">
+    <div class="col-sm-5 mb-2">
+        <label class="col-form-label mb-2">Start Date:</label>
+    </div>
+    <div class="col-sm-7 mb-2">
+        <input class="form-control" id="periodStartDate" name="periodStartDate" autocomplete="off" readonly>
+    </div>
+    <div class="col-sm-5 mb-2">
+        <label class="col-form-label mb-2">End Date:</label>
+    </div>
+    <div class="col-sm-7 mb-2">
+        <input class="form-control" id="periodEndDate" name="periodEndDate" autocomplete="off" readonly>
+    </div>
+</script>
+
+<script type="text/html" id="preParkHtml">
+    <div class="row mb-2 m-0 p-0" id="preParkDate-row">
+        <div class="col-sm-5">
+            <label class=" col-form-label">Pre-Park Date:</label>
+        </div>
+        <div class="col-sm-7">
+            <input class="form-control" id="preParkDate" name="preParkDate" autocomplete="off" readonly>
+        </div>
+    </div>
+</script>
+
+
+<script type="text/html" id="tripHtml">
+    <div class="mb-2 row">
+        <label for="serviceMode" class="col-sm-5 col-form-label">Service Mode:</label>
+        <div class="col-sm-7">
+            <select class="form-select" id="serviceMode" name="serviceMode" onchange="changeServiceMode(this)">
+            </select>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label for="typeOfVehicle" class="col-sm-5 col-form-label">Resource:</label>
+        <div class="col-sm-7">
+            <select class="form-select" id="typeOfVehicle" name="typeOfVehicle" onchange="changeTypeOfVehicle()">
+                <option value=""></option>
+            </select>
+        </div>
+    </div>
+    <div class="mb-2 row" id="vehicle-row">
+        <label for="noOfVehicle" class="col-sm-5 col-form-label">No. Of Resource:</label>
+        <div class="col-sm-7" style="float: right;">
+            <input type="number" min="1" class="form-control" id="noOfVehicle" name="noOfVehicle" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))"
+                autocomplete="off">
+        </div>
+    </div>
+    <div class="mb-2 row" id="driver-row" style="display: none;">
+        <label class="col-sm-5 col-form-label">Driver:</label>
+        <div class="col-sm-7 align-self-center" style="float: right;">
+            <input class="form-check-input mt-0" type="checkbox" onclick="serviceProviderChange(this)" id="driver" name="driver">
+        </div>
+    </div>
+    
+    <div class="mb-2 row noOfDriver" style="display: none;">
+        <label for="noOfDriver" class="col-sm-5 col-form-label">No. Of Driver:</label>
+        <div class="col-sm-7" style="float: right;">
+            <input type="number" min="1" oninput="checkDriverNum();" class="form-control" id="noOfDriver" name="noOfDriver"
+                autocomplete="off">
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label for="pickupDestination" class="col-sm-5 col-form-label">Reporting Location:</label>
+        <div class="col-sm-7">
+            <div class="position-relative">
+                <div class="input-group">
+                    <input type="text" class="form-select" id="pickupDestination" name="pickupDestination" autocomplete="off" readonly onclick="DestinationOnFocus(this)">
+                    <div class="search-select shadow">
+                        <input type="text" class="form-control" autocomplete="off" id="search1" placeholder="Search" onkeyup="DestinationSearchKeyUp(this)">
+                        <div class="form-search-select">
+                            
+                        </div>
+                    </div>
+                    <span class="input-group-text" role="button">
+                        <img src="../images/notes.svg" onclick="AddNotes(1)">
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label for="dropoffDestination" class="col-sm-5 col-form-label">Destination:</label>
+        <div class="col-sm-7">
+            <div class="position-relative">
+                <div class="input-group">
+                    <input type="text" class="form-select" id="dropoffDestination" name="dropoffDestination" autocomplete="off" readonly onclick="DestinationOnFocus(this)">
+                    <div class="search-select shadow">
+                        <input type="text" class="form-control" autocomplete="off" id="search2" placeholder="Search" onkeyup="DestinationSearchKeyUp(this)">
+                        <div class="form-search-select">
+                            
+                        </div>
+                    </div>
+                    <span class="input-group-text" role="button">
+                        <img src="../images/notes.svg" onclick="AddNotes(2)">
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label for="pocName" class="col-sm-5 col-form-label">POC:</label>
+        <div class="col-sm-7">
+            <input class="form-control" id="pocName" name="pocName"
+                autocomplete="off">
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label for="contactNumber" class="col-sm-5 col-form-label">Mobile
+            Number:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <span class="input-group-text" id="contactNumberPrefix">+65</span>
+                <input type="text" class="form-control" id="contactNumber" name="contactNumber" autocomplete="off" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))">
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row" id="repeats-div">
+        <label for="repeats" class="col-sm-5 col-form-label">Recurring:</label>
+        <div class="col-sm-7">
+            <select class="form-select" id="repeats" name="repeats" onchange="changeRecurring(this)">
+                
+            </select>
+        </div>
+    </div>
+    <div class="mb-2 row mt-2" id="date-select">
+        
+    </div>
+    <div class="mb-2 row" id="serviceProviderSelect">
+
+    </div>
+    <div class="mb-3 row">
+        <label for="tripRemarks" class="col-sm-5 col-form-label">Trip Remarks:</label>
+        <div class="col-sm-7">
+            <textarea rows="2" class="form-control" id="tripRemarks" name="tripRemarks"
+                placeholder="<5 days require justification"
+                autocomplete="off" disabled></textarea>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="fuelHtml">
+    <div class="mb-2 row">
+        <label for="fuelResource" class="col-sm-5 col-form-label">Resource:</label>
+        <div class="col-sm-7">
+            <select class="form-select" id="fuelResource" name="fuelResource">
+                <option value=""></option>
+                <option value="Diesel">Diesel</option>
+                <option value="Petrol">Petrol</option>
+                <option value="Bio Diesel">Bio Diesel</option>
+            </select>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label for="litres" class="col-sm-5 col-form-label">Quantity(Litres):</label>
+        <div class="col-sm-7">
+            <input type="number" min="1" class="form-control" id="litres" name="litres" autocomplete="off" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))">
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label for="polPoint" class="col-sm-5 col-form-label">POL Point:</label>
+        <div class="col-sm-7">
+            <div class="position-relative">
+                <div class="input-group">
+                    <input type="text" class="form-select" id="polPoint" name="polPoint" autocomplete="off" readonly onclick="PolPointOnFocus(this)">
+                    <div class="search-select shadow">
+                        <input type="text" class="form-control" autocomplete="off" id="search3" placeholder="Search" onkeyup="PolPointSearchKeyUp(this)">
+                        <div class="form-search-select">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label for="loaTagId" class="col-sm-5 col-form-label">LOA Tag ID:</label>
+        <div class="col-sm-7">
+            <input class="form-control" id="loaTagId" name="loaTagId" autocomplete="off">
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label for="fuelPOC" class="col-sm-5 col-form-label">POC:</label>
+        <div class="col-sm-7">
+            <input class="form-control" id="fuelPOC" name="fuelPOC" autocomplete="off">
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <label for="fuelContactNumber" class="col-sm-5 col-form-label">Mobile Number:</label>
+        <div class="col-sm-7">
+            <div class="input-group">
+                <span class="input-group-text">+65</span>
+                <input type="text" class="form-control" id="fuelContactNumber" name="fuelContactNumber" autocomplete="off" onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))">
+            </div>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <div class="col-sm-5 mb-2">
+            <label class="col-form-label mb-2">Start Date:</label>
+        </div>
+        <div class="col-sm-7 mb-2">
+            <input class="form-control" id="fuelStartDate" name="fuelStartDate" autocomplete="off" readonly>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <div class="col-sm-5 mb-2">
+            <label class="col-form-label mb-2">End Date:</label>
+        </div>
+        <div class="col-sm-7 mb-2">
+            <input class="form-control" id="fuelEndDate" name="fuelEndDate" autocomplete="off" readonly>
+        </div>
+    </div>
+    <div class="mb-2 row">
+        <div class="col-sm-5 mb-2">
+            <label class="col-form-label mb-2">Remarks:</label>
+        </div>
+        <div class="col-sm-7 mb-2">
+            <textarea rows="2" class="form-control" id="fuelRemarks" name="fuelRemarks" autocomplete="off"></textarea>
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="selectTemplateIndentHtml">
+    <div class="mb-3 row">
+        <label for="templateIndent" class="col-sm-5 col-form-label">Select From Template:</label>
+        <div class="col-sm-7">
+            <select class="form-select" id="templateIndent" name="templateIndent" onchange="changeSelectFromTemplate(this)">
+                <option value=""></option>
+            </select>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <ul class="list-group" id="templateIndentRow">
+            <!-- <li class="list-group-item d-flex justify-content-between align-items-start template-indent-li">
+                <div class="ms-2 me-auto">Content for list item</div>
+                <div class="img-warning"></div>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-start template-indent-li">
+                <div class="ms-2 me-auto">Content for list item</div>
+                <div class="img-success"></div>
+            </li> -->
+        </ul>
+    </div>
+</script>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+
+<style>
+    body {
+        width: 100vw;
+        height: 100vh; 
+        overflow: hidden;
+        font-family: inherit;
+    }
+    .content {
+        width: 100vw;
+        height: 100vh; 
+        /* background-image: url(../images/singpass-back.png); */
+        position: absolute;
+        top: 0;
+        left: -1px;
+        /* background-repeat: no-repeat; */
+        overflow: hidden;
+    }
+    .backBtn {
+        width: 160px;
+        height: 40px;
+        border-radius: 10px;
+        background-color: aquamarine;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .top-content {
+        background-image: url(../images/singpass/bg-top.png);
+        background-repeat: no-repeat;
+        width: 100%;
+        height: 180px;
+        overflow: hidden;
+    }
+    .middle-content {
+        width: 100%;
+        overflow: hidden;
+        height: calc(100% - 180px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .back-content {
+        background-image: url(../images/singpass/bg-back.svg);
+        width: 360px;
+        height: 370px;
+        background-repeat: no-repeat;
+    }
+</style>
+
+<body>
+    <div style="display: none;">Logging in...</div>
+    <div class="resCode" id="resCodeDiv" style="display: none;"><%= code%></div>
+    <div class="singpassNric" id="singpassNricDiv" style="display: none;"><%= nric%></div>
+    <div class="msg" style="display: none;"><%= msg%></div>
+    <div class="content">
+        <div class="top-content"></div>
+        <div class="middle-content">
+            <div class="back-content" onclick="openApp();">
+                <div style="width: 100%;height:fit-content;display: flex;justify-content: center;">
+                    <img src="../images/login/mobileRsp/cv-logo.png" style="width: 130px;height: 130px;margin-top: 100px;">
+                </div>
+                <div style="width: 100%;height:40px;display: flex;justify-content: center;align-items: center;">
+                    <label style="color: #169865; font-size: 32px; font-weight: 600;">OPEN CV</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/callback/callbackMobile.js"></script>
+</body>
+</html>

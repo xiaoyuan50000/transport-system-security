@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Group</title>
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/javascripts/datatables/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/icon/iconfont.css">
+    <link rel="stylesheet" type="text/css" href="../javascripts/jquery-confirm/jquery-confirm.css">
+    <link rel="stylesheet" href="/indent/indent.css">
+
+    <style>
+        .service-mode {
+            height: 26px;
+            line-height: 26px;
+            border-radius: 13px;
+            width: fit-content;
+            border: 1px solid #8b8a8a;
+            color: #198754;
+            padding: 0 1rem;
+            margin-bottom: 2px;
+            float: left;
+            background-color:#fff;
+        }
+        .checkbox-mt{
+            margin-top: 2.3px;
+        }
+        #group-form table tbody tr.selected{
+            background-color:antiquewhite;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid h-100 p-0 m-0">
+        <div class="shadow scroll-fixed-top">
+            <div class="row mx-1 py-3" id="indent-filter">
+                <div class="col-auto">
+                    <button class="btn btn-system" id="add-btn">Add</button>
+                </div>
+                <div class="col-2">
+                    <input class="form-control" type="text" placeholder="group name" id="search-groupName">
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-system" id="search-btn">Search</button>
+                </div>
+            </div>
+        </div>
+        <div class="body-bottom">
+            <div class="row m-0 p-3">
+                <div class="table-common table-shadow">
+                    <table class="table pb-2 w-100 group-table fixed-table">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('../group/create.html') -%>
+
+        <script src="/jquery/dist/jquery.min.js"></script>
+        <script src="/javascripts/axios/axios.min.js"></script>
+        <script src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/javascripts/datatables/jquery.dataTables.min.js"></script>
+        <script src="/javascripts/datatables/dataTables.bootstrap4.min.js"></script>
+        <script src="/javascripts/layui/layui.js"></script>
+        <script src="/javascripts/moment.min.js"></script>
+        <script src="/javascripts/jquery-confirm/jquery-confirm.js"></script>
+        <script src="/javascripts/jquery-confirm/custom-confirm.js"></script>
+        <script src="/js/pageHelper.js"></script>
+        <script src="/js/modal.js"></script>
+        <script src="/js/common.js"></script>
+        <script src="/group/group.js"></script>
+        <script type="text/javascript" src="../../resize.js"></script>
+
+</body>
+
+</html>

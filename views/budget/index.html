@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Budget</title>
+    <!-- css -->
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/javascripts/layui/css/layui.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/budget/style.css">
+</head>
+
+<body>
+    <div class="container-fluid h-100 p-0 m-0">
+        <!-- <div class="budget-top shadow">
+            <div class="row h-100 mx-0 justify-content-around">
+                <div class="col align-self-center">
+                    <span class="page-title ps-3">Wallet Management</span>
+                </div>
+            </div>
+        </div> -->
+        <div class="budget-content">
+            <div class="row g-4" id="wallet-container">
+                <div class="col-xxl-3 col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                    <div class="budget-card w-register" data-bs-toggle="modal" data-bs-target="#registerModal">
+                        <div class="mb-3"><img src="../images/budget/create.svg"></div>
+                        <div><span class="fw-bold w-name">Register New Wallet</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('registerModal.html') -%>
+
+    <script type="text/html" id="walletHtml">
+        <div class="col-xxl-3 col-xl-3 col-lg-4 col-md-6 col-sm-6">
+            <div class="budget-card w-create" data-id="{{id}}" onclick="RedirectToDetail(this)">
+                <div class="mb-3 w-icon">{{icon}}</div>
+                <div class="text-center"><span class="fw-bold w-name">{{name}}</span></div>
+                <div class="text-center mt-1"><span class="w-description">{{description}}</span></div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="/javascripts/axios/axios.min.js"></script>
+    <script type="text/javascript" src="/javascripts/layui/layui.js"></script>
+    <script type="text/javascript" src="/moment/moment.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/budget/register.js"></script>
+    <script type="text/javascript" src="../resize.js"></script>
+
+</body>
+
+</html>

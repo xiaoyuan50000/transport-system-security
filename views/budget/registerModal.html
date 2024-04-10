@@ -1,0 +1,61 @@
+<div class="modal fade" id="registerModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0">
+            <div class="modal-header modal-header-background">
+                <h5 class="modal-title">Register Wallet</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row m-2">
+                    <div class="col-8 offset-2">
+                        <form id="register-modal-form">
+                            <div class="mb-2 row">
+                                <label for="nameOfWallet" class="col-sm-4 col-form-label">Name of Wallet:</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="nameOfWallet" autocomplete="off" placeholder="Unique">
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="description" class="col-sm-4 col-form-label">Description of Wallet:</label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" name="description" autocomplete="off" rows="5"></textarea>
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="funding" class="col-sm-4 col-form-label">Type of Funding:</label>
+                                <div class="col-sm-8">
+                                    <select class="form-select" name="funding">
+                                        <option value=""></option>
+                                        <option value="Central">Central</option>
+                                        <option value="Unit">Unit</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-2 row">
+                                <label for="amount" class="col-sm-4 col-form-label">Maximum Amount:</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="amount" autocomplete="off" onpaste="return false" oninput="CheckOnInput(this)">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-2 row">
+                                <label for="expiryDate" class="col-sm-4 col-form-label">Expiry Date:</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="expiryDate">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row justify-content-center pt-3">
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-system" id="save">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

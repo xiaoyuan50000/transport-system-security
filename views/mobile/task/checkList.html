@@ -1,0 +1,644 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+		<link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/javascripts/jquery-confirm/jquery-confirm.css">
+
+		<script src="/javascripts/jquery-3.6.0.min.js"></script>
+		<script type="text/javascript" src="/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+		<script src="/javascripts/axios/axios.min.js"></script>
+		<script src="/javascripts/moment.min.js"></script>
+		<script src="/javascripts/jquery-confirm/jquery-confirm.js"></script>
+		<script src="/javascripts/jquery-confirm/custom-confirm.js"></script>
+		<script src="/javascripts/jSignature.min.js"></script>
+
+		<link rel="icon" href="data:;base64,=">
+		<script src="/mobile/task/task.js"></script>
+		<script src="/mobile/task/script.js"></script>
+		<script src="/mobile/common.js"></script>
+
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0; 
+				border: 0;
+			}
+			body {
+				overflow-x: hidden;
+			}
+			tr,td,th{
+				border:1px solid;
+				height: 30px;
+				vertical-align:middle;
+			}
+			th {
+				background-color: rgb(234, 238, 238);
+			}
+			td {
+				min-height: 40px;
+			}
+			thead th {
+				border: none;
+			}
+			.title-div {
+				height: fit-content;
+				font-weight: 600;
+			}
+			.content-div {
+				width: 100vw;
+				height: fit-content;
+				overflow-y: auto;
+			}
+			.field-input-row {
+				height: 50px;
+				display: flex;
+				align-items: center;
+				justify-content: flex-start;
+				padding-right: 16px;
+			}
+			.field-label {
+				font-size: 14px;
+			}
+			.field-value-div {
+				border-bottom: 1px solid;
+			}
+			.field-value-input {
+				height: 36px;
+				line-height: 36px;
+				width: 100%;
+				outline: none;
+			}
+			.input_checkbox {
+				width: 16px;
+				height: 16px;
+			}
+			.td-checkbox {
+				text-align: center;
+			}
+			tbody {
+				font-size: 12px;
+			}
+			.group-label {
+				font-size: 14px;
+			}
+			.opt-btn-div {
+				width: 120px;
+				height: 40px;
+				border: 1px solid #c8c5c5;
+				border-radius: 30px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				color: #064220;
+				font-weight: 600;
+			}
+			.signature-container {
+				background-color: white; 
+				border: dashed 3px rgb(216, 216, 216); 
+				border-radius: 1em; 
+				height: 15em;
+				/* touch-action: none; */
+			}
+			/* .signature-container div {
+				touch-action: none;
+			} */
+		</style>
+	</head>
+	<body>
+		<form id="check-page-one-form">
+			<div class="top-content px-2">
+				<div class="title-div pt-4">
+					<label style="text-decoration: underline;">CR VEHICLES OPERATIONAL CHECK-LIST</label>
+				</div>
+				<div class="title-notes">
+					<label style="font-size: 12px;">Note: Any defects found are to be reported to the transport OIC immediately.
+						This checklist must be kept by units until the end of the hiring period
+					</label>
+				</div>
+				<div class="detail-info">
+					<div class="row field-input-row py-2">
+						<div class="col-5 field-label">Type of Vehicle:</div>
+						<div class="col-7 field-value-div">
+							<input class="field-value-input" name="oneVehicleType"></input>
+						</div>
+					</div>
+					<div class="row field-input-row py-2">
+						<div class="col-5 field-label">Vehicle No:</div>
+						<div class="col-7 field-value-div">
+							<input class="field-value-input" name="oneVehicleNo"></input>
+						</div> 
+					</div>
+					<div class="row field-input-row py-2">
+						<div class="col-5 field-label">Indent reference:</div>
+						<div class="col-7 field-value-div">
+							<input class="field-value-input" name="oneIndentReference"></input> 
+						</div>
+					</div>
+					<div class="row field-input-row py-2">
+						<div class="col-5 field-label">CVMS/PO No:</div>
+						<div class="col-7 field-value-div">
+							<input class="field-value-input" name="oneCVMSPONo"></input>
+						</div>
+					</div>
+					<div class="row field-input-row py-2">
+						<div class="col-5 field-label">Date& Time:</div>
+						<div class="col-7 field-value-div">
+							<input class="field-value-input" name="oneTopDateTime"></input>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="content-div px-2">
+				<table>
+					<thead>
+						<th style="width: 75%">DESCRIPTION</th>
+						<th style="width: 15%">PASSED</th>
+					</thead>
+					<tbody>
+						<tr>
+							<td colspan="1" style="font-size: 16px;">
+								GENERAL CHECKS
+							</td>
+							<td colspan="1" style="text-align: right; padding-right: 15px;">
+								<div style="display: flex;">Please <div style="width: 16px;height: 16px;border: 1px solid;border-radius: 3px;margin-left: 3px;"></div></div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<label class="group-label" style="text-decoration: underline;">Checking Oil & Lubricate are within the Minimum and Maximum mark.</label>
+							</td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;a) Engine Oil</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="engineOil"></input></td>
+						</tr>
+						<tr>
+							<td><label><label>&nbsp;&nbsp;b) Brake Fluid level</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="brakeFluidlevel"></input></td>
+						</tr><tr>
+							<td><label>&nbsp;&nbsp;c) Power Steering Oil</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="psOil"></input></td>
+						</tr><tr>
+							<td><label>&nbsp;&nbsp;d) Radiator Water</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="radiatorWater"></input></td>
+						</tr><tr>
+							<td><label>&nbsp;&nbsp;e) Hydraulic Oil (for crane & forklift)</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="hydraulicOil"></input></td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;f) Transmission Oil (for forklift)</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="transmissionOil"></input></td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<label class="group-label" style="text-decoration: underline;">Checking of tyre.</label>
+							</td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;a) All wheel nuts are intact</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allSheelNuts"></input></td>
+						</tr>
+						<tr>
+							<td><label><label>&nbsp;&nbsp;b) Tyre side wall no damage</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="tyreSideWall"></input></td>
+						</tr><tr>
+							<td><label>&nbsp;&nbsp;c) Tyre thread not bald</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="tyreThread"></input></td>
+						</tr><tr>
+							<td><label>&nbsp;&nbsp;d) Same tyre tread pattern are on the same axle</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="sameTyreThread"></input></td>
+						</tr><tr>
+							<td><label>&nbsp;&nbsp;e) Check that tyres are inflated</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="tyresInflated"></input></td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<label class="group-label" style="text-decoration: underline;">Checking of vehicle body.</label>
+							</td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;a) All doors are able to open and close properly</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allSoorsProperly"></input></td>
+						</tr>
+						<tr>
+							<td><label><label>&nbsp;&nbsp;b) Battery terminal, terminal insulators mounting bracket are intact and secured</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="batteryTerminal"></input></td>
+						</tr><tr>
+							<td><label>&nbsp;&nbsp;c) No damage to electrical connector</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="noDamage"></input></td>
+						</tr><tr>
+							<td><label>&nbsp;&nbsp;d) All mirrors are intact; NOT loose and NOT blurred</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allMirrors"></input></td>
+						</tr><tr>
+							<td><label>&nbsp;&nbsp;e) Windscreen not shattered or crack</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="windScreen"></input></td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;f) All Seat Belts are able to buckle & lock properly</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allSeatBelts"></input></td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;g) Seat are secured</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="seatSecured"></input></td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<label class="group-label" style="text-decoration: underline;">Checking of vehicle functions.</label>
+							</td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;a) Allowable free-play of Clutch/ Brake/ Steering. (not more than an inch)</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allowableFreePlay"></input></td>
+						</tr>
+						<tr>
+							<td><label><label>&nbsp;&nbsp;b) Headlight / Signal Light / Tail Light/ Brake Light / Horn / Wipers / Reverse light / Rear Spot Light (if applicable) / instrument panel warning lights and buzzer are in working condition.</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allLight"></input></td>
+						</tr><tr>
+							<td><label>&nbsp;&nbsp;c) Fuel Tank level is not less than ¾ tank</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="fuelTankLevel"></input></td>
+						</tr><tr>
+							<td><label>&nbsp;&nbsp;d) Vehicle is able to start and stop by ignition key</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="vehicleStartStop"></input></td>
+						</tr><tr>
+							<td><label>&nbsp;&nbsp;e) No abnormal noise, vibration and burning smell during ignition and while engine running</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="noiseVibration"></input></td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;f) No sign of oil leakage undercarriage</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="noSignOil"></input></td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;g) Brake is effective</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="brakeEffedtive"></input></td>
+						</tr>
+						<tr>
+							<td colspan="2" class="group-label">
+								The following are ADDITIONAL CHECKS for the specified platforms
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<label class="group-label" style="text-decoration: underline;">FOR TRAILERS ONLY</label> <label class="group-label">(i.e. Flatbed, Skeletal platform, Low Loader)</label>
+							</td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;Trailer left and right stabiliser bars are in working condition</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="trailerLeftRight"></input></td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;Check air coupling hose (yellow and red) for leakage after connected</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="airCouplingHose"></input></td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;Check for any damage electrical connector</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="damageElectrical"></input></td>
+						</tr>
+						<tr>
+							<td colspan="2" >
+								<label class="group-label" style="text-decoration: underline;">Vehicle BIIs & Document</label>
+							</td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;Jack & Handle</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="jackHandle"></input></td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;First Aid Kit</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="firstAidKit"></input></td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;Wheel Brace & Handle</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="wheelBrace"></input></td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;Warning Triangle</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="warningTriangle"></input></td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;Fire Extinguisher</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="fireExtinguisher"></input></td>
+						</tr>
+						<tr>
+							<td><label>&nbsp;&nbsp;Annual Vehicle Inspection Disc</label></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="annualVehicle"></input></td>
+						</tr>
+					</tbody>
+					
+				</table>
+			</div>
+			<div class="px-2">
+				<div class="detail-info">
+					<div class="col-12 field-label" style="padding-top: 10px;text-decoration: underline;font-weight: 600;">Transport Operator</div>
+					<div class="row field-input-row py-2">
+						<div class="col-5 field-label">Rank & Name: </div>
+						<div class="col-7 field-value-div">
+							<input class="field-value-input" name="toOneRankName"></input>
+						</div>
+					</div>
+					<div class="row field-input-row py-2">
+						<div class="col-5 field-label">Date: </div>
+						<div class="col-7 field-value-div">
+							<input class="field-value-input" name="toOneDate"></input>
+						</div>
+					</div>
+					<div class="row field-input-row py-2">
+						<div class="col-5 field-label">Time:</div>
+						<div class="col-7 field-value-div">
+							<input class="field-value-input" name="toOneTime"></input>
+						</div>
+					</div>
+					<div class="row field-input-row py-2" style="height: 200px;">
+						<div class="col-5 field-label" style="height: 100%;padding-top: 10px;">Signature:</div>
+						<div class="col-7 field-value-div" style="border: none; padding: 0px;">
+							<div class="row" style="height: 24px;">
+								<div class="col-6" style="height: 24px;"></div>
+								<div class="col-6" style="text-align: right; height: 24px;">
+									<p class="show-popup fw-bold" id="resetTooneSignature">Clear</p>
+								</div>
+							</div>
+							<div class="signature-container" style="margin: 0px; height: 150px;">
+								<div id="tooneSignature" name="tooneSignature" style="width: 100%; height: 100%;">
+		
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 field-label" style="padding-top: 10px;text-decoration: underline;font-weight: 600;">Transport Leader</div>
+					<div class="row field-input-row py-2">
+						<div class="col-5 field-label">Rank & Name: </div>
+						<div class="col-7 field-value-div">
+							<input class="field-value-input" name="tlOneRankName"></input>
+						</div>
+					</div>
+					<div class="row field-input-row py-2">
+						<div class="col-5 field-label">Date: </div>
+						<div class="col-7 field-value-div">
+							<input class="field-value-input" name="tlOneDate"></input>
+						</div>
+					</div>
+					<div class="row field-input-row py-2">
+						<div class="col-5 field-label">Time:</div>
+						<div class="col-7 field-value-div">
+							<input class="field-value-input" name="tlOneTime"></input>
+						</div>
+					</div>
+					<div class="row field-input-row py-2" style="height: 200px;">
+						<div class="col-5 field-label" style="height: 100%;padding-top: 10px;">Signature:</div>
+						<div class="col-7 field-value-div" style="border: none; padding: 0px;">
+							<div class="row" style="height: 24px;">
+								<div class="col-6" style="height: 24px;"></div>
+								<div class="col-6" style="text-align: right; height: 24px;">
+									<p class="show-popup fw-bold" id="resetTloneSignature">Clear</p>
+								</div>
+							</div>
+							<div class="signature-container" style="margin: 0px; height: 150px;">
+								<div id="tloneSignature" name="tloneSignature" style="width: 100%; height: 100%;">
+		
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+
+		<form id="check-page-two-form">
+			<div class="top-content px-2">
+				<div class="title-div pt-4">
+					<label style="text-decoration: underline;">HANDING/TAKING OVER CERTIFICATE FOR GOVERNMENT FURNISHED EQUIPMENT</label>
+				</div>
+			</div>
+			<div class="content-div px-2">
+				<div class="py-3 fs-6">
+					<label style="text-decoration: underline;font-weight: 600;">I, (NRIC No) , (R/NAME)</label> from <input style="width: 100px; border-bottom: 1px solid;" name="twoNricOrName"></input>declare that I had gone through the following list with the Tenderer's driver diligently to ensure proper handing and taking over of the items listed herein:
+				</div>
+				<table>
+					<thead>
+						<th style="width: 10%">S/N</th>
+						<th style="width: 60%">Description of Items</th>
+						<th style="width: 10%">Qty</th>
+						<th style="width: 30%">Remarks</th>
+					</thead>
+					<tbody>
+						<tr>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+						</tr>
+						<tr>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+						</tr>
+						<tr>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+						</tr>
+						<tr>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></input></td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="py-3">
+					In addition, both the Tenderer's driver and I have carried out the following checks on the Government Furnished Equipment (GFE),
+				</div>
+				<div class="formtwo-chicklist">
+					<div class="py-2">
+						<label class="">1. Stow away items have been removed from GFE.</label>
+						<div class="px-2">YES&nbsp;<input type="checkbox" class="checkbox-yes input_checkbox" name="stowAwayItemsYes"></input>&nbsp;&nbsp;NO&nbsp;<input type="checkbox" class="checkbox-no input_checkbox" name="stowAwayItemsNo"></input>&nbsp;<label style="font-size: 16px;text-decoration: underline;font-weight: 600;">(List reason below)</label></div>
+						<div style="width: 100%;height: fit-content; display: none;" class="no-reason-div">
+							<div class="px-2 py-1"><textarea name="stowAwayItemsReason" rows="3" type="text" class="form-control" autocomplete="off"></textarea></div>
+						</div>
+					</div>
+					<div class="py-2">
+						<label class="">2. GFE elevated parts have been depressed.</label>
+						<div class="px-2">YES&nbsp;<input type="checkbox" class="checkbox-yes input_checkbox" name="GFEElevatedPartsYes"></input>&nbsp;&nbsp;NO&nbsp;<input type="checkbox" class="checkbox-no input_checkbox" name="GFEElevatedPartsNo"></input>&nbsp;<label style="font-size: 16px;text-decoration: underline;font-weight: 600;">(List reason below)</label></div>
+						<div style="width: 100%;height: fit-content; display: none;" class="no-reason-div">
+							<div class="px-2 py-1"><textarea name="GFEElevatedPartsReason" rows="3" type="text" class="form-control" autocomplete="off"></textarea></div>
+						</div>
+					</div>
+					<div class="py-2">
+						<label class="">3. Physical measuring of the GFE height by Tenderer after loaded onto the low loader has been carried out.</label>
+						<div class="px-2">YES&nbsp;<input type="checkbox" class="checkbox-yes input_checkbox" name="physicalMeasuringYes"></input>&nbsp;&nbsp;NO&nbsp;<input type="checkbox" class="checkbox-no input_checkbox" name="physicalMeasuringNo"></input>&nbsp;<label style="font-size: 16px;text-decoration: underline;font-weight: 600;">(List reason below)</label></div>
+						<div style="width: 100%;height: fit-content; display: none;" class="no-reason-div">
+							<div class="px-2 py-1"><textarea name="physicalMeasuringReason" rows="3" type="text" class="form-control" autocomplete="off"></textarea></div>
+						</div>
+					</div>
+					<div class="py-2">
+						<label class="">4. A physical check and identification of the anchor point on the lashing for the GFE have been carried out.</label>
+						<div class="px-2">YES&nbsp;<input type="checkbox" class="checkbox-yes input_checkbox" name="physicalCheckYes"></input>&nbsp;&nbsp;NO&nbsp;<input type="checkbox" class="checkbox-no input_checkbox" name="physicalCheckNo"></input>&nbsp;<label style="font-size: 16px;text-decoration: underline;font-weight: 600;">(List reason below)</label></div>
+						<div style="width: 100%;height: fit-content; display: none;" class="no-reason-div">
+							<div class="px-2 py-1"><textarea name="physicalCheckReason" rows="3" type="text" class="form-control" autocomplete="off"></textarea></div>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+			<div class="px-2 mt-4">
+				<div class="col-12 field-label" style="padding-top: 10px;text-decoration: underline;font-weight: 600;"><label style="text-decoration: underline;">HANDING OVER BY: </label>(UNIT)</div>
+				<div class="row field-input-row py-2">
+					<div class="col-5 field-label">Rank & Name: </div>
+					<div class="col-7 field-value-div">
+						<input class="field-value-input" name="hoUnitRankName"></input>
+					</div>
+				</div>
+				<div class="row field-input-row py-2">
+					<div class="col-5 field-label">Date: </div>
+					<div class="col-7 field-value-div">
+						<input class="field-value-input" name="hoUnitDate"></input>
+					</div>
+				</div>
+				<div class="row field-input-row py-2">
+					<div class="col-5 field-label">Time:</div>
+					<div class="col-7 field-value-div">
+						<input class="field-value-input" name="hoUnitTime"></input>
+					</div>
+				</div>
+				<div class="row field-input-row py-2" style="height: 200px;">
+					<div class="col-5 field-label" style="height: 100%;padding-top: 10px;">Signature:</div>
+					<div class="col-7 field-value-div" style="border: none; padding: 0px;">
+						<div class="row" style="height: 24px;">
+							<div class="col-6" style="height: 24px;"></div>
+							<div class="col-6" style="text-align: right; height: 24px;">
+								<p class="show-popup fw-bold" id="resetHoUnitSignature">Clear</p>
+							</div>
+						</div>
+						<div class="signature-container" style="margin: 0px; height: 150px;">
+							<div id="hoUnitSignature" name="hoUnitSignature" style="width: 100%; height: 100%;">
+	
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-12 field-label" style="padding-top: 10px;text-decoration: underline;font-weight: 600;"><label style="text-decoration: underline;">TAKING OVER BY: </label>(TENDERER)</div>
+				<div class="row field-input-row py-2">
+					<div class="col-5 field-label">Name: </div>
+					<div class="col-7 field-value-div">
+						<input class="field-value-input" name="toTendererName"></input>
+					</div>
+				</div>
+				<div class="row field-input-row py-2">
+					<div class="col-5 field-label">Date: </div>
+					<div class="col-7 field-value-div">
+						<input class="field-value-input" name="toTendererDate"></input>
+					</div>
+				</div>
+				<div class="row field-input-row py-2">
+					<div class="col-5 field-label">Time:</div>
+					<div class="col-7 field-value-div">
+						<input class="field-value-input" name="toTendererTime"></input>
+					</div>
+				</div>
+				<div class="row field-input-row py-2" style="height: 200px;">
+					<div class="col-5 field-label" style="height: 100%;padding-top: 10px;">Signature:</div>
+					<div class="col-7 field-value-div" style="border: none; padding: 0px;">
+						<div class="row" style="height: 24px;">
+							<div class="col-6" style="height: 24px;"></div>
+							<div class="col-6" style="text-align: right; height: 24px;">
+								<p class="show-popup fw-bold" id="resetToTendererSignature">Clear</p>
+							</div>
+						</div>
+						<div class="signature-container" style="margin: 0px; height: 150px;">
+							<div id="toTendererSignature" name="toTendererSignature" style="width: 100%; height: 100%;">
+	
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-12 field-label" style="padding-top: 10px;text-decoration: underline;font-weight: 600;"><label style="text-decoration: underline;">HANDING OVER BY: </label>(TENDERER)</div>
+				<div class="row field-input-row py-2">
+					<div class="col-5 field-label">Name: </div>
+					<div class="col-7 field-value-div">
+						<input class="field-value-input" name="hoTendererName"></input>
+					</div>
+				</div>
+				<div class="row field-input-row py-2">
+					<div class="col-5 field-label">Date: </div>
+					<div class="col-7 field-value-div">
+						<input class="field-value-input" name="hoTendererDate"></input>
+					</div>
+				</div>
+				<div class="row field-input-row py-2">
+					<div class="col-5 field-label">Time:</div>
+					<div class="col-7 field-value-div">
+						<input class="field-value-input" name="hoTendererTime"></input>
+					</div>
+				</div>
+				<div class="row field-input-row py-2" style="height: 200px;">
+					<div class="col-5 field-label" style="height: 100%;padding-top: 10px;">Signature:</div>
+					<div class="col-7 field-value-div" style="border: none; padding: 0px;">
+						<div class="row" style="height: 24px;">
+							<div class="col-6" style="height: 24px;"></div>
+							<div class="col-6" style="text-align: right; height: 24px;">
+								<p class="show-popup fw-bold" id="resetHoTendererSignature">Clear</p>
+							</div>
+						</div>
+						<div class="signature-container" style="margin: 0px; height: 150px;">
+							<div id="hoTendererSignature" name="hoTendererSignature" style="width: 100%; height: 100%;">
+	
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-12 field-label" style="padding-top: 10px;text-decoration: underline;font-weight: 600;"><label style="text-decoration: underline;">TAKING OVER BY: </label>(UNIT)</div>
+				<div class="row field-input-row py-2">
+					<div class="col-5 field-label">Rank and Name: </div>
+					<div class="col-7 field-value-div">
+						<input class="field-value-input" name="toUnitRankName"></input>
+					</div>
+				</div>
+				<div class="row field-input-row py-2">
+					<div class="col-5 field-label">Date: </div>
+					<div class="col-7 field-value-div">
+						<input class="field-value-input" name="toUnitDate"></input>
+					</div>
+				</div>
+				<div class="row field-input-row py-2">
+					<div class="col-5 field-label">Time:</div>
+					<div class="col-7 field-value-div">
+						<input class="field-value-input" name="toUnitTime"></input>
+					</div>
+				</div>
+				<div class="row field-input-row py-2" style="height: 200px;">
+					<div class="col-5 field-label" style="height: 100%;padding-top: 10px;">Signature:</div>
+					<div class="col-7 field-value-div" style="border: none; padding: 0px;">
+						<div class="row" style="height: 24px;">
+							<div class="col-6" style="height: 24px;"></div>
+							<div class="col-6" style="text-align: right; height: 24px;">
+								<p class="show-popup fw-bold" id="resetToUnitSignature">Clear</p>
+							</div>
+						</div>
+						<div class="signature-container" style="margin: 0px; height: 150px;">
+							<div id="toUnitSignature" name="toUnitSignature" style="width: 100%; height: 100%;">
+	
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+		<div class="px-2 mt-4" style="display: flex;">
+			<div style="width: 50%;display: flex;justify-content: flex-start;">
+				<div class="opt-btn-div" onclick="backToTaskList();">
+					<label class="fs-6">Cancel</label>
+				</div>
+			</div>
+			<div style="width: 50%;display: flex;justify-content: flex-end;">
+				<div onclick="submitCheckList();" class="opt-btn-div" style="background-color: #064220;">
+					<label style="color: white;" class="fs-6">Submit</label>
+				</div>
+			</div>
+		</div>
+		<div style="width: 100vw;height: 100px;"></div>
+	</body>
+
+	<script src="/mobile/task/checkList.js"></script>
+</html>

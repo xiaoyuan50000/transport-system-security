@@ -1,0 +1,33 @@
+.bg-black{
+    background-color: #204B4D !important;
+}
+.navbar-toggler{
+    color: white;
+    border-color: white;
+    background-color: white;
+}
+.navbar{
+    padding: 0rem 10px !important;
+}
+.navbar-light .navbar-nav .nav-link{
+    color: white !important;
+}
+
+.nav-item{
+    padding: 16px 0 0 0;
+    text-align: center;
+    width: 95px;
+    cursor: pointer;
+}
+
+.active{
+    background-color: #D88817;
+}
+
+.iframe-container{
+    width: 100%;
+    /* height: calc(100% - 82px); */
+    height: -webkit-fill-available;
+    position: fixed;
+    border: none;
+}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <!-- <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" /> -->
+    <meta charset="UTF-8">
+    <title>
+        <%= title%>
+    </title>
+    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./javascripts/jquery-confirm/jquery-confirm.css">
+    <link rel="stylesheet" href="./stylesheets/login.css">
+    <link rel="stylesheet" href="./stylesheets/style.css">
+</head>
+
+<body>
+    <div class="shadow bg-body position-absolute row login-div" data-error="<%= error%>">
+        <div class="col col-6 h-100 login-bg" style="padding: 0;width: 50% !important;">
+            <div class="p-5">
+                <div class="div-img">
+                    <img src="images/login/logo.svg"/>
+                    
+                    <br>
+                    <br>
+                
+                    <img style="width: 100px;" src="images/login/logo-text.svg"/>
+                </div>
+            </div>
+        </div>
+        <div class="col col-6 h-100" style="width: 50% !important;">
+            <div class="login-content mb-1 p-5">
+                <div class="mb-3">
+                    <label class="form-label">Login Name</label>
+                    <input type="text" name="username" class="form-control"  placeholder="" autocomplete="off">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control"  placeholder="" autocomplete="off">
+                </div>
+                <div class="mb-3">
+                    <p class="text-end"><a href="#" style="color: #3A5EC5;">Forgot Password?</a></p>
+                </div>
+                <div class="mb-2">
+                    <div class="d-grid gap-2 mx-auto">
+                        <button class="btn btn-primary btn-login" name="btn-login" type="button">Login</button>
+                    </div>
+                    <div class="d-grid gap-2 mx-auto pt-3">
+                        <button class="btn btn-primary btn-login-singpass" name="btn-login-singpass" type="button">Login Using Singpass</button>
+                    </div>
+                    <div class="d-grid gap-2 mx-auto pt-3">
+                        <button class="btn btn-primary btn-register-account" name="btn-register-account" type="button">Register Account</button>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="row login-content mb-1 p-5 h-100 align-items-center">
+                <div class="mb-2 col-12">
+                    <div class="d-grid gap-2 mx-auto pt-3">
+                        <button class="btn btn-primary btn-login-singpass" name="btn-login-singpass" type="button">Login Using Singpass</button>
+                    </div>
+                    <div class="d-grid gap-2 mx-auto pt-3">
+                        <button class="btn btn-primary btn-register-account" name="btn-register-account" type="button">Register Account</button>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+    </div>
+
+    <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+    <script src="./javascripts/axios/axios.min.js"></script>
+    <script src="../javascripts/moment.min.js"></script>
+    <script src="./javascripts/jquery-confirm/jquery-confirm.js"></script>
+    <script src="./javascripts/jquery-confirm/custom-confirm.js"></script>
+    <script type="text/javascript" src="/crypto-js/crypto-js.js"></script>
+
+    <script src="./user/login.js"></script>
+</body>
+</html>
