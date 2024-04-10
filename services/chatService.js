@@ -2,24 +2,20 @@ const log4js = require('../log4js/log.js');
 const log = log4js.logger('Chat Service');
 
 const { sequelizeObj } = require('../sequelize/dbConf');
-const { QueryTypes, Model, Op } = require('sequelize');
+const { QueryTypes } = require('sequelize');
 const moment = require('moment');
 
 const formidable = require('formidable');
 const fs = require('fs');
 const path = require('path');
 
-const { User } = require('../model/user');
 const { Role } = require('../model/role');
 const { Message } = require('../model/message');
-const { Request2 } = require('../model/request2');
-const { OperationHistory, Job2 } = require('../model/job2');
+const { OperationHistory } = require('../model/job2');
 
-const conf = require('../conf/conf.js');
 const utils = require('../util/utils');
 const { ROLE, INDENT_STATUS } = require('../util/content');
 const Response = require('../util/response.js');
-const { Task2 } = require('../model/task.js');
 
 module.exports.getSimpleChatInfo = async function (req, res) {
 	let userId = req.body.userId;
@@ -30,7 +26,6 @@ module.exports.getSimpleChatInfo = async function (req, res) {
 	if (user.roleName !== ROLE.TSP) {
 		// Find TSP user
 		let role = await getRoleModel(ROLE.TSP);
-		// targetUser = await User.findAll({ where: { group: user.group, role: role.id } });
 		targetUser = await sequelizeObj.query(`
 			SELECT u.*, r.roleName FROM \`user\` u  
 			LEFT JOIN role r ON r.id = u.role
@@ -130,9 +125,14 @@ module.exports.sendChatMessage = async function (req, res) {
 
 
 module.exports.uploadChatFile = async function (req, res) {
-	const form = formidable({ multiples: true, maxFileSize: 10 * 1024 * 1024, keepExtensions: false });
 	let chatUploadPath = path.join('./', 'public/chat/upload/');
 	if (!fs.existsSync(chatUploadPath)) fs.mkdirSync(chatUploadPath);
+	const form = formidable({ 
+		multiples: true, 
+		maxFileSize: 10 * 1024 * 1024, 
+		keepExtensions: false, 
+		uploadDir: chatUploadPath 
+	});
 	form.parse(req, async (error, fields, files) => {
 		if (error) {
 			log.error(error)
@@ -140,17 +140,13 @@ module.exports.uploadChatFile = async function (req, res) {
 		}
 		log.info('fields: ', JSON.stringify(fields))
 		log.info('files: ', JSON.stringify(files))
-		// TODO: change to array object(allow multi files upload)
 		if (!Array.isArray(files.file)) files.files = [files.file];
 		let currentUser = JSON.parse(fields.currentUser);
 		let targetUser = JSON.parse(fields.targetUser);
 		let taskId = fields.taskId;
-		// console.log(currentUser)
-		// console.log(targetUser)
 
 		let messageList = [];
 		for (let file of files.files) {
-			// Store file info public
 			let newFilePath = chatUploadPath + file.name;
 			fs.copyFileSync(file.path, newFilePath);
 			let message = {
