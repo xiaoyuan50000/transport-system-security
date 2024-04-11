@@ -586,7 +586,9 @@ const selectOrCancelTrip = function(ele, isAll) {
     let isSelectd = $(ele).hasClass("active");
     if (isSelectd) {
         $(ele).removeClass("active");
-        $(ele).hasClass("unactive") ? '' : $(ele).addClass("unactive");
+        if(!$(ele).hasClass("unactive")){
+            $(ele).addClass("unactive")
+        }
         if (isAll) {
             $(ele).parent().parent().parent().next().find(".trip-selector").removeClass("active");
         } else {
@@ -594,7 +596,9 @@ const selectOrCancelTrip = function(ele, isAll) {
         }
     } else {
         $(ele).removeClass("unactive");
-        $(ele).hasClass("active") ? '' : $(ele).addClass("active");
+        if(!$(ele).hasClass("active")){
+            $(ele).addClass("active")
+        }
         if (isAll) {
             $(ele).parent().parent().parent().next().find(".trip-selector").addClass("active");
         }  else {
@@ -941,7 +945,13 @@ const confirmOpt = function(optType) {
         },
         async function ($this) {
             let remarks = $this.$content.find("textarea").val();
-            optType == 'Cancel' ? confirmCancel(remarks) : optType == 'Reject' ? confirmReject(remarks) : optType == 'Approve' ? confirmApprove(remarks) : '';
+            if(optType == 'Cancel'){
+                confirmCancel(remarks)
+            } else if(optType == 'Reject'){
+                confirmReject(remarks)
+            }else if(optType == 'Approve'){
+                confirmApprove(remarks)
+            }
         }
     );
 }

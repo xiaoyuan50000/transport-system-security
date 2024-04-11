@@ -191,7 +191,6 @@ var ChatUtil = function () {
 			$('.chat-audio').off('click').on('click', function () {
 				$.confirm({
 					title: 'Audio',
-					closeIcon: true,
 					closeIcon: function () {
 						console.log('Close audio here.')
 						recStop();

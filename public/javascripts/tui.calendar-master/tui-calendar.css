@@ -1040,7 +1040,6 @@ input[type='checkbox'].tui-full-calendar-checkbox-round + span {
   line-height: 24px;
   height: 24px;
   font-size: 12px;
-  line-height: 2;
 }
 .tui-full-calendar-popup-detail .tui-full-calendar-section-header {
   margin-bottom: 6px;

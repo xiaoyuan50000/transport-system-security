@@ -44,8 +44,10 @@ const initIndentFlowPage = function(flowDataList) {
     let currentIndex = 0;
     for (let row of flowDataList) {
         currentIndex++;
-        let indentFlowColor = indentFlowColors[row.action];
-        indentFlowColor ? indentFlowColor : '#9D9D9D';
+        let indentFlowColor = '#9D9D9D';
+        if(indentFlowColors[row.action]){
+            indentFlowColor = indentFlowColors[row.action];
+        }
 
         let actionClass = row.action.toLowerCase().split(' ').join('');
         let username = row.username

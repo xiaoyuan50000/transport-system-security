@@ -103,9 +103,7 @@ html{font-size:16px}
 	padding: 0.5rem 0;
 	position: relative;
 }
-.calendar_week{
-	/*border-bottom: solid 1px #ddd;*/
-}
+
 .calendar_week > li{
 	padding: 1rem 0;
 }
@@ -197,14 +195,12 @@ html{font-size:16px}
 	padding: 0;
 }
 .jcalendar_week .calendar_header{
-	/*border-bottom: solid 1px #ddd;*/
 	padding-bottom: 0.25rem;
 }
 .jcalendar_week .calendar_day_bar{
 	padding: 0.75rem 0 0.75rem;
 }
 .jcalendar_week .calendar_week{
-	/*padding-bottom: 1rem;*/
 	font-size: 0.625rem;
 }
 .jc_week_act .calendar_day_i{
@@ -247,8 +243,7 @@ html{font-size:16px}
 	line-height: 1.5rem;
 	font-size: 1.5rem;
 	color: #666666;
-	font-family: -webkit-body;
-	font-family: body;
+	font-family: Helvetica, Arial, Verdana, Tahoma, sans-serif;
 	border-radius: 0.25rem;
 }
 .pop_close:active{

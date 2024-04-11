@@ -16,7 +16,6 @@ $(function () {
         "ordering": false,
         "searching": false,
         "paging": true,
-        "pageLength": 10,
         "autoWidth": false,
         "language": PageHelper.language(),
         "lengthMenu": PageHelper.lengthMenu(),

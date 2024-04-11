@@ -1,5 +1,5 @@
 window.onload = function() {
-    //loadPage();
+    //setTimeout(openApp(), 2000)
 };
 
 const isIOS = function(){
@@ -11,9 +11,6 @@ const isIOS = function(){
     }
 }
 
-function loadPage() {
-    setTimeout(openApp(), 2000)
-}
 
 function openApp() {
     let singpassNric = document.getElementById('singpassNricDiv').innerHTML

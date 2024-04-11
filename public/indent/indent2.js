@@ -12,7 +12,6 @@ $(function () {
         "ordering": false,
         "searching": false,
         "paging": true,
-        "pageLength": 10,
         "autoWidth": false,
         "language": PageHelper.language(),
         "lengthMenu": PageHelper.lengthMenu(),
@@ -125,7 +124,7 @@ const GetFilerParameters = function () {
     let nodeList = []
     if (node != "") {
         nodeList = [node]
-    } else if (hub != "" && node == "") {
+    } else if (hub != "" && node == "" && hubNodeList.length>0) {
         let hubNodes = hubNodeList.filter(a => a.unit == hub)
         nodeList = hubNodes.map(a => a.id)
     }
@@ -331,9 +330,6 @@ const TableColumn = {
         else if (data.toLowerCase() == "arrived") {
             return `<label class="color-arrived">${data}</label>`
         }
-        else if (data.toLowerCase() == "arrived") {
-            return `<label class="color-arrived">${data}</label>`
-        }
         else if (data.toLowerCase() == "no show" || data.toLowerCase() == "no show (system)") {
             return `<label class="color-noshow">${data}</label>`
         }
@@ -424,7 +420,7 @@ function format(datas) {
     for (var item of datas) {
         let taskStatus = item.status
 
-        tr += `<tr ${lastOptTripIds.includes(item.tripId) ? 'class="pending-action-background"' : ''}>
+        tr += `<tr ${lastOptTripIds.length > 0 && lastOptTripIds.includes(item.tripId) ? 'class="pending-action-background"' : ''}>
             <td style="width: ${columnWidth[0]}">${TableColumn.GetCheckBoxColumn(item)}</td>
             <td style="width: ${columnWidth[1]}"></td>
             <td style="width: ${columnWidth[2]}">${TableColumn.GetIndentDetailColumn(item)}</td>

@@ -11,7 +11,6 @@ const initTable = function () {
         "ordering": false,
         "searching": false,
         "paging": true,
-        "pageLength": 10,
         "language": PageHelper.language(),
         "lengthMenu": PageHelper.lengthMenu(),
         "dom": PageHelper.dom(),

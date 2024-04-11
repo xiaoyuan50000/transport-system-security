@@ -32,10 +32,10 @@
                 </div>
             </div>
             <div class="row m-0 p-0 position-relative">
-                <img id="l-scroll-btn" src="../images/budget/left.svg">
-                <img id="r-scroll-btn" src="../images/budget/right.svg">
+                <img id="l-scroll-btn" src="../images/budget/left.svg" alt="left">
+                <img id="r-scroll-btn" src="../images/budget/right.svg" alt="right">
                 <div class="p-0 table-wrappler" id="table-wrappler">
-                    <table class="wallet-table w-100"></table>
+                    <table class="wallet-table w-100" aria-hidden="true"></table>
                 </div>
             </div>
         </div>
@@ -48,29 +48,34 @@
                                 <span class="fw-bold" id="wallet-detail-name"></span>
                             </div>
                             <div>
-                                <img class="me-2" role="button" id="income-btn" style="width: 25px;" src="../images/budget/income.svg">
-                                <img class="me-2" role="button" id="payout-btn" style="width: 25px;" src="../images/budget/payout.svg">
+                                
+                                <button class="me-2 btn btn-sm p-0" id="income-btn">
+                                    <img style="width: 28px;" src="../images/budget/income.svg" alt="income">
+                                </button>
+                                <button class="me-2 btn btn-sm p-0" id="payout-btn">
+                                    <img style="width: 28px;" src="../images/budget/payout.svg" alt="payout">
+                                </button>
                                 <button class="me-2 btn btn-sm btn-seemore" id="see-amount-records">
-                                    <img style="width: 16px;" src="../images/budget/more.svg">
+                                    <img style="width: 16px;" src="../images/budget/more.svg" alt="more">
                                 </button>
                             </div>
                         </div>
                         <div class="wallet-detail-content p-5">
                             <div class="row g-0">
                                 <div class="col-4">
-                                    <div><img style="width: 25px;" src="../images/budget/Actual-1.svg"></div>
+                                    <div><img style="width: 25px;" src="../images/budget/Actual-1.svg" alt="actual"></div>
                                     <div><span class="fw-bold">Actual</span></div>
                                     <div class="mt-1 mb-2 wallet-detail-describe"><span class="describe-color">(Total - Spent)</span></div>
                                     <div class="momey-income-color fw-bold"><span>$ </span><span id="wallet-detail-actual">00.00</span></div>
                                 </div>
                                 <div class="col-4">
-                                    <div><img style="width: 25px;" src="../images/budget/Holding-1.svg"></div>
+                                    <div><img style="width: 25px;" src="../images/budget/Holding-1.svg" alt="holding"></div>
                                     <div><span class="fw-bold">Holding</span></div>
                                     <div class="mt-1 mb-2 wallet-detail-describe"></div>
                                     <div class="momey-income-color fw-bold"><span>$ </span><span id="wallet-detail-holding">00.00</span></div>
                                 </div>
                                 <div class="col-4">
-                                    <div><img style="width: 25px;" src="../images/budget/Projection-1.svg"></div>
+                                    <div><img style="width: 25px;" src="../images/budget/Projection-1.svg" alt="projection"></div>
                                     <div><span class="fw-bold">Projection</span></div>
                                     <div class="mt-1 mb-2 wallet-detail-describe"><span class="describe-color">(Total - Spent- Holding)</span></div>
                                     <div class="momey-income-color fw-bold"><span>$ </span><span id="wallet-detail-projection">00.00</span></div>
@@ -110,7 +115,7 @@
                         </div>
                         <div class="row">
                             <div class="p-4">
-                                <table class="table latestTransaction-table w-100 px-5"></table>
+                                <table class="table latestTransaction-table w-100 px-5" aria-hidden="true"></table>
                                 <div class="w-100 text-center" id="seemore">
                                     
                                 </div>
@@ -127,7 +132,7 @@
             <div class="row w-100 align-items-center mb-4">
                 <div class="col-12">
                     <div class="w-inline">
-                        <img src="../images/budget/Wallet.svg">
+                        <img src="../images/budget/Wallet.svg" alt="wallet">
                         <span class="fw-bold">{{walletName}}</span>
                     </div>
                 </div>
@@ -135,13 +140,13 @@
             <div class="row w-100">
                 <div class="col-6">
                     <div class="w-inline">
-                        <img src="../images/budget/Spent.svg">
+                        <img src="../images/budget/Spent.svg" alt="spent">
                         <span class="describe-color">Spent</span>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="w-inline">
-                        <img src="../images/budget/Projection-2.svg">
+                        <img src="../images/budget/Projection-2.svg" alt="actual">
                         <span class="describe-color">Actual</span>
                     </div>
                 </div>

@@ -598,11 +598,8 @@ const loadRate = function (starVal) {
             theme: starColor,
             choose: function (value) {
                 rateVal = value
-                if (value <= review.negativeStarVal) {
-                    loadRate(value)
-                } else {
-                    loadRate(value)
-                }
+                
+                loadRate(value)
                 changeQuestion(value)
             }
         });

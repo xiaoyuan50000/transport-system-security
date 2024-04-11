@@ -1,7 +1,7 @@
 var user = parent.user;
 var roleName = user.roleName;
 var table
-var needInitDateEle = [];
+// var needInitDateEle = [];
 var lastOptTask = [];
 var mobiusSubUnits = [];
 var hubNodeList = []
@@ -13,7 +13,6 @@ $(function () {
         "ordering": false,
         "searching": false,
         "paging": true,
-        "pageLength": 10,
         "autoWidth": false,
         "fixedHeader": true,
         "scrollX": "auto",
@@ -46,11 +45,11 @@ $(function () {
         "initComplete": function (settings, json) {
             $(".jobTask-table thead tr th:first").append(`<input type="checkbox" class="checkAll" onchange="checkAllOrNot()" />`);
         },
-        "footerCallback": function (tfoot, data, start, end, display) {
-            needInitDateEle.forEach((ele, index) => {
-                InitOptateTimeSelector(ele.taskId, ele.eleId, ele.timeType, ele.defaultVal);
-            });
-        },
+        // "footerCallback": function (tfoot, data, start, end, display) {
+        //     needInitDateEle.forEach((ele, index) => {
+        //         InitOptateTimeSelector(ele.taskId, ele.eleId, ele.timeType, ele.defaultVal);
+        //     });
+        // },
         "createdRow": function (row, data, index) {
             if (lastOptTask.includes(data.copyFrom)) {
                 $('td', row).addClass("pending-action-background")

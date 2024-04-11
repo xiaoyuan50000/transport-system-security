@@ -441,7 +441,6 @@
     font-size: 12px;
     line-height: 20px;
     border: 1px solid #ddd;
-    padding: 0 30px 0 10px;
     text-align: left;
     background: #fff;
     cursor: pointer
@@ -494,7 +493,6 @@
 .tui-datepicker-dropdown .tui-menu-item {
     position: relative;
     overflow: hidden;
-    position: relative;
     height: 28px;
     line-height: 28px;
     background-color: #fff;

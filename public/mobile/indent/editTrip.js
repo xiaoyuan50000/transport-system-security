@@ -261,7 +261,7 @@ const AddBtnListening = function () {
         $(".trip-div").show();
     })
     $(".confirm-add-btn").on("click", function () {
-        AddTrip('Create')
+        AddTrip()
     })
     $(".back-indent-btn").on("click", function () {
         $(".base-info").addClass("active");

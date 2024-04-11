@@ -51,7 +51,7 @@ const submitForm = function() {
     }
 }
 
-const check = async function (input) {
+const check = function (input) {
     let value = input.value.trim();
     let name = $(input).attr("name")
     let errorFieldName = $(input).prev().html()
