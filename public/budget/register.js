@@ -1,4 +1,4 @@
-var roleName = top.user.roleName
+let roleName = top.user.roleName
 // var registerModal = new bootstrap.Modal(document.getElementById('registerModal'))
 $(function () {
     InitFunding()
@@ -11,7 +11,7 @@ $(function () {
 })
 
 const InitRegisterModalEventListener = function () {
-    var modal = document.getElementById('registerModal')
+    let modal = document.getElementById('registerModal')
     modal.addEventListener('hidden.bs.modal', function (event) {
         CleanForm()
     })
@@ -19,7 +19,7 @@ const InitRegisterModalEventListener = function () {
 
 const InitDateSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let option = {
             elem: "#register-modal-form input[name='expiryDate']",
             lang: 'en',
@@ -50,15 +50,15 @@ const CleanForm = function () {
 
 const CheckOnInput = function (e) {
     e.value = e.value
-        .replace(/^0[0-9]+/, val => val[1])
+        .replace(/^0[\d]+/, val => val[1])
         .replace(/^(\.)+/, '')
         .replace(/[^\d.]/g, '')
         .replace(/\.+/, '.')
-        .replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3');
+        .replace(/^(-)*(\d+)\.(\d\d).*$/, '$1$2.$3');
 }
 
 const ValidFormBeforeSubmit = function (data) {
-    for (var key in data) {
+    for (let key in data) {
         if (data[key] == "" || data[key] == []) {
             let errorLabel = $(`#register-modal-form input[name='${key}'],#register-modal-form textarea[name='${key}'],#register-modal-form select[name='${key}']`).closest(".row").find("label").html()
             errorLabel = errorLabel.replace(":", "")

@@ -179,7 +179,6 @@ body {
     display: flex;
     justify-content: flex-start;
     flex-wrap: wrap;
-    /*margin: 0 calc(var(--bs-gutter-x) * -.5);*/
 }
 
 .wallet-table thead tr {
@@ -225,7 +224,6 @@ body {
 
 
 
-/**/
 .btn-seemore { 
     color: #FFFFFF; 
     background-color: #1A8D4A; 

@@ -105,30 +105,37 @@ module.exports.User = dbConf.sequelizeObj.define('user', {
 });
 
 const CheckUserStatus = function (status, activeTime, lastLoginTime, createdAt) {
-    lastLoginTime = lastLoginTime == null ? createdAt : lastLoginTime
+    if (!lastLoginTime) {
+        lastLoginTime = createdAt
+    }
     let day90 = 90
     let day180 = 180
     if (status != null) {
-        if (status == USER_STATUS.Active) {
-            lastLoginTime = moment(lastLoginTime).isSameOrAfter(moment(activeTime)) ? lastLoginTime : activeTime
-        } else if (status == USER_STATUS.LockOut) {
+        if (status == USER_STATUS.Active && !moment(lastLoginTime).isSameOrAfter(moment(activeTime))) {
+            lastLoginTime = activeTime
+        }
+
+        if (status == USER_STATUS.LockOut) {
             if (CheckIfDaysPassed(lastLoginTime, day180)) {
                 return USER_STATUS.Deactivated
             } else {
                 return USER_STATUS.LockOut
             }
-        } else if (status == USER_STATUS.Deactivated) {
+        }
+
+        if (status == USER_STATUS.Deactivated) {
             return USER_STATUS.Deactivated
         }
     }
 
+
     if (CheckIfDaysPassed(lastLoginTime, day180)) {
         return USER_STATUS.Deactivated
-    } else if (CheckIfDaysPassed(lastLoginTime, day90)) {
-        return USER_STATUS.LockOut
-    } else {
-        return USER_STATUS.Active
     }
+    if (CheckIfDaysPassed(lastLoginTime, day90)) {
+        return USER_STATUS.LockOut
+    }
+    return USER_STATUS.Active
 }
 
 const CheckIfDaysPassed = function (lastLoginTime, day) {

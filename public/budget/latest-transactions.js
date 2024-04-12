@@ -1,5 +1,5 @@
 $(function () {
-    latestTransactionsModal = document.getElementById('latestTransactionsModal')
+    let latestTransactionsModal = document.getElementById('latestTransactionsModal')
     latestTransactionsModal.addEventListener('hidden.bs.modal', function (event) {
     })
     latestTransactionsModal.addEventListener('show.bs.modal', function (event) {
@@ -8,7 +8,7 @@ $(function () {
         let walletName = button.getAttribute('data-bs-name')
         let modalTitle = latestTransactionsModal.querySelector('.modal-title')
         modalTitle.textContent = `Latest Transactions (${walletName})`
-        driverTable = $('.latestTransaction-seemore-table').DataTable({
+        $('.latestTransaction-seemore-table').DataTable({
             "ordering": false,
             "searching": false,
             "paging": true,
@@ -89,7 +89,7 @@ $(function () {
         let walletName = full.walletName
         let modalTitle = amountTransactionsModalObj.querySelector('.modal-title')
         modalTitle.textContent = `Amount Transactions (${walletName})`
-        driverTable = $('.amountTransaction-seemore-table').DataTable({
+        $('.amountTransaction-seemore-table').DataTable({
             "ordering": false,
             "searching": false,
             "paging": true,

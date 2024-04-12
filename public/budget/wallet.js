@@ -1,12 +1,12 @@
-var table;
-var latestTransactionTable;
-var fundingSelectElem = $("#wallet-search select[name='funding']")
-var walletNameElem = $("#wallet-search input[name='walletName']")
-var walletCardHtml = $("#walletCardHtml").html();
-var _scrollLeft = 0
-var _scrollLeftLength = 0
-var step = 100;
-var redirectWalletId = $('body').data('id')
+let table;
+let latestTransactionTable;
+let fundingSelectElem = $("#wallet-search select[name='funding']")
+let walletNameElem = $("#wallet-search input[name='walletName']")
+let walletCardHtml = $("#walletCardHtml").html();
+let _scrollLeft = 0
+let _scrollLeftLength = 0
+let step = 100;
+let redirectWalletId = $('body').data('id')
 
 
 const incomeModal = new bootstrap.Modal(document.getElementById('incomeModal'))
@@ -80,8 +80,8 @@ const InitWallets = function () {
             }
         },
         "drawCallback": function (settings) {
-            var api = this.api();
-            var length = api.rows({ page: 'current' }).data().length
+            let api = this.api();
+            let length = api.rows({ page: 'current' }).data().length
             if (length == 1) {
                 $(".wallet-top").hide()
             } else {
@@ -114,13 +114,13 @@ const InitWalletSearchEvent = function () {
 }
 
 const InitIncomeModalEventListener = function () {
-    var modal = document.getElementById('incomeModal')
+    let modal = document.getElementById('incomeModal')
     modal.addEventListener('hidden.bs.modal', function (event) {
         $("#income-modal-form input[name='amount']").val("")
     })
 }
 const InitPayoutModalEventListener = function () {
-    var modal = document.getElementById('payoutModal')
+    let modal = document.getElementById('payoutModal')
     modal.addEventListener('hidden.bs.modal', function (event) {
         $("#payout-modal-form input[name='amount']").val("")
     })
@@ -131,7 +131,7 @@ const LoadFirstWallet = function () {
 }
 
 const InitLRScrollEvent = function () {
-    var outDiv = document.querySelector('#table-wrappler')
+    let outDiv = document.querySelector('#table-wrappler')
 
     document.getElementById('r-scroll-btn').addEventListener('click', () => {
         _scrollLeft += step
@@ -203,11 +203,11 @@ const ChangeChartsInfo = function () {
 
 const CheckOnInput = function (e) {
     e.value = e.value
-        .replace(/^0[0-9]+/, val => val[1])
+        .replace(/^0[\d]+/, val => val[1])
         .replace(/^(\.)+/, '')
         .replace(/[^\d.]/g, '')
         .replace(/\.+/, '.')
-        .replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3');
+        .replace(/^(-)*(\d+)\.(\d\d).*$/, '$1$2.$3');
 }
 
 const SaveWalletIncome = function () {
@@ -297,8 +297,8 @@ const ShowLatestTransactions = function (walletId, walletName) {
             },
         },
         "drawCallback": function (settings) {
-            var api = this.api();
-            var length = api.rows({ page: 'current' }).data().length
+            let api = this.api();
+            let length = api.rows({ page: 'current' }).data().length
             if (length > 0) {
                 $("#seemore").html(`<button class="btn btn-md btn-seemore mt-2" data-bs-id="${walletId}" data-bs-name="${walletName}" data-bs-toggle="modal" data-bs-target="#latestTransactionsModal">
                     See More<img class="ms-2" style="width: 16px;" src="../images/budget/more.svg">

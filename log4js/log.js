@@ -7,6 +7,5 @@ module.exports.configure = function() {
 
 module.exports.logger = function(name) {
     const dateFileLog = log4js.getLogger(name);
-    // dateFileLog.level = log4js.levels.INFO;
     return dateFileLog;
 };

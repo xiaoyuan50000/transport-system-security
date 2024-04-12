@@ -1,4 +1,3 @@
-//let createError = require('http-errors');
 let express = require('express');
 let path = require('path');
 let cookieParser = require('cookie-parser');
@@ -7,7 +6,7 @@ let cors = require('cors');
 let ejs = require('ejs');
 let log4js = require('./log4js/log.js');
 let Response = require('./util/response.js');
-var session = require('express-session');
+let session = require('express-session');
 const helmet = require('helmet');
 const crypto = require('crypto');
 
@@ -115,7 +114,6 @@ app.get('/mobile-callback', mobileCallback)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  //next(createError(404));
   res.render('404');
 });
 
@@ -129,7 +127,6 @@ app.use(function (err, req, res, next) {
   log4js.logger("error").error(err);
   // render the error page
   res.status(err.status || 500);
-  //res.render('error');
   Response.error(res, err.message, 500);
 });
 
@@ -160,7 +157,7 @@ if (!fs.existsSync(invoicePath)) fs.mkdirSync(invoicePath);
 /**
  * Init ActiveMQ Client
  */
- const ActiveMQ = require('./activemq/activemq.js');
+ let ActiveMQ = require('./activemq/activemq.js');
  setTimeout(function () {
      ActiveMQ.initActiveMQ();
  },100);

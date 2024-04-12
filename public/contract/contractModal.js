@@ -537,11 +537,11 @@ const GetSliderValue = function () {
 
 const CheckOnInput = function (e) {
     e.value = e.value
-        .replace(/^0[0-9]+/, val => val[1])
+        .replace(/^0[\d]+/, val => val[1])
         .replace(/^(\.)+/, '')
         .replace(/[^\d.]/g, '')
         .replace(/\.+/, '.')
-        .replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3');
+        .replace(/^(-)*(\d+)\.(\d\d).*$/, '$1$2.$3');
 }
 
 const AddAnnualContract = function () {

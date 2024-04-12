@@ -45,17 +45,17 @@ const recStop = function (){
 	rec.stop(function(blob, duration){
 		_blob = blob;
 		_duration = duration;
-		// rec.close();
+		
 		
 	}, function(msg) {
 		console.log("Recording failed.");
-		// rec.close();
+		
 	});
 };
 const recSend = function (callBack) {
 	if (!_blob) {
 		callBack(null, null)
-		return;
+		
 	} else {
 		recDown64({ blob: _blob, set: $.extend({}, rec.set), time: _duration }, function (base64Data) {
 			// send audio to xmpp
@@ -68,7 +68,7 @@ const recDown = function (obj){
 	let o = obj;
 	if(o){
 		let name = "rec-" + new Date().getTime() + "." + o.set.type;
-		var downA=document.createElement("A");
+		let downA=document.createElement("A");
 		downA.innerHTML="DownLoad "+name;
 		downA.href=(window.URL||webkitURL).createObjectURL(o.blob);
 		downA.download=name;

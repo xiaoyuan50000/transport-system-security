@@ -8,8 +8,19 @@ const { Role } = require('../model/role');
 const log4js = require('../log4js/log.js');
 const log = log4js.logger('Token Interceptor');
 
+const redirectToFrontend = (res, loginPageUrl, method) => {
+    res.clearCookie('token');
+    if (method === 'GET') {
+        res.redirect(loginPageUrl);
+    } else {
+        res.setHeader("Location", loginPageUrl)
+        res.status(302).json(loginPageUrl);
+    }
+};
+
+
 router.use(async (req, res, next) => {
-    var loginPageUrl = '/login';
+    let loginPageUrl = '/login';
     log.warn("req.url:" + req.url);
 
     if (req.query.token) {
@@ -20,79 +31,60 @@ router.use(async (req, res, next) => {
     } else if (req.url.startsWith('/mobilePOC')) {
         loginPageUrl = '/mobilePOC/login';
     }
-    // log.warn("login url:" + loginPageUrl);
     let token = req.cookies.token
     if (UrlWhiteList.includes(req.url) || req.url.startsWith('/mobileTO') || req.url.startsWith('/callback') || req.url.startsWith('/mobile-callback')) {
         next();
     } else if (!token) {
         log.warn('There is no token !');
-        if(req.method == 'GET'){
-            res.redirect(loginPageUrl);
-        } else {
-            res.setHeader("Location", loginPageUrl)
-            res.status(302).json(loginPageUrl);
-        }
+        return redirectToFrontend(res, loginPageUrl, req.method)
     } else {
-        // https://www.npmjs.com/package/jsonwebtoken
-        jwt.verify(token, SecretKey, { algorithms: JWTHeader.algorithm.toUpperCase() }, async function (err, decoded) {
-            if (err) {
-                if (err.expiredAt) {
-                    log.warn('(Token Interceptor): Token is expired at ', err.expiredAt);
-                    res.clearCookie('token');
-                    if(req.method == 'GET'){
-                        res.redirect(loginPageUrl);
+        try {
+            const decoded = await new Promise((resolve, reject) => {
+                jwt.verify(token, SecretKey, { algorithms: JWTHeader.algorithm.toUpperCase() }, (err, decoded) => {
+                    if (err) {
+                        reject(err);
                     } else {
-                        res.setHeader("Location", loginPageUrl)
-                        res.status(302).json(loginPageUrl);
+                        resolve(decoded);
                     }
-                } else {
-                    log.warn('(Token Interceptor): Token is invalid !');
-                    res.clearCookie('token');
-                    if(req.method == 'GET'){
-                        res.redirect(loginPageUrl);
-                    } else {
-                        res.setHeader("Location", loginPageUrl)
-                        res.status(302).json(loginPageUrl);
-                    }
-                }
-            } else {
-                let userId = decoded.data.id
-                let groupId = decoded.data.groupId
-                let user = await User.findByPk(userId)
-                if (user == null || user != null && user.token != token) {
-                    res.clearCookie('token');
-                    if(req.method == 'GET'){
-                        res.redirect(loginPageUrl);
-                    } else {
-                        res.setHeader("Location", loginPageUrl)
-                        res.status(302).json(loginPageUrl);
-                    }
-                } else {
-                    if (user.role) {
-                        let role = await Role.findByPk(user.role)
-                        if (req.body.roleName && req.body.roleName != role.roleName) {
-                            res.clearCookie('token');
-                            if(req.method == 'GET'){
-                                res.redirect(loginPageUrl);
-                            } else {
-                                res.setHeader("Location", loginPageUrl)
-                                res.status(302).json(loginPageUrl);
-                            }
-                        } else {
-                            log.warn('(Token Interceptor): Token is correct !');
-                            req.body.userId = userId
-                            req.body.operatorId = userId
-                            req.body.createdBy = userId
-                            req.body.groupId = groupId
-                            if (req.url == '/indent/create') {
-                                req.body.indent.createdBy = userId
-                            }
-                            next();
-                        }
-                    }
-                }
+                });
+            });
+
+            const userId = await decoded.data.id;
+            const groupId = await decoded.data.groupId;
+            const user = await User.findByPk(userId);
+
+            if (!user || user.token !== token) {
+                return redirectToFrontend(res, loginPageUrl, req.method);
             }
-        });
+
+            if (user.role) {
+                const role = await Role.findByPk(user.role);
+                if (req.body.roleName && req.body.roleName !== role.roleName) {
+                    log.warn(`User id ${userId} role changed from ${req.body.roleName} to ${role.roleName}!`);
+                    return redirectToFrontend(res, loginPageUrl, req.method);
+                }
+
+                log.info('Token is correct!');
+                req.body.userId = userId;
+                req.body.operatorId = userId;
+                req.body.createdBy = userId;
+                req.body.groupId = groupId
+                if (req.url === '/indent/create') {
+                    req.body.indent.createdBy = userId;
+                }
+                next();
+            } else {
+                log.warn(`User id ${userId} does not have a role!`);
+                redirectToFrontend(res, loginPageUrl, req.method);
+            }
+        } catch (error) {
+            if (error.expiredAt) {
+                log.warn('(Token Interceptor): Token is expired at ', err.expiredAt);
+            } else {
+                log.warn('(Token Interceptor): Token is invalid !');
+            }
+            redirectToFrontend(res, loginPageUrl, req.method);
+        }
     }
 
 });
