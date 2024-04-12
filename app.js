@@ -27,6 +27,7 @@ const mobileTORouter = require('./routes/mobileTO');
 const home = require('./singpass/home')
 const callback = require('./singpass/callback')
 const mobileCallback = require('./singpass/mobileCallback')
+let ActiveMQ = require('./activemq/activemq.js');
 
 let app = express();
 
@@ -157,7 +158,6 @@ if (!fs.existsSync(invoicePath)) fs.mkdirSync(invoicePath);
 /**
  * Init ActiveMQ Client
  */
- let ActiveMQ = require('./activemq/activemq.js');
  setTimeout(function () {
      ActiveMQ.initActiveMQ();
  },100);

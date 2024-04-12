@@ -1,36 +1,36 @@
-var RongIMLib;
+let RongIMLib;
 (function (RongIMLib) {
-    var RongIMVoice = (function () {
+    let RongIMVoice = (function () {
         function RongIMVoice() {
         }
         RongIMVoice.init = function () {
             if (this.isIE) {
-                var div = document.createElement("div");
+                let div = document.createElement("div");
                 div.setAttribute("id", "flashContent");
                 document.body.appendChild(div);
-                var script = document.createElement("script");
+                let script = document.createElement("script");
                 script.src = "/chat/recorder/swfobject-2.0.0.min.js";
-                var header = document.getElementsByTagName("head")[0];
+                let header = document.getElementsByTagName("head")[0];
                 header.appendChild(script);
                 setTimeout(function () {
-                    var swfVersionStr = "11.4.0";
-                    var flashvars = {};
-                    var params = {};
+                    let swfVersionStr = "11.4.0";
+                    let flashlets = {};
+                    let params = {};
                     params.quality = "high";
                     params.bgcolor = "#ffffff";
                     params.allowscriptaccess = "always";
                     params.allowfullscreen = "true";
-                    var attributes = {};
+                    let attributes = {};
                     attributes.id = "player";
                     attributes.name = "player";
                     attributes.align = "middle";
-                    swfobject.embedSWF("/chat/recorder/player-2.0.2.swf", "flashContent", "1", "1", swfVersionStr, null, flashvars, params, attributes);
+                    swfobject.embedSWF("/chat/recorder/player-2.0.2.swf", "flashContent", "1", "1", swfVersionStr, null, flashlets, params, attributes);
                 }, 200);
             }
             else {
-                var list = ["/chat/recorder/pcmdata-2.0.0.min.js", "/chat/recorder/libamr-2.0.1.min.js"];
-                for (var i = 0, len = list.length; i < len; i++) {
-                    var script = document.createElement("script");
+                let list = ["/chat/recorder/pcmdata-2.0.0.min.js", "/chat/recorder/libamr-2.0.1.min.js"];
+                for (let i = 0, len = list.length; i < len; i++) {
+                    let script = document.createElement("script");
                     script.src = list[i];
                     document.head.appendChild(script);
                 }
@@ -39,7 +39,7 @@ var RongIMLib;
         };
         RongIMVoice.play = function (data, duration) {
             this.checkInit("play");
-            var me = this;
+            let me = this;
             if (me.isIE) {
                 me.thisMovie().doAction("init", data);
             }
@@ -50,7 +50,7 @@ var RongIMLib;
         };
         RongIMVoice.stop = function () {
             this.checkInit("stop");
-            var me = this;
+            let me = this;
             if (me.isIE) {
                 me.thisMovie().doAction("stop");
             }
@@ -72,9 +72,9 @@ var RongIMLib;
             return eval("window['player']");
         };
         RongIMVoice.onCompleted = function (duration) {
-            var me = this;
-            var count = 0;
-            var timer = setInterval(function () {
+            let me = this;
+            let count = 0;
+            let timer = setInterval(function () {
                 count++;
                 me.onprogress();
                 if (count >= duration) {
@@ -86,21 +86,21 @@ var RongIMLib;
             }
         };
         RongIMVoice.base64ToBlob = function (base64Data, type) {
-            var mimeType;
+            let mimeType;
             if (type) {
                 mimeType = { type: type };
             }
             base64Data = base64Data.replace(/^(.*)[,]/, '');
-            var sliceSize = 1024;
-            var byteCharacters = atob(base64Data);
-            var bytesLength = byteCharacters.length;
-            var slicesCount = Math.ceil(bytesLength / sliceSize);
-            var byteArrays = new Array(slicesCount);
-            for (var sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
-                var begin = sliceIndex * sliceSize;
-                var end = Math.min(begin + sliceSize, bytesLength);
-                var bytes = new Array(end - begin);
-                for (var offset = begin, i = 0; offset < end; ++i, ++offset) {
+            let sliceSize = 1024;
+            let byteCharacters = atob(base64Data);
+            let bytesLength = byteCharacters.length;
+            let slicesCount = Math.ceil(bytesLength / sliceSize);
+            let byteArrays = new Array(slicesCount);
+            for (let sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
+                let begin = sliceIndex * sliceSize;
+                let end = Math.min(begin + sliceSize, bytesLength);
+                let bytes = new Array(end - begin);
+                for (let offset = begin, i = 0; offset < end; ++i, ++offset) {
                     bytes[i] = byteCharacters[offset].charCodeAt(0);
                 }
                 byteArrays[sliceIndex] = new Uint8Array(bytes);
@@ -108,9 +108,9 @@ var RongIMLib;
             return new Blob(byteArrays, mimeType);
         };
         RongIMVoice.palyVoice = function (base64Data) {
-            var reader = new FileReader(), blob = this.base64ToBlob(base64Data, "audio/amr"), me = this;
+            let reader = new FileReader(), blob = this.base64ToBlob(base64Data, "audio/amr"), me = this;
             reader.onload = function () {
-                var samples = new AMR({
+                let samples = new AMR({
                     benchmark: true
                 }).decode(reader.result);
                 me.element = AMR.util.play(samples);

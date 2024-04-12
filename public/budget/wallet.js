@@ -203,11 +203,11 @@ const ChangeChartsInfo = function () {
 
 const CheckOnInput = function (e) {
     e.value = e.value
-        .replace(/^0[\d]+/, val => val[1])
-        .replace(/^(\.)+/, '')
+        .replace(/^0+/, '')
+        .replace(/^\./g, '')
         .replace(/[^\d.]/g, '')
-        .replace(/\.+/, '.')
-        .replace(/^(-)*(\d+)\.(\d\d).*$/, '$1$2.$3');
+        .replace(/\./g, '.')
+        .replace(/^(-)?(\d+)\.(\d\d).*$/, '$1$2.$3');
 }
 
 const SaveWalletIncome = function () {

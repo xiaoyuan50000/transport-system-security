@@ -69,11 +69,12 @@ const initAudioClickEventHandler = function () {
 								fileName: `Chat_Audio_${currentUser.id}_` + moment().valueOf() + '.amr',
 								fileSize: duration,
 								base64Data: base64Data
-							}).then(result => {
-								// if (result.code == 1) {
-								// 	generateChatMessageContent(currentUser.id, result.data.messageList);
-								// }
 							})
+							// .then(result => {
+							// 	if (result.code == 1) {
+							// 		generateChatMessageContent(currentUser.id, result.data.messageList);
+							// 	}
+							// })
 
 						})
 					}
