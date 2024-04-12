@@ -38,12 +38,12 @@ const initGroupSelect = function() {
     })
 }
 
-const submitForm = function() {
+const submitForm = async function() {
     let canSignUP = $(".register-btn-div").hasClass("active");
     if (canSignUP === true) {
-        let checkNumResult = check(document.getElementById('user-mobileNumber'))
-        let checkPwdResult = check(document.getElementById('user-password'))
-        let checkRePwdResult =  check(document.getElementById('user-confirmPassword'))
+        let checkNumResult = await check(document.getElementById('user-mobileNumber'))
+        let checkPwdResult = await check(document.getElementById('user-password'))
+        let checkRePwdResult = await check(document.getElementById('user-confirmPassword'))
         let checkBoxResult = ($("#checkBoxEle")[0].checked == true);
         if (checkNumResult && checkPwdResult && checkRePwdResult && checkBoxResult === true) {
             saveUser();
@@ -51,7 +51,7 @@ const submitForm = function() {
     }
 }
 
-const check = function (input) {
+const check = async function (input) {
     let value = input.value.trim();
     let name = $(input).attr("name")
     let errorFieldName = $(input).prev().html()
