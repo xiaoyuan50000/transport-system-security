@@ -2,14 +2,14 @@
  * DB
  */
 module.exports.dbConf = {
-    host: '192.168.1.18',
+    host: '192.168.1.5',
 	// host: '192.168.1.11',
     user: 'root',
     password: 'root',
     // port: 6446,
     port: 3306,
     // database: 'tms_test_migrate',
-    database: 'tms3',
+    database: 'tms2',
     timezone: 'GMT%2B8',
     multipleStatements: true,
 	connectionLimit: 2000,

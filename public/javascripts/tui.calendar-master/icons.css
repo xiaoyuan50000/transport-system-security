@@ -15,7 +15,7 @@
 }
 
 .calendar-font-icon {
-  font-family: 'tui-calendar-font-icon';
+  font-family: 'tui-calendar-font-icon', sans-serif;
   font-size: 10px;
   font-weight: normal;
 }
