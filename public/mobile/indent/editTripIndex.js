@@ -39,6 +39,12 @@ var publidHolidays = [];
             }
         });
 
+        $("#back, #done").on('click', function(){
+            backToIndentList()
+        })
+        $("#addTripContinue").on('click', function(){
+            addTripContinue()
+        })
         publidHolidays = await getSingaporePublicHolidays();
     });
 

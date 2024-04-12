@@ -3,20 +3,20 @@
         <div class="col-auto">
             <form class="needs-validation was-validated" novalidate id="active-form">
                 <p>To {{action}} this account, please enter a new password for this user.</p>
-                <label class="my-2">New Password</label>
+                <label for="password" class="my-2">New Password</label>
                 <input class="form-control mb-2" type="password" placeholder="password" name="password" 
                 autocomplete="false" required oninput="checkActiveFormInput(this)" nric="{{nric}}" id="active-password">
                 <div class="invalid-feedback mb-2">
                     New Password is mandatory.
                 </div>
-                <label class="mb-2">Confirm Password</label>
+                <label for="confirmPassword" class="mb-2">Confirm Password</label>
                 <input class="form-control mb-2" type="password" placeholder="confirm password" name="confirmPassword" 
                 autocomplete="false" required oninput="checkActiveFormInput(this)" id="active-confirmPassword">
                 <div class="invalid-feedback mb-2">
                     Confirm Password is mandatory.
                 </div>
                 <div class="col-12">
-                    <label class="mb-2">Remarks</label>
+                    <label for="remarks" class="mb-2">Remarks</label>
                     <textarea rows="8" cols="15" class="form-control mb-2" name="remarks" required oninput="checkActiveFormInput(this)" id="active-remark"></textarea>
                     <div class="invalid-feedback">
                         Remarks is mandatory.
@@ -31,7 +31,7 @@
     <div class="row p-2 w-100">
         <form class="needs-validation was-validated" novalidate id="remark-form">
             <div class="col-12">
-                <label class="mb-2">Remarks</label>
+                <label for="remarks" class="mb-2">Remarks</label>
                 <textarea rows="8" cols="15" class="form-control" name="remarks" required oninput="checkActiveFormInput(this)" id="active-remark"></textarea>
                 <div class="invalid-feedback">
                     Remarks is mandatory.

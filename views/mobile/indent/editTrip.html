@@ -182,13 +182,13 @@
     <div class="index-head row">
         <div class="row" style="width: 100%; height: 60px; margin: 0;">
             <div class="col-1 col-sm-1" style="display: flex;justify-content: center;align-items: center;">
-                <label onclick="backToIndentList();" style="color: white;font-weight:bolder;font-size: xx-large;margin-bottom: 3px;">
-                    <img style="padding: 0 5px;" src="/images/indent/mobileRsp/left.svg">
-                </label>
+                <span id="back" style="color: white;font-weight:bolder;font-size: xx-large;margin-bottom: 3px;">
+                    <img style="padding: 0 5px;" src="/images/indent/mobileRsp/left.svg" alt="back">
+                </span>
             </div>
             <div class="col-10 col-sm-10" style="display: flex;justify-content: center;align-items: center;">
-                <label class="edit-trip-title-label" style="color: white;font-weight:bolder;font-size: large; margin-bottom: 0px;">
-                </label>
+                <span class="edit-trip-title-label" style="color: white;font-weight:bolder;font-size: large; margin-bottom: 0px;">
+                </span>
             </div>
             <div class="col-1 col-sm-1" style="text-align: right;"></div>
         </div>
@@ -198,16 +198,16 @@
         </div>
         <div class="create-nav row" style="display: none;">
             <div class="create-info-item active base-info">
-                <lable style="font-weight:bolder;font-size: large;">Activity</lable>
+                <span style="font-weight:bolder;font-size: large;">Activity</span>
             </div>
             <div class="create-info-item trip-info">
-                <lable style="font-weight:bolder;font-size: large;">Trip</lable>
+                <span style="font-weight:bolder;font-size: large;">Trip</span>
             </div>
         </div>
         <div class="info-div" style="display:none;">
             <div class="info-nav base-info-nav up">
-                <label style="font-weight:bolder;" class="col-4 col-sm-4">Activity</label>
-                <label class="col-5 col-sm-5"></label>
+                <span style="font-weight:bolder;" class="col-4 col-sm-4">Activity</span>
+                <span class="col-5 col-sm-5"></label>
                 <img src="/images/indent/mobileRsp/up.svg">
             </div>
             <div class = "info-form base-info-form">
@@ -253,15 +253,15 @@
             </div>
             <div class="row">
                 <div class="trip-btn to-add-btn" style="display: none;">
-                    <label id="add-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Add New Trip</label>
+                    <span id="add-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Add New Trip</span>
                 </div>
             </div>
         </div>
         <div class="trip-div" style="display:none;">
             <div class="info-nav trip-info-nav up">
-                <label style="font-weight:bolder;" class="col-4 col-sm-4">Trip</label>
-                <label class="col-5 col-sm-5"></label>
-                <img src="/images/indent/mobileRsp/up.svg">
+                <span style="font-weight:bolder;" class="col-4 col-sm-4">Trip</span>
+                <span class="col-5 col-sm-5"></span>
+                <img src="/images/indent/mobileRsp/up.svg" alt="up">
             </div>
             <div class = "info-form trip-info-form">
                 <form id="trip-info-form">
@@ -320,7 +320,7 @@
                                 <option value=""></option>
                             </select>
                             <span class="duration-nuit-ele">
-                                <img src="../images/link.svg">
+                                <img src="../images/link.svg" alt="link">
                             </span>
                         </div>
                     </div>
@@ -337,7 +337,7 @@
                                 <option value=""></option>
                             </select>
                             <span class="duration-nuit-ele">
-                                <img src="../images/link.svg">
+                                <img src="../images/link.svg" alt="link">
                             </span>
                         </div>
                     </div>
@@ -364,9 +364,9 @@
                 </form>
             </div>
             <div class="info-nav more-trip-info-nav up">
-                <label style="font-weight:bolder;" class="col-4 col-sm-4">More</label>
-                <label class="col-5 col-sm-5"></label>
-                <img src="/images/indent/mobileRsp/up.svg">
+                <span style="font-weight:bolder;" class="col-4 col-sm-4">More</span>
+                <span class="col-5 col-sm-5"></span>
+                <img src="/images/indent/mobileRsp/up.svg" alt="up">
             </div>
             <div class="info-form more-trip-info-form">
                 <form id="more-trip-info-form">
@@ -391,20 +391,20 @@
                 <div class="add-trip-btn" style="display: none;">
                     <div class="col-6">
                         <div class="trip-btn back-indent-btn">
-                            <label id="add-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">cancel</label>
+                            <span id="add-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Cancel</span>
                         </div>
                     </div>
-                    <div class="col-6 confirm-add-btn" >
+                    <div class="col-6 confirm-add-btn">
                         <div class="trip-btn">
-                            <label id="add-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Add</label>
+                            <span id="add-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Add</span>
                         </div>
                     </div>
                 </div>
                 <div class="trip-btn edit-trip-btn" style="display: none;">
-                    <label id="edit-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Edit</label>
+                    <span id="edit-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Edit</span>
                 </div>
                 <div class="trip-btn duplicate-trip-btn" style="display: none;">
-                    <label id="duplicate-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Duplicate</label>
+                    <span id="duplicate-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Duplicate</span>
                 </div>
             </div>
             <div class="bottom-space" style="width: 100%;height: 50px;">
@@ -413,19 +413,19 @@
     </div>
     <div class="success-page-div" style="display: none;">
         <div class="success-div">
-            <img src="../images/create-success.svg"/>
+            <img src="../images/create-success.svg" alt="success"/>
         </div>
         <div class="success-info-div">
             <div class="success-msg-div row">
-                <label></label>
+                <span></span>
             </div>
-            <div onclick="addTripContinue()" class="add-more row" style="text-align: center;margin-top: 30px;font-size: larger;">
-                <label style="text-decoration:underline; color:rgb(51, 144, 97);">+ Add More Trips</label>
+            <div id="addTripContinue" class="add-more row" style="text-align: center;margin-top: 30px;font-size: larger;">
+                <span style="text-decoration:underline; color:rgb(51, 144, 97);">+ Add More Trips</span>
             </div>
         </div>
         <div class="row">
-            <div class="trip-btn" onclick="backToIndentList();">
-                <label id="add-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Done</label>
+            <div class="trip-btn" id="done">
+                <span id="add-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Done</span>
             </div>
         </div>
     </div>

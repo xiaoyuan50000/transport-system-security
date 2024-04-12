@@ -20,6 +20,10 @@ $(function () {
     });
 
     initActionHistory();
+
+    $("#back").on('click', function(){
+        history.back(-1);
+    })
 });
 
 const initActionHistory = async function () {

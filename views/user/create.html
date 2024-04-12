@@ -12,7 +12,7 @@
                     <div class="row p-3">
                         <div class="col-6">
                             <div class="mb-3">
-                                <label class="form-label">NRIC</label>
+                                <label for="nric" class="form-label">NRIC</label>
                                 <input type="text" class="form-control" name="nric" autocomplete="off" required
                                     oninput="check(this)" id="user-nric">
                                 <div class="invalid-feedback">
@@ -22,7 +22,7 @@
                         </div>
                         <div class="col-6">
                             <div class="mb-3">
-                                <label class="form-label">Name</label>
+                                <label for="username" class="form-label">Name</label>
                                 <input type="text" class="form-control" name="username" autocomplete="off" required
                                     oninput="check(this)" id="user-username">
                                 <div class="invalid-feedback">
@@ -32,7 +32,7 @@
                         </div>
                         <div class="col-12">
                             <div class="mb-3">
-                                <label class="form-label">Mobile Number</label>
+                                <label for="mobileNumber" class="form-label">Mobile Number</label>
                                 <input type="text" class="form-control" name="mobileNumber" autocomplete="off" required
                                     onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))"
                                     oninput="check(this)" id="user-mobileNumber">
@@ -43,7 +43,7 @@
                         </div>
                         <div class="col-12">
                             <div class="mb-3">
-                                <label class="form-label">Email</label>
+                                <label for="email" class="form-label">Email</label>
                                 <input type="text" class="form-control" name="email" autocomplete="off" required
                                     oninput="check(this)" id="user-email">
                                 <div class="invalid-feedback">
@@ -53,7 +53,7 @@
                         </div>
                         <div class="col-12">
                             <div class="mb-3">
-                                <label class="form-label">Operationally Ready Date (ORD)</label>
+                                <label for="ord" class="form-label">Operationally Ready Date (ORD)</label>
                                 <input type="text" class="form-control" name="ord" autocomplete="off" required
                                     oninput="check(this)" id="user-ord">
                                 <div class="invalid-feedback">
@@ -83,7 +83,7 @@
                         </div> -->
                         <div class="col-12">
                             <div class="mb-3">
-                                <label class="form-label">Role</label>
+                                <label for="role" class="form-label">Role</label>
                                 <select class="form-select" name="role">
                                     <option value=""></option>
                                     <% for(var i=0; i < role.length; i++){ %>
@@ -94,7 +94,7 @@
                         </div>
                         <div class="col-12" id="group">
                             <div class="mb-3">
-                                <label class="form-label">Group</label>
+                                <label for="group" class="form-label">Group</label>
                                 <select class="form-select" name="group">
                                     <option value=""></option>
                                     <% for(var i=0; i < group.length; i++){ %>
@@ -105,7 +105,7 @@
                         </div>
                         <div class="col-12" id="serviceProvider" style="display: none;">
                             <div class="mb-3">
-                                <label class="form-label">Service Provider</label>
+                                <label for="serviceProvider" class="form-label">Service Provider</label>
                                 <select class="form-select" multiple name="serviceProvider" style="min-height: 200px;">
                                     <option value=""></option>
                                     <% for(var i=0; i < serviceProvider.length; i++){ %>

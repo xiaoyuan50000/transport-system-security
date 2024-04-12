@@ -27,6 +27,10 @@
         label {
             margin-bottom: 0;
         }
+        span {
+            margin-bottom: 0;
+            display: inline-block;
+        }
         .setting-div {
             position: absolute;
             top: 1em;
@@ -114,8 +118,8 @@
 </head>
     <body style="background: url(/images/login/mobileRsp/login-bg-top.svg) no-repeat; background-size: 100%;">
         <div class="login-div">
-            <img style="margin-bottom: 0.3em;width: 122px;" src="/images/login/mobileRsp/logo.svg"><br/>
-            <img style="margin-bottom: 2em;width: 122px;" src="/images/login/mobileRsp/logoFont.svg">
+            <img style="margin-bottom: 0.3em;width: 122px;" src="/images/login/mobileRsp/logo.svg" alt="logo"><br/>
+            <img style="margin-bottom: 2em;width: 122px;" src="/images/login/mobileRsp/logoFont.svg" alt="logo">
             <div class="input-group input-group-border mb-3" style="margin-bottom: 10px !important;">
                 <input type="text" class="form-control username" placeholder="Login Name" value="">
             </div>
@@ -135,9 +139,9 @@
             <button type="button" class="form-control btn btn-login">Login</button>
 
             <div class="row" style="font-size: 1em;display: flex;">
-                <label class="login-using-singpass" style="padding: 0px;width: 100%;color: #A12426; text-decoration:underline;margin-top: 15px;">
+                <span class="login-using-singpass" style="padding: 0px;width: 100%;color: #A12426; text-decoration:underline;margin-top: 15px;">
                     Login Using Singpass
-                </label>
+                </span>
             </div>
         </div>
         <div class="bg-bottom-div"></div>

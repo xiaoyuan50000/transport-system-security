@@ -14,7 +14,7 @@
     <script src="./javascripts/datatables/dataTables.bootstrap4.min.js"></script>
     <script src="./js/pageHelper.js"></script>
     <style>
-        label {
+        span {
             margin-bottom: 0;
         }
         .card-div {
@@ -29,16 +29,16 @@
 <div class="row" style="height: fit-content;">
     <div class="col-4 col-sm-4 col-md-4 col-lg-4">
         <div class="card-div" style="background: url('../images/tag/In-1@2x.png');">
-            <table style="width: 100%;height: 100%;text-align: center;font-weight: bolder;color: whitesmoke;">
+            <table style="width: 100%;height: 100%;text-align: center;font-weight: bolder;color: whitesmoke;" aria-hidden="true">
                 <tr>
                     <td width="30">
-                        <img style="width: 50px;" src="../images/tag/in.png">
+                        <img style="width: 50px;" src="../images/tag/in.png" alt="in">
                     </td>
                     <td width="50">
-                        <label style="font-size: 2em;">IN</label>
+                        <span style="font-size: 2em;">IN</span>
                     </td>
                     <td width="20">
-                        <label style="font-size: 3em;">7</label>
+                        <span style="font-size: 3em;">7</span>
                     </td>
                 </tr>
             </table>
@@ -46,16 +46,16 @@
     </div>
     <div class="col-4 col-sm-4 col-md-4 col-lg-4">
         <div class="card-div" style="background: url('../images/tag/out-1@2x.png');">
-            <table style="width: 100%;height: 100%;text-align: center;font-weight: bolder;color: whitesmoke;">
+            <table style="width: 100%;height: 100%;text-align: center;font-weight: bolder;color: whitesmoke;" aria-hidden="true">
                 <tr>
                     <td width="30">
                         <img style="width: 50px;" src="../images/tag/out.png">
                     </td>
                     <td width="50">
-                        <label style="font-size: 2em;">OUT</label>
+                        <span style="font-size: 2em;">OUT</span>
                     </td>
                     <td width="20">
-                        <label style="font-size: 3em;">7</label>
+                        <span style="font-size: 3em;">7</span>
                     </td>
                 </tr>
             </table>
@@ -63,16 +63,16 @@
     </div>
     <div class="col-4 col-sm-4 col-md-4 col-lg-4">
         <div class="card-div" style="background: url('../images/tag/Overdue-1@2x.png')">
-            <table style="width: 100%;height: 100%;text-align: center;font-weight: bolder;color: whitesmoke;">
+            <table style="width: 100%;height: 100%;text-align: center;font-weight: bolder;color: whitesmoke;" aria-hidden="true">
                 <tr>
                     <td width="30">
                         <img style="width: 50px;" src="../images/tag/overdue.png">
                     </td>
                     <td width="50">
-                        <label style="font-size: 2em;">Overdue</label>
+                        <span style="font-size: 2em;">Overdue</span>
                     </td>
                     <td width="20">
-                        <label style="font-size: 3em;">6</label>
+                        <span style="font-size: 3em;">6</span>
                     </td>
                 </tr>
             </table>
@@ -81,7 +81,7 @@
 </div>
 <div class="row task-table" style="margin-top: 2em;">
     <div class="w-100">
-        <table class="table table-hover center w-100">
+        <table class="table table-hover center w-100" aria-hidden="true">
             <thead class="thead-light">
             </thead>
         </table>

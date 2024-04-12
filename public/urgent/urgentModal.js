@@ -4,7 +4,7 @@ var resourceElem = $('#urgentModal input[name="resource"]')
 var reportingLocationElem = $('#urgentModal input[name="reportingLocation"]')
 var pocElem = $('#urgentModal input[name="poc"]')
 var mobileNumberElem = $('#urgentModal input[name="mobileNumber"]')
-var dateElem = $('#urgentModal label[name="date"]')
+var dateElem = $('#urgentModal span[name="date"]')
 var timeElem = $('#urgentModal #time-select button')
 var timeList = ["09:30", "12:30", "15:00"]
 var currentSelectedTask = null

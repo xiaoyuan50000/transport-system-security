@@ -12,7 +12,7 @@
                     <div class="row p-3">
                         <div class="col-12">
                             <div class="mb-3">
-                                <label class="form-label">Group Name</label>
+                                <span class="form-label">Group Name</span>
                                 <input type="text" class="form-control" name="groupname" autocomplete="off" required
                                     oninput="check(this)" id="groupname">
                                 <div class="invalid-feedback">
@@ -23,15 +23,15 @@
                     </div>
                     <div class="row p-3">
                         <div class="col-12">
-                            <label class="form-label">Platform Type</label>
+                            <span class="form-label">Platform Type</span>
                             <div class="service-mode-checkbox"></div>
                         </div>
                     </div>
                     <div class="row p-3">
                         <div class="col-5">
-                            <div class="row mb-2"><label>Unassigned User</label></div>
+                            <div class="row mb-2"><span>Unassigned User</span></div>
                             <div class="table-common table-shadow">
-                                <table class="table table-striped unassigned-user-table"></table>
+                                <table class="table table-striped unassigned-user-table" aria-hidden="true"></table>
                             </div>
                         </div>
                         <div class="col-2 text-center align-self-center">
@@ -43,9 +43,9 @@
                             </div>
                         </div>
                         <div class="col-5">
-                            <div class="row mb-2"><label>Assigned User</label></div>
+                            <div class="row mb-2"><span>Assigned User</span></div>
                             <div class="table-common table-shadow">
-                                <table class="table table-striped assigned-user-table"></table>
+                                <table class="table table-striped assigned-user-table" aria-hidden="true"></table>
                             </div>
                         </div>
                     </div>

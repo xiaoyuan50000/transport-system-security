@@ -131,7 +131,7 @@
             font-size: 40px;
         }
 
-        .dashboard-card-title label {
+        .dashboard-card-title span {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -185,11 +185,11 @@
         <div class="dashboard-content">
             <div class="dashboard-module">
                 <div class="title-div box-shadow title-dashboard">
-                    <label>Dashboard</label>
+                    <span>Dashboard</span>
                 </div>
                 <div class="row align-items-center dashboard-top box-shadow">
                     <div class="col-auto">
-                        <div><label>Units:</label></div>
+                        <div><span>Units:</span></div>
                     </div>
                     <div class="col-auto">
                         <div>
@@ -204,7 +204,7 @@
                         </div>
                     </div>
                     <div class="col-auto">
-                        <div><label>TSP:</label></div>
+                        <div><span>TSP:</span></div>
                     </div>
                     <div class="col-auto">
                         <div>
@@ -219,7 +219,7 @@
                         </div>
                     </div>
                     <div class="col-auto">
-                        <div><label>Month:</label></div>
+                        <div><span>Month:</span></div>
                     </div>
                     <div class="col-auto">
                         <div>
@@ -229,7 +229,7 @@
                         </div>
                     </div>
                     <div class="col-auto">
-                        <div><label>Year:</label></div>
+                        <div><span>Year:</span></div>
                     </div>
                     <div class="col-auto">
                         <div>
@@ -244,17 +244,17 @@
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-1">
-                                <label>Contract Value Balance</label>
+                                <span>Contract Value Balance</span>
                             </div>
                             <div class="dashboard-card-content">
-                                <label class="color-1">$<span id="contract-balance">0</span></label>
+                                <span class="color-1">$<span id="contract-balance">0</span></span>
                             </div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-1">
-                                <label>Total Expenditure By Month</label>
+                                <span>Total Expenditure By Month</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <div class="chart-container">
@@ -266,7 +266,7 @@
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-1">
-                                <label>Expenditure By Purpose</label>
+                                <span>Expenditure By Purpose</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <div class="chart-container">
@@ -278,7 +278,7 @@
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-1">
-                                <label>Total Expenditure (Surcharge)</label>
+                                <span>Total Expenditure (Surcharge)</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <div class="chart-container">
@@ -290,7 +290,7 @@
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-1">
-                                <label>Expenditure By Contracts</label>
+                                <span>Expenditure By Contracts</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <div class="container-chart position-relative" id="container-expenditure-contracts">
@@ -315,33 +315,33 @@
             </div>
             <div class="dashboard-module">
                 <div class="title-div box-shadow">
-                    <label>Yet To Fulfil</label>
+                    <span>Yet To Fulfil</span>
                 </div>
                 <div class="row row-cols-5">
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-2">
-                                <label>Total Resource</label>
+                                <span>Total Resource</span>
                             </div>
                             <div class="dashboard-card-content">
-                                <label class="color-2" id="yet-to-fulfil-total-buses">0</label>
+                                <span class="color-2" id="yet-to-fulfil-total-buses">0</span>
                             </div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-2">
-                                <label>Total Indents</label>
+                                <span>Total Indents</span>
                             </div>
                             <div class="dashboard-card-content">
-                                <label class="color-3" id="yet-to-fulfil-total-indents">0</label>
+                                <span class="color-3" id="yet-to-fulfil-total-indents">0</span>
                             </div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-2">
-                                <label>Total Resource With Late Indent Surcharges</label>
+                                <span>Total Resource With Late Indent Surcharges</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <sup class="color-4" id="yet-to-fulfil-incur-surcharge">0</sup>
@@ -353,7 +353,7 @@
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-2">
-                                <label>Total Resource With Late Indents</label>
+                                <span>Total Resource With Late Indents</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <sup class="color-5" id="yet-to-fulfil-from-units">0</sup>
@@ -365,7 +365,7 @@
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-2">
-                                <label>Indents By Purpose</label>
+                                <span>Indents By Purpose</span>
                             </div>
                             <div class="row m-0">
                                 <div class="col-7">
@@ -400,40 +400,40 @@
             </div>
             <div class="dashboard-module">
                 <div class="title-div box-shadow">
-                    <label>Fulfilment</label>
+                    <span>Fulfilment</span>
                 </div>
                 <div class="row row-cols-5">
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-3">
-                                <label>Total Resource</label>
+                                <span>Total Resource</span>
                             </div>
                             <div class="dashboard-card-content">
-                                <label class="color-2" id="fulfilment-total-buses">0</label>
+                                <span class="color-2" id="fulfilment-total-buses">0</span>
                             </div>
                         </div>
                     </div>
                     <!-- <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-3">
-                                <label>Total Indents</label>
+                                <span>Total Indents</span>
                             </div>
                             <div class="dashboard-card-content">
-                                <label class="color-3" id="fulfilment-total-indents">0</label>
+                                <span class="color-3" id="fulfilment-total-indents">0</span>
                             </div>
                         </div>
                     </div> -->
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-3">
-                                <label>Indents By Purpose</label>
+                                <span>Indents By Purpose</span>
                             </div>
                             <div class="row m-0">
                                 <div class="col-7">
                                     <!-- <div class="dashboard-card-content" style="line-height: 0 !important;">
                                         <div class="container-chart" id="container-fulfilment-purpose"
                                             style="height: 115px !important;"></div>
-                                        <div style="height: 25px; line-height:25px;"><span>Total: <label class="color-3" id="fulfilment-total-indents">0</label></span></div>
+                                        <div style="height: 25px; line-height:25px;"><span>Total: <span class="color-3" id="fulfilment-total-indents">0</span></span></div>
                                     </div> -->
                                     <div class="dashboard-card-content">
                                         <div class="container-chart" id="container-fulfilment-purpose"></div>
@@ -459,7 +459,7 @@
                                         </div>
                                         <div class="mb-2 d-flex" style="font-size: 30px;">
                                             <div class="d-text"><span>Total:</span></div>
-                                            <div><label class="color-3" id="fulfilment-total-indents">0</label></div>
+                                            <div><span class="color-3" id="fulfilment-total-indents">0</span></div>
                                         </div>
                                     </div>
                                 </div>
@@ -469,7 +469,7 @@
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-3">
-                                <label>Total Late Arrival Resource</label>
+                                <span>Total Late Arrival Resource</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <sup class="color-4" id="fulfilment-late-arrival">0</sup>
@@ -481,7 +481,7 @@
                     <!-- <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-3">
-                                <label>Total No Show Resource</label>
+                                <span>Total No Show Resource</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <sup class="color-5" id="fulfilment-noshow">0</sup>
@@ -494,7 +494,7 @@
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-3">
-                                <label>Indents By TSP</label>
+                                <span>Indents By TSP</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <div class="chart-container">
@@ -506,7 +506,7 @@
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-3">
-                                <label>Indents by Contract / Category</label>
+                                <span>Indents by Contract / Category</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <div class="chart-container">
@@ -519,33 +519,33 @@
             </div>
             <!-- <div class="dashboard-module">
                 <div class="title-div box-shadow">
-                    <label>Feedback / Incident</label>
+                    <span>Feedback / Incident</span>
                 </div>
                 <div class="row row-cols-5">
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-4">
-                                <label>Total No. Of Bus With Near Miss</label>
+                                <span>Total No. Of Bus With Near Miss</span>
                             </div>
                             <div class="dashboard-card-content">
-                                <label class="color-6" id="feedback-total-buses">0</label>
+                                <span class="color-6" id="feedback-total-buses">0</span>
                             </div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-4">
-                                <label>Bus With Incident</label>
+                                <span>Bus With Incident</span>
                             </div>
                             <div class="dashboard-card-content">
-                                <label class="color-6" id="feedback-total-incidents">0</label>
+                                <span class="color-6" id="feedback-total-incidents">0</span>
                             </div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-4">
-                                <label>Bus Company With Near Miss</label>
+                                <span>Bus Company With Near Miss</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <div class="container-chart" id="container-near-miss"></div>
@@ -555,7 +555,7 @@
                     <div class="col custom-col-last">
                         <div class="dashboard-card box-shadow">
                             <div class="dashboard-card-title background-4">
-                                <label>Bus Company With Incident</label>
+                                <span>Bus Company With Incident</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <div class="container-chart" id="container-incident"></div>
@@ -566,13 +566,13 @@
             </div> -->
             <div class="dashboard-module">
                 <div class="title-div box-shadow">
-                    <label>Users Performance</label>
+                    <span>Users Performance</span>
                 </div>
                 <div class="row row-cols-3">
                     <div class="col">
                         <div class="dashboard-card box-shadow mb-2">
                             <div class="dashboard-card-title background-5">
-                                <label>Total Indent with Late Indent Surcharge</label>
+                                <span>Total Indent with Late Indent Surcharge</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <sup class="color-4" id="performance-late-indent">0</sup>
@@ -584,7 +584,7 @@
                     <div class="col">
                         <div class="dashboard-card box-shadow mb-2">
                             <div class="dashboard-card-title background-5">
-                                <label>Total Indent with Late Amendment & Cancellation Surcharge</label>
+                                <span>Total Indent with Late Amendment & Cancellation Surcharge</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <sup class="color-4" id="performance-late-amendment">0</sup>
@@ -596,7 +596,7 @@
                     <div class="col">
                         <div class="dashboard-card box-shadow mb-2">
                             <div class="dashboard-card-title background-5">
-                                <label>Total Indent with No Show</label>
+                                <span>Total Indent with No Show</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <sup class="color-4" id="performance-noshow-indent">0</sup>
@@ -608,7 +608,7 @@
                     <div class="col">
                         <div class="dashboard-card box-shadow mb-2">
                             <div class="dashboard-card-title background-5">
-                                <label>Late Indent with Surcharge</label>
+                                <span>Late Indent with Surcharge</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <div class="chart-container">
@@ -620,7 +620,7 @@
                     <div class="col">
                         <div class="dashboard-card box-shadow mb-2">
                             <div class="dashboard-card-title background-5">
-                                <label>Indents Amended with Surcharge</label>
+                                <span>Indents Amended with Surcharge</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <div class="chart-container">
@@ -634,7 +634,7 @@
                     <div class="col">
                         <div class="dashboard-card box-shadow mb-2">
                             <div class="dashboard-card-title background-5">
-                                <label>Indents Cancellation with Surcharge</label>
+                                <span>Indents Cancellation with Surcharge</span>
                             </div>
                             <div class="dashboard-card-content">
                                 <div class="chart-container">

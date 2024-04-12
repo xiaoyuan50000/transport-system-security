@@ -1,7 +1,9 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+		<title>check list</title>
 		<link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
 		<link rel="stylesheet" href="/javascripts/jquery-confirm/jquery-confirm.css">
 
@@ -103,54 +105,57 @@
 			/* .signature-container div {
 				touch-action: none;
 			} */
+			span {
+				display: inline-block;
+			}
 		</style>
 	</head>
 	<body>
 		<form id="check-page-one-form">
 			<div class="top-content px-2">
 				<div class="title-div pt-4">
-					<label style="text-decoration: underline;">CR VEHICLES OPERATIONAL CHECK-LIST</label>
+					<span style="text-decoration: underline;">CR VEHICLES OPERATIONAL CHECK-LIST</span>
 				</div>
 				<div class="title-notes">
-					<label style="font-size: 12px;">Note: Any defects found are to be reported to the transport OIC immediately.
+					<span style="font-size: 12px;">Note: Any defects found are to be reported to the transport OIC immediately.
 						This checklist must be kept by units until the end of the hiring period
-					</label>
+					</span>
 				</div>
 				<div class="detail-info">
 					<div class="row field-input-row py-2">
 						<div class="col-5 field-label">Type of Vehicle:</div>
 						<div class="col-7 field-value-div">
-							<input class="field-value-input" name="oneVehicleType"></input>
+							<input class="field-value-input" name="oneVehicleType">
 						</div>
 					</div>
 					<div class="row field-input-row py-2">
 						<div class="col-5 field-label">Vehicle No:</div>
 						<div class="col-7 field-value-div">
-							<input class="field-value-input" name="oneVehicleNo"></input>
+							<input class="field-value-input" name="oneVehicleNo">
 						</div> 
 					</div>
 					<div class="row field-input-row py-2">
 						<div class="col-5 field-label">Indent reference:</div>
 						<div class="col-7 field-value-div">
-							<input class="field-value-input" name="oneIndentReference"></input> 
+							<input class="field-value-input" name="oneIndentReference"> 
 						</div>
 					</div>
 					<div class="row field-input-row py-2">
 						<div class="col-5 field-label">CVMS/PO No:</div>
 						<div class="col-7 field-value-div">
-							<input class="field-value-input" name="oneCVMSPONo"></input>
+							<input class="field-value-input" name="oneCVMSPONo">
 						</div>
 					</div>
 					<div class="row field-input-row py-2">
 						<div class="col-5 field-label">Date& Time:</div>
 						<div class="col-7 field-value-div">
-							<input class="field-value-input" name="oneTopDateTime"></input>
+							<input class="field-value-input" name="oneTopDateTime">
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="content-div px-2">
-				<table>
+				<table aria-hidden="true">
 					<thead>
 						<th style="width: 75%">DESCRIPTION</th>
 						<th style="width: 15%">PASSED</th>
@@ -166,111 +171,111 @@
 						</tr>
 						<tr>
 							<td colspan="2">
-								<label class="group-label" style="text-decoration: underline;">Checking Oil & Lubricate are within the Minimum and Maximum mark.</label>
+								<span class="group-label" style="text-decoration: underline;">Checking Oil & Lubricate are within the Minimum and Maximum mark.</span>
 							</td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;a) Engine Oil</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="engineOil"></input></td>
+							<td><span>&nbsp;&nbsp;a) Engine Oil</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="engineOil"></td>
 						</tr>
 						<tr>
-							<td><label><label>&nbsp;&nbsp;b) Brake Fluid level</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="brakeFluidlevel"></input></td>
+							<td><span>&nbsp;&nbsp;b) Brake Fluid level</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="brakeFluidlevel"></td>
 						</tr><tr>
-							<td><label>&nbsp;&nbsp;c) Power Steering Oil</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="psOil"></input></td>
+							<td><span>&nbsp;&nbsp;c) Power Steering Oil</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="psOil"></td>
 						</tr><tr>
-							<td><label>&nbsp;&nbsp;d) Radiator Water</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="radiatorWater"></input></td>
+							<td><span>&nbsp;&nbsp;d) Radiator Water</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="radiatorWater"></td>
 						</tr><tr>
-							<td><label>&nbsp;&nbsp;e) Hydraulic Oil (for crane & forklift)</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="hydraulicOil"></input></td>
+							<td><span>&nbsp;&nbsp;e) Hydraulic Oil (for crane & forklift)</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="hydraulicOil"></td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;f) Transmission Oil (for forklift)</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="transmissionOil"></input></td>
+							<td><span>&nbsp;&nbsp;f) Transmission Oil (for forklift)</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="transmissionOil"></td>
 						</tr>
 						<tr>
 							<td colspan="2">
-								<label class="group-label" style="text-decoration: underline;">Checking of tyre.</label>
+								<span class="group-label" style="text-decoration: underline;">Checking of tyre.</span>
 							</td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;a) All wheel nuts are intact</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allSheelNuts"></input></td>
+							<td><span>&nbsp;&nbsp;a) All wheel nuts are intact</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allSheelNuts"></td>
 						</tr>
 						<tr>
-							<td><label><label>&nbsp;&nbsp;b) Tyre side wall no damage</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="tyreSideWall"></input></td>
+							<td><span>&nbsp;&nbsp;b) Tyre side wall no damage</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="tyreSideWall"></td>
 						</tr><tr>
-							<td><label>&nbsp;&nbsp;c) Tyre thread not bald</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="tyreThread"></input></td>
+							<td><span>&nbsp;&nbsp;c) Tyre thread not bald</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="tyreThread"></td>
 						</tr><tr>
-							<td><label>&nbsp;&nbsp;d) Same tyre tread pattern are on the same axle</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="sameTyreThread"></input></td>
+							<td><span>&nbsp;&nbsp;d) Same tyre tread pattern are on the same axle</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="sameTyreThread"></td>
 						</tr><tr>
-							<td><label>&nbsp;&nbsp;e) Check that tyres are inflated</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="tyresInflated"></input></td>
+							<td><span>&nbsp;&nbsp;e) Check that tyres are inflated</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="tyresInflated"></td>
 						</tr>
 						<tr>
 							<td colspan="2">
-								<label class="group-label" style="text-decoration: underline;">Checking of vehicle body.</label>
+								<span class="group-label" style="text-decoration: underline;">Checking of vehicle body.</span>
 							</td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;a) All doors are able to open and close properly</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allSoorsProperly"></input></td>
+							<td><span>&nbsp;&nbsp;a) All doors are able to open and close properly</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allSoorsProperly"></td>
 						</tr>
 						<tr>
-							<td><label><label>&nbsp;&nbsp;b) Battery terminal, terminal insulators mounting bracket are intact and secured</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="batteryTerminal"></input></td>
+							<td><span>&nbsp;&nbsp;b) Battery terminal, terminal insulators mounting bracket are intact and secured</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="batteryTerminal"></td>
 						</tr><tr>
-							<td><label>&nbsp;&nbsp;c) No damage to electrical connector</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="noDamage"></input></td>
+							<td><span>&nbsp;&nbsp;c) No damage to electrical connector</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="noDamage"></td>
 						</tr><tr>
-							<td><label>&nbsp;&nbsp;d) All mirrors are intact; NOT loose and NOT blurred</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allMirrors"></input></td>
+							<td><span>&nbsp;&nbsp;d) All mirrors are intact; NOT loose and NOT blurred</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allMirrors"></td>
 						</tr><tr>
-							<td><label>&nbsp;&nbsp;e) Windscreen not shattered or crack</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="windScreen"></input></td>
+							<td><span>&nbsp;&nbsp;e) Windscreen not shattered or crack</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="windScreen"></td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;f) All Seat Belts are able to buckle & lock properly</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allSeatBelts"></input></td>
+							<td><span>&nbsp;&nbsp;f) All Seat Belts are able to buckle & lock properly</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allSeatBelts"></td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;g) Seat are secured</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="seatSecured"></input></td>
+							<td><span>&nbsp;&nbsp;g) Seat are secured</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="seatSecured"></td>
 						</tr>
 						<tr>
 							<td colspan="2">
-								<label class="group-label" style="text-decoration: underline;">Checking of vehicle functions.</label>
+								<span class="group-label" style="text-decoration: underline;">Checking of vehicle functions.</span>
 							</td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;a) Allowable free-play of Clutch/ Brake/ Steering. (not more than an inch)</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allowableFreePlay"></input></td>
+							<td><span>&nbsp;&nbsp;a) Allowable free-play of Clutch/ Brake/ Steering. (not more than an inch)</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allowableFreePlay"></td>
 						</tr>
 						<tr>
-							<td><label><label>&nbsp;&nbsp;b) Headlight / Signal Light / Tail Light/ Brake Light / Horn / Wipers / Reverse light / Rear Spot Light (if applicable) / instrument panel warning lights and buzzer are in working condition.</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allLight"></input></td>
+							<td><span>&nbsp;&nbsp;b) Headlight / Signal Light / Tail Light/ Brake Light / Horn / Wipers / Reverse light / Rear Spot Light (if applicable) / instrument panel warning lights and buzzer are in working condition.</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="allLight"></td>
 						</tr><tr>
-							<td><label>&nbsp;&nbsp;c) Fuel Tank level is not less than ¾ tank</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="fuelTankLevel"></input></td>
+							<td><span>&nbsp;&nbsp;c) Fuel Tank level is not less than ¾ tank</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="fuelTankLevel"></td>
 						</tr><tr>
-							<td><label>&nbsp;&nbsp;d) Vehicle is able to start and stop by ignition key</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="vehicleStartStop"></input></td>
+							<td><span>&nbsp;&nbsp;d) Vehicle is able to start and stop by ignition key</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="vehicleStartStop"></td>
 						</tr><tr>
-							<td><label>&nbsp;&nbsp;e) No abnormal noise, vibration and burning smell during ignition and while engine running</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="noiseVibration"></input></td>
+							<td><span>&nbsp;&nbsp;e) No abnormal noise, vibration and burning smell during ignition and while engine running</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="noiseVibration"></td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;f) No sign of oil leakage undercarriage</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="noSignOil"></input></td>
+							<td><span>&nbsp;&nbsp;f) No sign of oil leakage undercarriage</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="noSignOil"></td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;g) Brake is effective</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="brakeEffedtive"></input></td>
+							<td><span>&nbsp;&nbsp;g) Brake is effective</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="brakeEffedtive"></td>
 						</tr>
 						<tr>
 							<td colspan="2" class="group-label">
@@ -279,49 +284,49 @@
 						</tr>
 						<tr>
 							<td colspan="2">
-								<label class="group-label" style="text-decoration: underline;">FOR TRAILERS ONLY</label> <label class="group-label">(i.e. Flatbed, Skeletal platform, Low Loader)</label>
+								<span class="group-label" style="text-decoration: underline;">FOR TRAILERS ONLY</span> <span class="group-label">(i.e. Flatbed, Skeletal platform, Low Loader)</span>
 							</td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;Trailer left and right stabiliser bars are in working condition</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="trailerLeftRight"></input></td>
+							<td><span>&nbsp;&nbsp;Trailer left and right stabiliser bars are in working condition</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="trailerLeftRight"></td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;Check air coupling hose (yellow and red) for leakage after connected</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="airCouplingHose"></input></td>
+							<td><span>&nbsp;&nbsp;Check air coupling hose (yellow and red) for leakage after connected</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="airCouplingHose"></td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;Check for any damage electrical connector</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="damageElectrical"></input></td>
+							<td><span>&nbsp;&nbsp;Check for any damage electrical connector</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="damageElectrical"></td>
 						</tr>
 						<tr>
 							<td colspan="2" >
-								<label class="group-label" style="text-decoration: underline;">Vehicle BIIs & Document</label>
+								<span class="group-label" style="text-decoration: underline;">Vehicle BIIs & Document</span>
 							</td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;Jack & Handle</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="jackHandle"></input></td>
+							<td><span>&nbsp;&nbsp;Jack & Handle</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="jackHandle"></td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;First Aid Kit</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="firstAidKit"></input></td>
+							<td><span>&nbsp;&nbsp;First Aid Kit</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="firstAidKit"></td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;Wheel Brace & Handle</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="wheelBrace"></input></td>
+							<td><span>&nbsp;&nbsp;Wheel Brace & Handle</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="wheelBrace"></td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;Warning Triangle</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="warningTriangle"></input></td>
+							<td><span>&nbsp;&nbsp;Warning Triangle</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="warningTriangle"></td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;Fire Extinguisher</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="fireExtinguisher"></input></td>
+							<td><span>&nbsp;&nbsp;Fire Extinguisher</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="fireExtinguisher"></td>
 						</tr>
 						<tr>
-							<td><label>&nbsp;&nbsp;Annual Vehicle Inspection Disc</label></td>
-							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="annualVehicle"></input></td>
+							<td><span>&nbsp;&nbsp;Annual Vehicle Inspection Disc</span></td>
+							<td class="td-checkbox"><input type="checkbox" class="input_checkbox" name="annualVehicle"></td>
 						</tr>
 					</tbody>
 					
@@ -333,19 +338,19 @@
 					<div class="row field-input-row py-2">
 						<div class="col-5 field-label">Rank & Name: </div>
 						<div class="col-7 field-value-div">
-							<input class="field-value-input" name="toOneRankName"></input>
+							<input class="field-value-input" name="toOneRankName">
 						</div>
 					</div>
 					<div class="row field-input-row py-2">
 						<div class="col-5 field-label">Date: </div>
 						<div class="col-7 field-value-div">
-							<input class="field-value-input" name="toOneDate"></input>
+							<input class="field-value-input" name="toOneDate">
 						</div>
 					</div>
 					<div class="row field-input-row py-2">
 						<div class="col-5 field-label">Time:</div>
 						<div class="col-7 field-value-div">
-							<input class="field-value-input" name="toOneTime"></input>
+							<input class="field-value-input" name="toOneTime">
 						</div>
 					</div>
 					<div class="row field-input-row py-2" style="height: 200px;">
@@ -368,19 +373,19 @@
 					<div class="row field-input-row py-2">
 						<div class="col-5 field-label">Rank & Name: </div>
 						<div class="col-7 field-value-div">
-							<input class="field-value-input" name="tlOneRankName"></input>
+							<input class="field-value-input" name="tlOneRankName">
 						</div>
 					</div>
 					<div class="row field-input-row py-2">
 						<div class="col-5 field-label">Date: </div>
 						<div class="col-7 field-value-div">
-							<input class="field-value-input" name="tlOneDate"></input>
+							<input class="field-value-input" name="tlOneDate">
 						</div>
 					</div>
 					<div class="row field-input-row py-2">
 						<div class="col-5 field-label">Time:</div>
 						<div class="col-7 field-value-div">
-							<input class="field-value-input" name="tlOneTime"></input>
+							<input class="field-value-input" name="tlOneTime">
 						</div>
 					</div>
 					<div class="row field-input-row py-2" style="height: 200px;">
@@ -406,12 +411,12 @@
 		<form id="check-page-two-form">
 			<div class="top-content px-2">
 				<div class="title-div pt-4">
-					<label style="text-decoration: underline;">HANDING/TAKING OVER CERTIFICATE FOR GOVERNMENT FURNISHED EQUIPMENT</label>
+					<span style="text-decoration: underline;">HANDING/TAKING OVER CERTIFICATE FOR GOVERNMENT FURNISHED EQUIPMENT</span>
 				</div>
 			</div>
 			<div class="content-div px-2">
 				<div class="py-3 fs-6">
-					<label style="text-decoration: underline;font-weight: 600;">I, (NRIC No) , (R/NAME)</label> from <input style="width: 100px; border-bottom: 1px solid;" name="twoNricOrName"></input>declare that I had gone through the following list with the Tenderer's driver diligently to ensure proper handing and taking over of the items listed herein:
+					<span style="text-decoration: underline;font-weight: 600;">I, (NRIC No) , (R/NAME)</span> from <input style="width: 100px; border-bottom: 1px solid;" name="twoNricOrName">declare that I had gone through the following list with the Tenderer's driver diligently to ensure proper handing and taking over of the items listed herein:
 				</div>
 				<table>
 					<thead>
@@ -422,28 +427,28 @@
 					</thead>
 					<tbody>
 						<tr>
-							<td><input class="px-2" style="width: 100%;"></input></td>
-							<td><input class="px-2" style="width: 100%;"></input></td>
-							<td><input class="px-2" style="width: 100%;"></input></td>
-							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></td>
+							<td><input class="px-2" style="width: 100%;"></td>
+							<td><input class="px-2" style="width: 100%;"></td>
+							<td><input class="px-2" style="width: 100%;"></td>
 						</tr>
 						<tr>
-							<td><input class="px-2" style="width: 100%;"></input></td>
-							<td><input class="px-2" style="width: 100%;"></input></td>
-							<td><input class="px-2" style="width: 100%;"></input></td>
-							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></td>
+							<td><input class="px-2" style="width: 100%;"></td>
+							<td><input class="px-2" style="width: 100%;"></td>
+							<td><input class="px-2" style="width: 100%;"></td>
 						</tr>
 						<tr>
-							<td><input class="px-2" style="width: 100%;"></input></td>
-							<td><input class="px-2" style="width: 100%;"></input></td>
-							<td><input class="px-2" style="width: 100%;"></input></td>
-							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></td>
+							<td><input class="px-2" style="width: 100%;"></td>
+							<td><input class="px-2" style="width: 100%;"></td>
+							<td><input class="px-2" style="width: 100%;"></td>
 						</tr>
 						<tr>
-							<td><input class="px-2" style="width: 100%;"></input></td>
-							<td><input class="px-2" style="width: 100%;"></input></td>
-							<td><input class="px-2" style="width: 100%;"></input></td>
-							<td><input class="px-2" style="width: 100%;"></input></td>
+							<td><input class="px-2" style="width: 100%;"></td>
+							<td><input class="px-2" style="width: 100%;"></td>
+							<td><input class="px-2" style="width: 100%;"></td>
+							<td><input class="px-2" style="width: 100%;"></td>
 						</tr>
 					</tbody>
 				</table>
@@ -452,29 +457,29 @@
 				</div>
 				<div class="formtwo-chicklist">
 					<div class="py-2">
-						<label class="">1. Stow away items have been removed from GFE.</label>
-						<div class="px-2">YES&nbsp;<input type="checkbox" class="checkbox-yes input_checkbox" name="stowAwayItemsYes"></input>&nbsp;&nbsp;NO&nbsp;<input type="checkbox" class="checkbox-no input_checkbox" name="stowAwayItemsNo"></input>&nbsp;<label style="font-size: 16px;text-decoration: underline;font-weight: 600;">(List reason below)</label></div>
+						<span class="">1. Stow away items have been removed from GFE.</span>
+						<div class="px-2">YES&nbsp;<input type="checkbox" class="checkbox-yes input_checkbox" name="stowAwayItemsYes">&nbsp;&nbsp;NO&nbsp;<input type="checkbox" class="checkbox-no input_checkbox" name="stowAwayItemsNo">&nbsp;<span style="font-size: 16px;text-decoration: underline;font-weight: 600;">(List reason below)</span></div>
 						<div style="width: 100%;height: fit-content; display: none;" class="no-reason-div">
 							<div class="px-2 py-1"><textarea name="stowAwayItemsReason" rows="3" type="text" class="form-control" autocomplete="off"></textarea></div>
 						</div>
 					</div>
 					<div class="py-2">
-						<label class="">2. GFE elevated parts have been depressed.</label>
-						<div class="px-2">YES&nbsp;<input type="checkbox" class="checkbox-yes input_checkbox" name="GFEElevatedPartsYes"></input>&nbsp;&nbsp;NO&nbsp;<input type="checkbox" class="checkbox-no input_checkbox" name="GFEElevatedPartsNo"></input>&nbsp;<label style="font-size: 16px;text-decoration: underline;font-weight: 600;">(List reason below)</label></div>
+						<span class="">2. GFE elevated parts have been depressed.</span>
+						<div class="px-2">YES&nbsp;<input type="checkbox" class="checkbox-yes input_checkbox" name="GFEElevatedPartsYes">&nbsp;&nbsp;NO&nbsp;<input type="checkbox" class="checkbox-no input_checkbox" name="GFEElevatedPartsNo">&nbsp;<span style="font-size: 16px;text-decoration: underline;font-weight: 600;">(List reason below)</span></div>
 						<div style="width: 100%;height: fit-content; display: none;" class="no-reason-div">
 							<div class="px-2 py-1"><textarea name="GFEElevatedPartsReason" rows="3" type="text" class="form-control" autocomplete="off"></textarea></div>
 						</div>
 					</div>
 					<div class="py-2">
-						<label class="">3. Physical measuring of the GFE height by Tenderer after loaded onto the low loader has been carried out.</label>
-						<div class="px-2">YES&nbsp;<input type="checkbox" class="checkbox-yes input_checkbox" name="physicalMeasuringYes"></input>&nbsp;&nbsp;NO&nbsp;<input type="checkbox" class="checkbox-no input_checkbox" name="physicalMeasuringNo"></input>&nbsp;<label style="font-size: 16px;text-decoration: underline;font-weight: 600;">(List reason below)</label></div>
+						<span class="">3. Physical measuring of the GFE height by Tenderer after loaded onto the low loader has been carried out.</span>
+						<div class="px-2">YES&nbsp;<input type="checkbox" class="checkbox-yes input_checkbox" name="physicalMeasuringYes">&nbsp;&nbsp;NO&nbsp;<input type="checkbox" class="checkbox-no input_checkbox" name="physicalMeasuringNo">&nbsp;<span style="font-size: 16px;text-decoration: underline;font-weight: 600;">(List reason below)</span></div>
 						<div style="width: 100%;height: fit-content; display: none;" class="no-reason-div">
 							<div class="px-2 py-1"><textarea name="physicalMeasuringReason" rows="3" type="text" class="form-control" autocomplete="off"></textarea></div>
 						</div>
 					</div>
 					<div class="py-2">
-						<label class="">4. A physical check and identification of the anchor point on the lashing for the GFE have been carried out.</label>
-						<div class="px-2">YES&nbsp;<input type="checkbox" class="checkbox-yes input_checkbox" name="physicalCheckYes"></input>&nbsp;&nbsp;NO&nbsp;<input type="checkbox" class="checkbox-no input_checkbox" name="physicalCheckNo"></input>&nbsp;<label style="font-size: 16px;text-decoration: underline;font-weight: 600;">(List reason below)</label></div>
+						<span class="">4. A physical check and identification of the anchor point on the lashing for the GFE have been carried out.</span>
+						<div class="px-2">YES&nbsp;<input type="checkbox" class="checkbox-yes input_checkbox" name="physicalCheckYes">&nbsp;&nbsp;NO&nbsp;<input type="checkbox" class="checkbox-no input_checkbox" name="physicalCheckNo">&nbsp;<span style="font-size: 16px;text-decoration: underline;font-weight: 600;">(List reason below)</span></div>
 						<div style="width: 100%;height: fit-content; display: none;" class="no-reason-div">
 							<div class="px-2 py-1"><textarea name="physicalCheckReason" rows="3" type="text" class="form-control" autocomplete="off"></textarea></div>
 						</div>
@@ -483,23 +488,23 @@
 				
 			</div>
 			<div class="px-2 mt-4">
-				<div class="col-12 field-label" style="padding-top: 10px;text-decoration: underline;font-weight: 600;"><label style="text-decoration: underline;">HANDING OVER BY: </label>(UNIT)</div>
+				<div class="col-12 field-label" style="padding-top: 10px;text-decoration: underline;font-weight: 600;"><span style="text-decoration: underline;">HANDING OVER BY: </span>(UNIT)</div>
 				<div class="row field-input-row py-2">
 					<div class="col-5 field-label">Rank & Name: </div>
 					<div class="col-7 field-value-div">
-						<input class="field-value-input" name="hoUnitRankName"></input>
+						<input class="field-value-input" name="hoUnitRankName">
 					</div>
 				</div>
 				<div class="row field-input-row py-2">
 					<div class="col-5 field-label">Date: </div>
 					<div class="col-7 field-value-div">
-						<input class="field-value-input" name="hoUnitDate"></input>
+						<input class="field-value-input" name="hoUnitDate">
 					</div>
 				</div>
 				<div class="row field-input-row py-2">
 					<div class="col-5 field-label">Time:</div>
 					<div class="col-7 field-value-div">
-						<input class="field-value-input" name="hoUnitTime"></input>
+						<input class="field-value-input" name="hoUnitTime">
 					</div>
 				</div>
 				<div class="row field-input-row py-2" style="height: 200px;">
@@ -518,23 +523,23 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-12 field-label" style="padding-top: 10px;text-decoration: underline;font-weight: 600;"><label style="text-decoration: underline;">TAKING OVER BY: </label>(TENDERER)</div>
+				<div class="col-12 field-label" style="padding-top: 10px;text-decoration: underline;font-weight: 600;"><span style="text-decoration: underline;">TAKING OVER BY: </span>(TENDERER)</div>
 				<div class="row field-input-row py-2">
 					<div class="col-5 field-label">Name: </div>
 					<div class="col-7 field-value-div">
-						<input class="field-value-input" name="toTendererName"></input>
+						<input class="field-value-input" name="toTendererName">
 					</div>
 				</div>
 				<div class="row field-input-row py-2">
 					<div class="col-5 field-label">Date: </div>
 					<div class="col-7 field-value-div">
-						<input class="field-value-input" name="toTendererDate"></input>
+						<input class="field-value-input" name="toTendererDate">
 					</div>
 				</div>
 				<div class="row field-input-row py-2">
 					<div class="col-5 field-label">Time:</div>
 					<div class="col-7 field-value-div">
-						<input class="field-value-input" name="toTendererTime"></input>
+						<input class="field-value-input" name="toTendererTime">
 					</div>
 				</div>
 				<div class="row field-input-row py-2" style="height: 200px;">
@@ -553,23 +558,23 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-12 field-label" style="padding-top: 10px;text-decoration: underline;font-weight: 600;"><label style="text-decoration: underline;">HANDING OVER BY: </label>(TENDERER)</div>
+				<div class="col-12 field-label" style="padding-top: 10px;text-decoration: underline;font-weight: 600;"><span style="text-decoration: underline;">HANDING OVER BY: </span>(TENDERER)</div>
 				<div class="row field-input-row py-2">
 					<div class="col-5 field-label">Name: </div>
 					<div class="col-7 field-value-div">
-						<input class="field-value-input" name="hoTendererName"></input>
+						<input class="field-value-input" name="hoTendererName">
 					</div>
 				</div>
 				<div class="row field-input-row py-2">
 					<div class="col-5 field-label">Date: </div>
 					<div class="col-7 field-value-div">
-						<input class="field-value-input" name="hoTendererDate"></input>
+						<input class="field-value-input" name="hoTendererDate">
 					</div>
 				</div>
 				<div class="row field-input-row py-2">
 					<div class="col-5 field-label">Time:</div>
 					<div class="col-7 field-value-div">
-						<input class="field-value-input" name="hoTendererTime"></input>
+						<input class="field-value-input" name="hoTendererTime">
 					</div>
 				</div>
 				<div class="row field-input-row py-2" style="height: 200px;">
@@ -588,23 +593,23 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-12 field-label" style="padding-top: 10px;text-decoration: underline;font-weight: 600;"><label style="text-decoration: underline;">TAKING OVER BY: </label>(UNIT)</div>
+				<div class="col-12 field-label" style="padding-top: 10px;text-decoration: underline;font-weight: 600;"><span style="text-decoration: underline;">TAKING OVER BY: </span>(UNIT)</div>
 				<div class="row field-input-row py-2">
 					<div class="col-5 field-label">Rank and Name: </div>
 					<div class="col-7 field-value-div">
-						<input class="field-value-input" name="toUnitRankName"></input>
+						<input class="field-value-input" name="toUnitRankName">
 					</div>
 				</div>
 				<div class="row field-input-row py-2">
 					<div class="col-5 field-label">Date: </div>
 					<div class="col-7 field-value-div">
-						<input class="field-value-input" name="toUnitDate"></input>
+						<input class="field-value-input" name="toUnitDate">
 					</div>
 				</div>
 				<div class="row field-input-row py-2">
 					<div class="col-5 field-label">Time:</div>
 					<div class="col-7 field-value-div">
-						<input class="field-value-input" name="toUnitTime"></input>
+						<input class="field-value-input" name="toUnitTime">
 					</div>
 				</div>
 				<div class="row field-input-row py-2" style="height: 200px;">
@@ -627,13 +632,13 @@
 		</form>
 		<div class="px-2 mt-4" style="display: flex;">
 			<div style="width: 50%;display: flex;justify-content: flex-start;">
-				<div class="opt-btn-div" onclick="backToTaskList();">
-					<label class="fs-6">Cancel</label>
+				<div class="opt-btn-div" id="cancelCheckList">
+					<span class="fs-6">Cancel</span>
 				</div>
 			</div>
 			<div style="width: 50%;display: flex;justify-content: flex-end;">
-				<div onclick="submitCheckList();" class="opt-btn-div" style="background-color: #064220;">
-					<label style="color: white;" class="fs-6">Submit</label>
+				<div class="opt-btn-div" style="background-color: #064220;" id="submitCheckList">
+					<span style="color: white;" class="fs-6">Submit</span>
 				</div>
 			</div>
 		</div>

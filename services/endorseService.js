@@ -324,8 +324,7 @@ const QueryEndorseDatas = async function (reqParams) {
     }
 
     if (endorseCheckbox == "true") {
-        whereSql += ` and b.taskStatus in (?) and (b.endorse is null or b.endorse = 0)`
-        replacements.push(indentStatus)
+        whereSql += ` and (b.endorse is null or b.endorse = 0)`
     }
 
     let countFromSql = `FROM

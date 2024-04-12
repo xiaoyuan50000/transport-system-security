@@ -1,5 +1,9 @@
 $(function() {
     initDriverData();
+
+    $("#back").on('click', function(){
+        history.back(-1);
+    })
 });
 
 const getParams = function(key) {

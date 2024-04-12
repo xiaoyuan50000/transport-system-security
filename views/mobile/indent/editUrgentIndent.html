@@ -138,12 +138,12 @@
     <div class="index-head row">
         <div class="row" style="width: 100%; height: 60px; margin: 0;">
             <div class="col-1 col-sm-1" style="display: flex;justify-content: center;align-items: center;">
-                <label onclick="backToIndentList();" style="color: white;font-weight:bolder;font-size: xx-large;margin-bottom: 3px;">
-                    <img style="padding: 0 5px;" src="/images/indent/mobileRsp/left.svg">
-                </label>
+                <span id="back" style="color: white;font-weight:bolder;font-size: xx-large;margin-bottom: 3px;">
+                    <img style="padding: 0 5px;" src="/images/indent/mobileRsp/left.svg" alt="back">
+                </span>
             </div>
             <div class="col-10 col-sm-10" style="display: flex;justify-content: center;align-items: center;">
-                <label class="edit-urgent-indent-title-label" style="color: white;font-weight:bolder;font-size: large; margin-bottom: 0px;">Add New Urgent Indent</label>
+                <span class="edit-urgent-indent-title-label" style="color: white;font-weight:bolder;font-size: large; margin-bottom: 0px;">Add New Urgent Indent</span>
             </div>
             <div class="col-1 col-sm-1" style="text-align: right;"></div>
         </div>
@@ -162,31 +162,31 @@
             </div>
         </div>
         <div class="info-div">
-            <label style="display: none;" class="taskId"></label>
+            <span style="display: none;" class="taskId"></span>
             <div id="groupSelect" class="mb-2 row">
             </div>
             <div class="mb-2 row" id="startDateDiv">
-                <label class="col-12 col-sm-12 form-item form-label">Date:</label>
+                <span class="col-12 col-sm-12 form-item form-label">Date:</span>
                 <div class="col-12 col-sm-12 pt-2">
-                    <label class="currentDateLabel" style="padding-left: calc(var(--bs-gutter-x) * .5);"></label>
+                    <span class="currentDateLabel" style="padding-left: calc(var(--bs-gutter-x) * .5);"></span>
                 </div>
             </div>
             <div class="mb-2 row" id="startTimeDiv">
-                <label class="col-12 col-sm-12 form-item form-label">Time:</label>
+                <span class="col-12 col-sm-12 form-item form-label">Time:</span>
                 <div class="col-12 col-sm-12 pt-2">
                     <div class="time-range-div time-range-div-1 active" timeStart="09:30" timeEnd="11:30" dataValue="1">
-                        <label>09:30H to 11:30H</label>
+                        <span>09:30H to 11:30H</span>
                     </div>
                     <div class="time-range-div time-range-div-2" timeStart="12:30" timeEnd="14:30" dataValue="2">
-                        <label>12:30H to 14:30H</label>
+                        <span>12:30H to 14:30H</span>
                     </div>
                     <div class="time-range-div time-range-div-3" timeStart="15:00" timeEnd="17:00" dataValue="3">
-                        <label>15:00H to 17:00H</label>
+                        <span>15:00H to 17:00H</span>
                     </div>
                 </div>
             </div>
             <div class="mb-2 row">
-                <label class="col-12 col-sm-12 form-item form-label">Reporting Location:</label>
+                <span class="col-12 col-sm-12 form-item form-label">Reporting Location:</span>
                 <div class="col-12 col-sm-12">
                     <!-- <select class="form-control form-item" id="reportingLocation" name="reportingLocation">
                     </select> -->
@@ -194,31 +194,31 @@
                 </div>
             </div>
             <div class="mb-2 row">
-                <label class="col-12 col-sm-12 form-item form-label">POC:</label>
+                <span class="col-12 col-sm-12 form-item form-label">POC:</span>
                 <div class="col-12 col-sm-12">
                     <input class="form-control form-item" id="pocName" name="pocName" autocomplete="off">
                 </div>
             </div>
             <div class="mb-2 row">
-                <label class="col-12 col-sm-12 form-item form-label">Mobile Number:</label>
+                <span class="col-12 col-sm-12 form-item form-label">Mobile Number:</span>
                 <div class="col-12 col-sm-12" style="display: flex;">
                     <div style="width: 60px; line-height: 1.5; border-radius: 0.375rem 0 0 0.375rem; background-color: #bebebe; margin-left: 3%; display: flex; align-items: center; justify-content: center;">+65</div>
                     <input class="form-control form-item" style="border-radius: 0 0.375rem 0.375rem 0; margin-left: 0px; margin-right: 3%;" id="pocNumber" name="pocNumber" autocomplete="off">
                 </div>
             </div>
             <div class="mb-2 row">  
-                <label style="margin-left: 3%;">If your unit resides in a camp without a Transport Node, please expect delay on arrival timing.</label>
+                <span style="margin-left: 3%;">If your unit resides in a camp without a Transport Node, please expect delay on arrival timing.</span>
             </div>
         </div>
         <div style="width: 100%; height: fit-content; display: flex;" class="opt-btn-div">
             <div class="col-6" style="height: 40px; margin-top: 10px;">
                 <div class="back-indent-btn" style="width: 70%; margin-left: 15%; height: 40px; background-color: #bebebe; border-radius: 5px; display: flex; justify-content: center; align-items: center;">
-                    <label id="cancel-btn" onclick="backToIndentList();" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Cancel</label>
+                    <span id="cancel-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Cancel</span>
                 </div>
             </div>
             <div class="col-6" style="height: 40px; margin-top: 10px;">
                 <div class="confirm-add-btn" style="width: 70%; margin-left: 15%; height: 40px; background-color: #204b4d; border-radius: 5px; display: flex; justify-content: center; align-items: center;">
-                    <label id="add-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Create</label>
+                    <span id="add-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Create</span>
                 </div>
             </div>
         </div>

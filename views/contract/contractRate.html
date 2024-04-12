@@ -20,31 +20,31 @@
                 <div class="row my-3">
                     <div class="col-3">Contract No:</div>
                     <div class="col-6">
-                        <label id="contractNo"><%- contract.contractNo %></label>
+                        <span id="contractNo"><%- contract.contractNo %></span>
                     </div>
                 </div>
                 <div class="row my-3">
                     <div class="col-3">Contract Name:</div>
                     <div class="col-6">
-                        <label><%- contract.name %></label>
+                        <span><%- contract.name %></span>
                     </div>
                 </div>
                 <div class="row my-3">
                     <div class="col-3">Start Date:</div>
                     <div class="col-6">
-                        <label id="contract-start-date"><%- contract.startDate %></label>
+                        <span id="contract-start-date"><%- contract.startDate %></span>
                     </div>
                 </div>
                 <div class="row my-3">
                     <div class="col-3">End Date:</div>
                     <div class="col-6">
-                        <label id="contract-end-date"><%- contract.endDate %></label>
+                        <span id="contract-end-date"><%- contract.endDate %></span>
                     </div>
                 </div>
                 <div class="row my-3">
                     <div class="col-3">Extension Date:</div>
                     <div class="col-6">
-                        <label id="contract-extension-date"><%- contract.extensionDate %></label>
+                        <span id="contract-extension-date"><%- contract.extensionDate %></span>
                     </div>
                 </div>
             </div>
@@ -52,25 +52,25 @@
                 <div class="row my-3">
                     <div class="col-4">Company:</div>
                     <div class="col-6">
-                        <label><%- company %></label>
+                        <span><%- company %></span>
                     </div>
                 </div>
                 <div class="row my-3">
                     <div class="col-4">Po Type:</div>
                     <div class="col-6">
-                        <label><%- contract.poType %></label>
+                        <span><%- contract.poType %></span>
                     </div>
                 </div>
                 <div class="row my-3">
                     <div class="col-4">Performance Grade:</div>
                     <div class="col-6">
-                        <label><%- contract.performanceMatrix %></label>
+                        <span><%- contract.performanceMatrix %></span>
                     </div>
                 </div>
                 <div class="row my-3">
                     <div class="col-4">Status:</div>
                     <div class="col-6">
-                        <label><%- contract.status %></label>
+                        <span><%- contract.status %></span>
                     </div>
                 </div>
             </div>
@@ -86,13 +86,13 @@
         <div class="body-bottom mt-3 position-relative">
             <div class="btn table-collapse-btn w-100 table-shadow" data-bs-toggle="collapse" href="#collapse3" role="button" aria-expanded="true">
                 <div class="float-start">
-                    <label class="collapse-title">Contract Balance</label>
+                    <span class="collapse-title">Contract Balance</span>
                 </div>
             </div>
             <div class="collapse show" id="collapse3">
                 <div class="row m-0">
                     <div class="table-collapse-common table-shadow">
-                        <table class="table contract-balance-table pb-2 w-100">
+                        <table class="table contract-balance-table pb-2 w-100" aria-hidden="true">
     
                         </table>
                     </div>
@@ -113,13 +113,13 @@
             <% } %>
             <div class="btn table-collapse-btn w-100 table-shadow" data-bs-toggle="collapse" href="#collapse1" role="button" aria-expanded="true">
                 <div class="float-start">
-                    <label class="collapse-title">Contract Detail</label>
+                    <span class="collapse-title">Contract Detail</span>
                 </div>
             </div>
             <div class="collapse show" id="collapse1">
                 <div class="row m-0">
                     <div class="table-collapse-common table-shadow">
-                        <table class="table contract-detail-table pb-2 w-100">
+                        <table class="table contract-detail-table pb-2 w-100" aria-hidden="true">
     
                         </table>
                     </div>
@@ -157,13 +157,13 @@
             <% } %>
             <div class="btn table-collapse-btn w-100 table-shadow" data-bs-toggle="collapse" href="#collapse2" role="button" aria-expanded="true">
                 <div class="float-start">
-                    <label class="collapse-title">Contract Rate</label>
+                    <span class="collapse-title">Contract Rate</span>
                 </div>
             </div>
             <div class="collapse show" id="collapse2">
                 <div class="row m-0">
                     <div class="table-collapse-common table-shadow">
-                        <table class="table contract-rate-table pb-2 w-100">
+                        <table class="table contract-rate-table pb-2 w-100" aria-hidden="true">
     
                         </table>
                     </div>

@@ -30,4 +30,8 @@ var publidHolidays = [];
                 isDown ? $(".more-info-form").show() : $(".more-info-form").hide();
             }
         });
+
+        $("#back").on('click', function(){
+            backToIndentList()
+        })
     });

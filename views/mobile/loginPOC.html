@@ -27,6 +27,10 @@
         label {
             margin-bottom: 0;
         }
+        span {
+            margin-bottom: 0;
+            display: inline-block;
+        }
         .setting-div {
             position: absolute;
             top: 1em;
@@ -115,7 +119,7 @@
 </head>
     <body style="background: url(/images/login/mobileRsp/poc-login-bg.svg) no-repeat; background-size: 100%;">
         <div class="login-div">
-            <img style="margin-top: 1em;margin-bottom: 0.3em;width: 122px;" src="/images/login/mobileRsp/poc-logo.svg"><br>
+            <img style="margin-top: 1em;margin-bottom: 0.3em;width: 122px;" src="/images/login/mobileRsp/poc-logo.svg" alt="logo"><br>
             <div class="input-group input-group-border mb-3" style="margin-bottom: 10px !important;">
                 <input type="text" class="form-control username" placeholder="Mobile Number" value="">
             </div>
@@ -131,12 +135,12 @@
                 </div>
             </div>
             <div class="row" style="font-size: 0.7em;display: flex;justify-content: right;">
-                <label class="change-pwd-poc" style="padding: 0px;width: 120px;color: #2757c8; text-decoration:underline;">
+                <span class="change-pwd-poc" style="padding: 0px;width: 120px;color: #2757c8; text-decoration:underline;">
                     Change Password
-                </label>
-                <label class="regist-poc" style="padding: 0px;width: 90px;color: #2757c8; text-decoration:underline;margin-right: 10px;">
+                </span>
+                <span class="regist-poc" style="padding: 0px;width: 90px;color: #2757c8; text-decoration:underline;margin-right: 10px;">
                     Register POC
-                </label>
+                </span>
             </div>
 
             <button type="button" class="form-control btn btn-login">Login</button>

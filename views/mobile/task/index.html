@@ -66,10 +66,7 @@
             padding: 0 5px;
         }
 
-        label {
-            margin-bottom: 0;
-            font-size: 13px;
-        }
+        
         .item-div-list {
             padding-bottom: 2.5em;
             width: 100%;
@@ -177,19 +174,24 @@
             width: 70%;
             margin-left: 15%;
         }
+        span {
+            display: inline-block;
+            margin-bottom: 0;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body style="background-color: #f3f3f3;overflow: hidden;">
     <div class="index-head row">
         <div class="row" style="width: 100%; height: 60px; margin: 0;">
             <div class="col-2" style="text-align: right;">
-                <img src="" />
+                
             </div>
             <div class="col-8" style="text-align: center;">
-                <label style="color: white;font-weight:bolder;font-size: x-large; margin-top: 15px;">Schedule Job</label>
+                <span style="color: white;font-weight:bolder;font-size: x-large; margin-top: 15px;">Schedule Job</span>
             </div>
             <div id="logout" class="col-2" style="display: flex;justify-content: right;align-items: center;">
-                <img style="width: 16px;margin-right: 3px;margin-bottom:2px;" src="/images/logout.svg">
+                <img style="width: 16px;margin-right: 3px;margin-bottom:2px;" src="/images/logout.svg" alt="logout">
                 <span class="role-name-span" style="color: white;"></span>
             </div>
         </div>
@@ -222,7 +224,7 @@
                         <td><img class="nav-tab-img-task" src="/images/indent/mobileRsp/Job-active.svg"></td>
                     </tr>
                     <tr>
-                        <td><label class="nav-tab-label native">Job</label></td>
+                        <td><span class="nav-tab-label native">Job</span></td>
                     </tr>
                 </table>
             </td>
@@ -234,12 +236,12 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0">
             <div class="modal-header modal-header-background">
-                <h7 class="modal-title"></h7>
+                <h6 class="modal-title"></h6>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="background-color: #e8e8e8;">
                 <div class="row md-2">
-                    <label class="col-12 col-sm-12 form-item form-label">Execution Date:</label>
+                    <span class="col-12 col-sm-12 form-item form-label">Execution Date:</span>
                     <div class="col-12 col-sm-12">
                         <input class="form-control form-item" id="executionDate" name="executionDate" autocomplete="off">
                     </div>

@@ -1,6 +1,13 @@
 window.onload = function() {
     //setTimeout(openApp(), 2000)
+
+    var element = document.getElementById('back-content');
+    element.onclick = function() {
+        openApp()
+    };
 };
+
+
 
 const isIOS = function(){
     let agent = navigator.userAgent.toLowerCase();

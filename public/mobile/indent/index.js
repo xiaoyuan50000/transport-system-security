@@ -15,4 +15,21 @@ $(function() {
             })
         })
     });
+
+    $(".sortBtn").on('click', function(){
+        sortByField(this);
+    })
+
+    $(".bulk-approve").on('click', function(){
+        approve()
+    })
+    $(".bulk-reject").on('click', function(){
+        confirmOpt('Reject')
+    })
+    $(".bulk-cancel").on('click', function(){
+        confirmOpt('Cancel')
+    })
+    $(".add-common-indent-btn").on('click', function(){
+        toAddIndentPage()
+    })
 });

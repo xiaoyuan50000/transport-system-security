@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width: 1500px;">
         <div class="modal-content border-0">
             <div class="modal-header modal-header-background">
-                <h5 class="modal-title"></h5>
+                <h5 class="modal-title">Contract Rate</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -11,7 +11,7 @@
                     <div class="row m-2">
                         <div class="col-3">
                             <div class="mb-2 row" style="display: none;">
-                                <label class="col-sm-5 col-form-label">Contract:</label>
+                                <span class="col-sm-5 col-form-label">Contract:</span>
                                 <div class="col-sm-7">
                                     <select class="form-select" name="contractNo">
                                         <option value="<%- contract.contractNo %>" selected><%- contract.contractNo %></option>
@@ -19,7 +19,7 @@
                                 </div>
                             </div>
                             <div class="mb-2 row">
-                                <label class="col-sm-5 col-form-label">Resource:</label>
+                                <span class="col-sm-5 col-form-label">Resource:</span>
                                 <div class="col-sm-7">
                                     <select class="form-select" name="vehicleType">
                                         <option value=""></option>
@@ -33,7 +33,7 @@
                             </div>
                             
                             <!-- <div class="mb-2 row">
-                                <label class="col-sm-5 col-form-label">Funding:</label>
+                                <span class="col-sm-5 col-form-label">Funding:</span>
                                 <div class="col-sm-7 position-relative">
                                     <select class="form-select" name="funding" multiple>
                                         <option value="Central">Central</option>
@@ -43,7 +43,7 @@
                                 </div> 
                             </div> -->
                             <div class="mb-2 row">
-                                <label class="col-sm-5 col-form-label">Contract Type:</label>
+                                <span class="col-sm-5 col-form-label">Contract Type:</span>
                                 <div class="col-sm-7">
                                     <select class="form-select" name="chargeType">
                                         <option value=""></option>
@@ -290,7 +290,7 @@
         </div>
     </div>
     <div class="mb-2 row rounded-2" style="border: 1px solid #dee2e6;">
-        <table class="table table-borderless" id="mix-table">
+        <table class="table table-borderless" id="mix-table" aria-hidden="true">
             <thead>
                 <tr>
                     <td></td>
@@ -354,7 +354,7 @@
         </div>
     </div>
     <div class="mb-2 row rounded-2" style="border: 1px solid #dee2e6;">
-        <table class="table table-borderless text-center" id="daily-trip-table">
+        <table class="table table-borderless text-center" id="daily-trip-table" aria-hidden="true">
             <thead>
                 <tr>
                     <td>Per Day Trips</td>

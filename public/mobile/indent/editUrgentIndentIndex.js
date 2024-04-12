@@ -24,4 +24,8 @@ $(async function() {
 
         DisableTimeItemByGroupAndVehicle();
     });
+
+    $("#back, #cancel-btn").on('click', function(){
+        backToIndentList()
+    })
 });

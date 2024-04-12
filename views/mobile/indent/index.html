@@ -30,12 +30,12 @@
         .condition-btn {
             width: fit-content;
             min-width: 80px;
+            margin: 0px;
             margin-left: 2% !important;
             height: 30px;
             border-radius: 20px;
             border: 1px solid #2bb982;
             background-color: white;
-            margin: 0px;
             text-align: center;
             padding-top: 6px;
             padding-left: 5px;
@@ -77,7 +77,6 @@
             width: 100vw;
             margin: 0;
             background-color: #ffffff;
-            margin: 0;
             padding: 0;
             height: 130px;
         }
@@ -210,7 +209,7 @@
             width: 22px;
             margin-left: 5px;
         }
-        .bulk-opt-btn label {
+        .bulk-opt-btn span {
             width: calc(100% - 22px);
             color: white;
             margin-left: 5px;
@@ -261,55 +260,56 @@
         .add-indent-btn-div.disable {
             background-color: #bebebe !important;
         }
+        span {
+            display: inline-block;
+        }
     </style>
 </head>
 <body style="background-color: #f3f3f3;overflow: hidden;">
     <div class="index-head row">
         <div class="row" style="width: 100%; height: 60px; margin: 0;">
             <div class="col-3" style="display: flex;justify-content: right;align-items: center;">
-                <img src="">
+                
             </div>
-            <div class="col-6" style="text-align: center;">
-                <label class="page-title-label" style="color: white;font-weight:bolder;font-size: x-large; margin-top: 15px;">Activity</label>
+            <div class="col-6" style="text-align: center; margin-top: 15px;">
+                <span class="page-title-label" style="color: white;font-weight:bolder;font-size: x-large; ">Activity</span>
             </div>
             <div class="col-3" style="display: flex;justify-content: right;align-items: center; right: 0px;">
-                <!-- <img class="add-indent-btn" onclick="toAddIndentPage();" style="display:none;width: 30px;margin-right: 3px;" 
-                    src="/images/add.svg" /> -->
-                <img id="logout" style="width: 16px;margin-right: 3px;margin-left:15px;" src="/images/logout.svg">
+                <img id="logout" style="width: 16px;margin-right: 3px;margin-left:15px;" src="/images/logout.svg" alt="logout">
                 <span class="role-name-span" style="color: white;margin-top: 3px;"></span>
             </div>
         </div>
     </div>
     <div class="querycondition">
-        <table style="text-align: center; width: 100%;">
+        <table style="text-align: center; width: 100%;" aria-hidden="true">
             <tr><td><div style="height: 3px;"></div></td></tr>
             <tr>
                 <div class="indent-action-div" style="width: 100%; justify-content: center;align-items: center; padding-top: 10px;">
-                    <label class="condition-btn active" data-indent-action="1">All</label>
-                    <label class="condition-btn" data-indent-action="2">Pending Action</label>
-                    <label class="condition-btn" data-indent-action="3">Today's</label>
-                    <!-- <label class="condition-btn" data-indent-action="4">Urgent</label> -->
+                    <span class="condition-btn active" data-indent-action="1">All</span>
+                    <span class="condition-btn" data-indent-action="2">Pending Action</span>
+                    <span class="condition-btn" data-indent-action="3">Today's</span>
+                    
                 </div>
             </tr>
             <tr><td><div></div></td></tr>
             <tr style="border: 10px solid white;">
                 <td style="text-align: right;padding-top: 5px;">
-                    <div onclick="sortByField(this);" style="width: 15px;display: flex;align-items: center;justify-content: flex-end;width: 100%;height: 30px;">
+                    <div class="sortBtn" style="width: 15px;display: flex;align-items: center;justify-content: flex-end;width: 100%;height: 30px;">
                         <div class="exeDateSordDiv" style="height: 100%;width: 15px;">
-                            <img style="width: 12px;height: 12px;margin-top: 8px;" data-sort="none" class="sortele none" src="/images/indent/mobileRsp/sort-all.svg">
+                            <img style="width: 12px;height: 12px;margin-top: 8px;" data-sort="none" class="sortele none" src="/images/indent/mobileRsp/sort-all.svg" alt="sort">
                         </div>
-                        <label style="margin-right: 5px;">Exe:</label>
+                        <span style="margin-right: 5px;">Exe:</span>
                     </div>
                 </td>
                 <td style="text-align: left;padding-top: 5px;padding-right: 10px;">
                     <input style="height: 30px; font-size: 14px;" class="form-control form-item" id="exe-date" name="exe-date" autocomplete="off">
                 </td>
                 <td style="text-align: right;padding-top: 5px;">
-                    <div onclick="sortByField(this);" style="width: 15px;display: flex;align-items: center;justify-content: flex-end;width: 100%;height: 30px;">
+                    <div class="sortBtn" style="width: 15px;display: flex;align-items: center;justify-content: flex-end;width: 100%;height: 30px;">
                         <div class="createDateSordDiv" style="height: 100%;width: 15px;">
-                            <img style="width: 12px;height: 12px;margin-top: 8px;" data-sort="none" class="sortele all" src="/images/indent/mobileRsp/sort-all.svg">
+                            <img style="width: 12px;height: 12px;margin-top: 8px;" data-sort="none" class="sortele all" src="/images/indent/mobileRsp/sort-all.svg" alt="sort">
                         </div>
-                        <label style="margin-right: 5px;">Created:</label>
+                        <span style="margin-right: 5px;">Created:</span>
                     </div>
                 </td>
                 <td style="text-align: left;padding-top: 5px;padding-right: 10px;"> 
@@ -318,14 +318,14 @@
             </tr>
             <tr>
                 <td style="width: 20%; text-align: right;">
-                    <label style="margin-right: 5px;">Status:</label>
+                    <span style="margin-right: 5px;">Status:</span>
                 </td>
                 <td style="width: 30%; text-align: left;padding-right: 10px;">
                     <select style="height: 30px; font-size: 14px;" id="indent-status" name="indent-status" class="condition-select form-select form-control">
                     </select>
                 </td>
                 <td class="unit-filter-condition" style="display: none;width: 15%; text-align: right;"> 
-                    <label style="margin-right: 5px;">Unit:</label>  
+                    <span style="margin-right: 5px;">Unit:</span>  
                 </td>
                 <td class="unit-filter-condition" style="display: none;width: 30%;text-align: left;padding-right: 10px;">
                     <select style="height: 30px; font-size: 14px;" id="group" name="group" class="condition-select form-select form-control">
@@ -336,21 +336,21 @@
         </table>
     </div>
     <div class="bulk-opt-div">
-        <div class="col-3 bulk-opt-btn bulk-approve" style="display: none;" onclick="approve()">
-            <img src="/images/indent/action/approve-white.svg">
-            <label>Approve</label>
+        <div class="col-3 bulk-opt-btn bulk-approve" style="display: none;">
+            <img src="/images/indent/action/approve-white.svg" alt="approve">
+            <span>Approve</span>
         </div>
         <div class="col-3 bulk-opt-btn bulk-endorse" style="display: none;">
-            <img src="/images/indent/action/endorse-white.svg">
-            <label>Endorse</label>
+            <img src="/images/indent/action/endorse-white.svg" alt="endorse">
+            <span>Endorse</span>
         </div>
-        <div class="col-3 bulk-opt-btn bulk-reject" style="display: none;" onclick="confirmOpt('Reject')">
-            <img src="/images/indent/action/reject-white.svg">
-            <label>Reject</label>
+        <div class="col-3 bulk-opt-btn bulk-reject" style="display: none;">
+            <img src="/images/indent/action/reject-white.svg" alt="reject">
+            <span>Reject</span>
         </div>
-        <div class="col-3 bulk-opt-btn bulk-cancel" style="display: none;" onclick="confirmOpt('Cancel')">
-            <img src="/images/indent/action/cancel-white.svg">
-            <label>Cancel</label>
+        <div class="col-3 bulk-opt-btn bulk-cancel" style="display: none;">
+            <img src="/images/indent/action/cancel-white.svg" alt="cancel">
+            <span>Cancel</span>
         </div>
     </div>
     <div class="col-12 col-sm-12 col-md-12 item-div-list">
@@ -360,8 +360,8 @@
     </div> -->
     <div class="col-12 add-inddent-div" style="display: none;">
         <div class="col-5" style="height: 40px; margin-top: 10px;">
-            <div class="add-indent-btn-div add-common-indent-btn" onclick="toAddIndentPage();">
-                <label id="add-indent-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Indent</label>
+            <div class="add-indent-btn-div add-common-indent-btn">
+                <span id="add-indent-btn" style="color: white;font-weight:bolder;font-size: large; margin: 0px;">Indent</span>
             </div>
         </div>
         <!-- <div class="col-7" style="height: 40px; margin-top: 10px;">
@@ -371,16 +371,16 @@
         </div> -->
     </div>
     <div class="tms-mobile-nav">
-        <table class="tms-mobile-nav-table" style="width: 100%;height: 100%;">
+        <table class="tms-mobile-nav-table" style="width: 100%;height: 100%;" aria-hidden="true">
             <tr class="col-12">
-                <td class="upcomming-btn nav-indent"><img class="nav-tab-img-indent" src="/images/indent/mobileRsp/Indent-active.svg"></td>
-                <td class="new-btn nav-indent" style="display: none;"><img class="nav-tab-img-indent" src="/images/add-white.svg"></td>
-                <td class="past-btn nav-indent"><img class="nav-tab-img-indent" src="/images/history-mobile.svg"></td>
+                <td class="upcomming-btn nav-indent"><img class="nav-tab-img-indent" src="/images/indent/mobileRsp/Indent-active.svg" alt="activity"></td>
+                <td class="new-btn nav-indent" style="display: none;"><img class="nav-tab-img-indent" src="/images/add-white.svg" alt="new"></td>
+                <td class="past-btn nav-indent"><img class="nav-tab-img-indent" src="/images/history-mobile.svg" alt="history"></td>
             </tr>
             <tr class="col-12">
-                <td class="upcomming-btn nav-indent"><label class="nav-tab-label native">Activity</label></td>
-                <td class="new-btn nav-indent" style="display: none;"><label class="nav-tab-label">New</label></td>
-                <td class="past-btn nav-indent"><label class="nav-tab-label">History</label></td>
+                <td class="upcomming-btn nav-indent"><span class="nav-tab-label native">Activity</span></td>
+                <td class="new-btn nav-indent" style="display: none;"><span class="nav-tab-label">New</span></td>
+                <td class="past-btn nav-indent"><span class="nav-tab-label">History</span></td>
             </tr>
         </table>
     </div>

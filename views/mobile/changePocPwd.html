@@ -118,19 +118,19 @@
     <body>
         <div style="width: 100%; height: 100%;">
             <div class="head-div">
-                <img style="width: 60px;height: 60px;margin-top: 10%;" src="/images/login/mobileRsp/user-login.svg">
+                <img style="width: 60px;height: 60px;margin-top: 10%;" src="/images/login/mobileRsp/user-login.svg" alt="login">
             </div>
             <div class="tail-div"></div>
         </div>
         <div class="content-div">
             <div class="content-head">
-                <label class="head-label">CHANGE PASSWORD</label>
+                <span class="head-label">CHANGE PASSWORD</span>
             </div>
             <div class="user-info-div">
                 <div class="row" style="margin-left: 6%;margin-right: 6%;">
                     <div class="col-12">
                         <div class="mb-3">
-                            <label class="form-label">MobileNumber</label>
+                            <label for="mobileNumber" class="form-label">MobileNumber</label>
                             <input type="text" name="mobileNumber" autocomplete="off" required onKeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))"
                                 oninput="check(this)" id="user-mobileNumber">
                             <div class="invalid-feedback">
@@ -140,7 +140,7 @@
                     </div>
                     <div class="col-12">
                         <div class="mb-3">
-                            <label class="form-label">Old Password</label>
+                            <label for="old-password" class="form-label">Old Password</label>
                             <input type="password" name="old-password" autocomplete="off" required
                                 oninput="check(this)" id="user-old-password">
                             <div class="invalid-feedback">
@@ -150,7 +150,7 @@
                     </div>
                     <div class="col-12">
                         <div class="mb-3">
-                            <label class="form-label">Password</label>
+                            <label for="password" class="form-label">Password</label>
                             <input type="password" name="password" autocomplete="off" required
                                 oninput="check(this)" id="user-password">
                             <div class="invalid-feedback">
@@ -160,7 +160,7 @@
                     </div>
                     <div class="col-12">
                         <div class="mb-3">
-                            <label class="form-label">Confirm Password</label>
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
                             <input type="password" name="confirmPassword" autocomplete="off"
                                 required oninput="check(this)" id="user-confirmPassword">
                             <div class="invalid-feedback">
@@ -172,10 +172,10 @@
             </div>
         </div>
         <div class="change-btn-div">
-            <label class="btn-label">Change</label>
+            <span class="btn-label">Change</span>
         </div>
         <div class="back-tologin-div">
-            <label class="tologin-label">Already Have An Account?</label>
+            <span class="tologin-label">Already Have An Account?</span>
         </div>
     </body>
 </html>

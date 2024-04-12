@@ -2400,7 +2400,7 @@ module.exports.updateMobiusUnit = async function (req, res) {
                 if (job2.status != INDENT_STATUS.APPROVED) {
                     await WorkFlow.apply(job2.instanceId, 1, "", ROLE.RF)
                     await RecordOperationHistory(job2.requestId, job2.id, null, userId, INDENT_STATUS.APPROVED, OperationAction.Approve, "")
-                    await Job2.update({ status: INDENT_STATUS.APPROVED, approve: 1 }, { where: { id: task.tripId } })
+                    await Job2.update({ status: INDENT_STATUS.APPROVED, approve: 1 }, { where: { id: job2.id } })
                 }
 
                 tripIds.push(job2.id)
