@@ -16,24 +16,7 @@ const initTripsPage = function (scheduleList) {
                 <div class="row" style="padding: 5px 10px;">
                     <div class="col-12 col-sm-12">
                         <table style="width: 100%;text-align: center;">
-                            <!--<tr>
-                                <td></td>
-                                <td id="${schedule.id}" class=${schedule.evaluate.star >= 1 ? 'evaluate' : 'un-evaluate'}>`;
-                                if (schedule.star > 0) {
-                                    for (let index = 0; index < schedule.star; index++) {
-                                        html += `<img style="width: 15px;" src="../images/trips/star-orange.png">`
-                                    }
-                                } else {
-                                    html += `<img style="width: 15px;" src="../images/trips/star-gray.png">
-                                            <img style="width: 15px;" src="../images/trips/star-gray.png">
-                                            <img style="width: 15px;" src="../images/trips/star-gray.png">
-                                            <img style="width: 15px;" src="../images/trips/star-gray.png">
-                                            <img style="width: 15px;" src="../images/trips/star-gray.png">`
-
-                                }
-                                html += `</td>
-                                <td></td>
-                            </tr>-->
+                            
                             <tr>
                                 <td><label style="font-weight: 500;">${schedule.startDay} ${getMonthStr(schedule.startMonth - 1)}</label></td>
                                 <td></td>

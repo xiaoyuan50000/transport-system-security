@@ -1,12 +1,12 @@
-var user = parent.user;
-var roleName = user.roleName;
-var currentUserId = $('body').data('user-id')
+let user = parent.user;
+let roleName = user.roleName;
+let currentUserId = $('body').data('user-id')
 
-var table
-var TASK_STATUS = ["completed", "late trip", "no show", "cancelled", "cancelled by TSP"]
-var rateVal = 0
-var occ = ["OCC Mgr"]
-var today = moment().format("DD/MM/YYYY")
+let table
+let TASK_STATUS = ["completed", "late trip", "no show", "cancelled", "cancelled by TSP"]
+let rateVal = 0
+// let occ = ["OCC Mgr"]
+let today = moment().format("DD/MM/YYYY")
 
 $(function () {
     if (roleName == "UCO") {
@@ -31,8 +31,8 @@ $(function () {
             $(this).prop("checked", checked)
             table.ajax.reload(null, true);
         })
-    } 
-    if(occ.indexOf(roleName) != -1){
+    }
+    if (occ.indexOf(roleName) != -1) {
         $("#indent-filter select[name='task-status']").append(
             `
             <option value="Completed">Task Status: On-Time</option>
@@ -42,7 +42,7 @@ $(function () {
             `
         )
     }
-    
+
 
     $("#indent-filter input[name='execution-date']").val(today + " ~ " + today)
     table = $('.jobTask-table').DataTable({
@@ -134,14 +134,12 @@ $(function () {
                             if (full.repeats == 'Period') {
                                 return `<div>Period</div>
                                     <div>${moment(full.startDate).format("DD/MM/YYYY HH:mm")}</div>`
+                            } else if (full.repeats != 'Period' && full.duration) {
+                                return `<div>Once(Duration ${full.duration}hr)</div>
+                                    <div>${moment(full.startDate).format("DD/MM/YYYY HH:mm")}</div>`
                             } else {
-                                if (full.duration) {
-                                    return `<div>Once(Duration ${full.duration}hr)</div>
-                                        <div>${moment(full.startDate).format("DD/MM/YYYY HH:mm")}</div>`
-                                } else {
-                                    return `<div>Once(no duration)</div>
-                                        <div>${moment(full.startDate).format("DD/MM/YYYY HH:mm")}</div>`
-                                }
+                                return `<div>Once(no duration)</div>
+                                    <div>${moment(full.startDate).format("DD/MM/YYYY HH:mm")}</div>`
                             }
                         } else {
                             return moment(data).format("DD/MM/YYYY HH:mm");
@@ -270,13 +268,13 @@ $(function () {
                     if (roleName == 'RF' || occ.indexOf(roleName) != -1) {
                         let baseHtml = ``
                         if (full.notifiedTime) {
-                            baseHtml += `<div>Notified:${full.notifiedTime ? moment(full.notifiedTime).format("DD/MM/YYYY HH:mm") : '-'}</div>`;
+                            baseHtml += `<div>Notified:${getNotifyTSPTime(full.notifiedTime)}</div>`;
                         }
                         if (full.tspChangeTime) {
-                            baseHtml += `<div >Amendment:${full.tspChangeTime ? moment(full.tspChangeTime).format("DD/MM/YYYY HH:mm") : '-'}</div>`;
+                            baseHtml += `<div >Amendment:${getNotifyTSPTime(full.tspChangeTime)}</div>`;
                         }
                         if (full.cancellationTime) {
-                            baseHtml += `<div >Cancellation:${full.cancellationTime ? moment(full.cancellationTime).format("DD/MM/YYYY HH:mm") : '-'}</div>`;
+                            baseHtml += `<div >Cancellation:${getNotifyTSPTime(full.cancellationTime)}</div>`;
                         }
                         if (full.endorse != 1) {
                             if (roleName == 'RF') {
@@ -305,7 +303,7 @@ $(function () {
                         Endorse: `<button class="btn btn-sm me-1" onclick="TaskEndorse(${taskId}, '${full.taskStatus}', '${full.category.toLowerCase()}', ${full.walletId}, ${full.serviceProviderId}, ${full.disableWallet})" title="Endorse"><img src="../images/indent/action/endorse.svg"></button>`,
                         EndorseDisabled: `<button class="btn btn-sm me-1" title="Endorse"><img src="../images/indent/action/endorse-grey.svg"></button>`,
                         Reset: `<button class="btn btn-sm me-1" onclick="TaskReset(${taskId})" title="Reset"><img style="width: 21px;" src="../images/reset.svg"></button>`,
-                        Arbitrate: `<button class="btn btn-sm me-1" title="Arbitrate" onclick="javascript:ChatUtil.initRoomChatModal(${currentUserId}, \'${parent.user.roleName}\', ${full.serviceProviderId}, ${taskId})"><img src="../images/indent/action/arbitrate.svg"></button>`,
+                        Arbitrate: `<button class="btn btn-sm me-1" title="Arbitrate" onclick="javascript:ChatUtil.initRoomChatModal(${currentUserId}, '${parent.user.roleName}', ${full.serviceProviderId}, ${taskId})"><img src="../images/indent/action/arbitrate.svg"></button>`,
                         Review: `<button class="btn btn-sm me-1" title="Review" onclick="showReviewDialog(this)" data-row="${meta.row}"><img src="../images/indent/action/comment.svg"></button>`,
                         Review2: `<button class="btn btn-sm me-1" title="Review" onclick="showReviewDialog(this)" data-row="${meta.row}"><img src="../images/indent/action/comment2.svg"></button>`,
                     }
@@ -325,22 +323,18 @@ $(function () {
                                     btn += action["Reset"]
                                 }
                             }
-                        } else {
-                            //if (TASK_STATUS.indexOf(full.taskStatus.toLowerCase()) != -1) {
-                            if (roleName == "UCO") {
-                                if (full.tsp != null && TASK_STATUS.indexOf(full.taskStatus.toLowerCase()) != -1) {
-                                    btn += action["Endorse"]
-                                } else {
-                                    // btn += action["EndorseDisabled"]
-                                }
+                        } else if (!full.endorse && roleName == "UCO") {
+                            if (full.tsp != null && TASK_STATUS.indexOf(full.taskStatus.toLowerCase()) != -1) {
+                                btn += action["Endorse"]
                             }
-                            //}
                         }
+
+
                     }
                     if (roleName == "RF" || roleName == "RA" || roleName == "OCC Mgr") {
-                        if(full.comment){
+                        if (full.comment) {
                             btn += action["Review2"]
-                        }else{
+                        } else {
                             btn += action["Review"]
                         }
                     }
@@ -350,9 +344,11 @@ $(function () {
         ]
     });
 
-    
-})
 
+})
+const getNotifyTSPTime = function (date) {
+    return date ? moment(date).format("DD/MM/YYYY HH:mm") : '-'
+}
 const GetFilerParameters = function () {
     let execution_date = $("#indent-filter input[name='execution-date']").val()
     let created_date = $("#indent-filter input[name='created-date']").val()
@@ -551,7 +547,7 @@ const GetCheckbox = function () {
 const showReviewDialog = function (e) {
     let row = table.row($(e).data("row")).data();
     let taskId = row.taskId
-    var reviewDialog = $.alert({
+    let reviewDialog = $.alert({
         title: 'Review',
         closeIcon: false,
         animation: 'bottom',
@@ -590,7 +586,7 @@ const showReviewDialog = function (e) {
 const loadRate = function (starVal) {
     let starColor = starVal <= review.negativeStarVal ? review.starColor[1] : review.starColor[0]
     layui.use('rate', function () {
-        var rate = layui.rate;
+        let rate = layui.rate;
         rate.render({
             elem: '#review-rate',
             length: review.maxStarVal,
@@ -598,7 +594,7 @@ const loadRate = function (starVal) {
             theme: starColor,
             choose: function (value) {
                 rateVal = value
-                
+
                 loadRate(value)
                 changeQuestion(value)
             }
@@ -614,9 +610,9 @@ const initReviewHtml = function (starVal, remark) {
 }
 
 const changeQuestion = function (starVal) {
-    var question = ""
-    var options = []
-    var color = review.starColor[0]
+    let question = ""
+    let options = []
+    let color = review.starColor[0]
     review.star.forEach((item, index) => {
         if (item.value.indexOf(Number(starVal)) != -1) {
             question = item.question

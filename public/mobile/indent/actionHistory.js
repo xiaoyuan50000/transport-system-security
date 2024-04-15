@@ -1,9 +1,9 @@
-var indentFlowColors = {'New Indent': '#A8BBE5','New Trip': '#A8BBE5', 'Edit Trip': '#A8BBE5', 'Create': '#A8BBE5','Approve': '#4EB981', 
+let indentFlowColors = {'New Indent': '#A8BBE5','New Trip': '#A8BBE5', 'Edit Trip': '#A8BBE5', 'Create': '#A8BBE5','Approve': '#4EB981', 
     'Cancel': '#adadad', 'Reject': '#f6a7a6', 'Edit': '#8cc9fd',
     'assigned': '#008aff', 'declined': '#eb3531', 'No Show': '#ff80a5', 
     'Arrived': '#4EB981', 'Late Trip': '#fd7624','successful': '#007c5c'};
 
-var tripId;
+let tripId;
 $(function () {
     tripId = getParams('tripId');
 
@@ -53,7 +53,6 @@ const initIndentFlowPage = function(flowDataList) {
             indentFlowColor = indentFlowColors[row.action];
         }
 
-        let actionClass = row.action.toLowerCase().split(' ').join('');
         let username = row.username
         let remark = row.remark ? `(${row.remark})` : ""
         let createdAt = moment(row.createdAt).format("DD/MM HH:mm:ss")
@@ -191,8 +190,8 @@ const initDriverFlowPage = function(flowDataList) {
 }
 
 const getParams = function(key) {
-    var reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
-    var r = window.location.search.substr(1).match(reg);
+    let reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
+    let r = window.location.search.substr(1).match(reg);
     if (r != null) {
         return unescape(r[2]);
     }

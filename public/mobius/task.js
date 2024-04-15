@@ -1,6 +1,6 @@
-var table;
-var fmt = 'DD/MM/YYYY'
-var fmtTime = 'HH:mm'
+let table;
+let fmt = 'DD/MM/YYYY'
+let fmtTime = 'HH:mm'
 $(function(){
     table = $('.mobius-task-table').DataTable({
         "ordering": false,

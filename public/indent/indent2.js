@@ -1,10 +1,10 @@
-var table
-var lastOptTripIds = []
+let table
+let lastOptTripIds = []
 let approveBtn = `<div class="col-auto ps-0"><button class="btn btn-sm btn-white rounded-pill btn-action" onclick="ApproveBulkAction()"><img class="me-2" src="../images/indent/action/approve.svg">Approve</button></div>`
 let rejectBtn = `<div class="col-auto ps-0"><button class="btn btn-sm btn-white rounded-pill btn-action" onclick="RejectBulkAction()"><img class="me-2" src="../images/indent/action/reject.svg">Reject</button></div>`
 let cancelBtn = `<div class="col-auto ps-0"><button class="btn btn-sm btn-white rounded-pill btn-action" onclick="CancelBulkAction()"><img class="me-2" src="../images/indent/action/cancel.svg">Cancel</button></div>`
-var mobiusSubUnits = []
-var hubNodeList = []
+let mobiusSubUnits = []
+let hubNodeList = []
 
 $(function () {
     $("#execution-date").val(`${moment().format("DD/MM/YYYY")} ~ ${moment().add(1, 'M').format("DD/MM/YYYY")}`)
@@ -46,8 +46,8 @@ $(function () {
         //     PageHelper.drawGoPageMenu();
         // },
         "rowCallback": function (tr, data) {
-            var row = table.row(tr);
-            var details = format(data.trips)
+            let row = table.row(tr);
+            let details = format(data.trips)
             row.child(details).show();
             $(tr).addClass('shown');
         },
@@ -99,13 +99,14 @@ $(function () {
     $('.indent-table').on('error.dt', function (e, settings, techNote, message) {
         console.log('An error has been reported by DataTables: ', message);
     }).DataTable();
-    
+
     $('.indent-table').find("thead").hide()
     if (roleName != "TSP") {
         GetTodayIndentsCount()
     }
     AddCollapseExpandClickEvent()
     AddFilterListening()
+    checkUCORestricted()
 })
 
 const GetFilerParameters = function () {
@@ -124,7 +125,7 @@ const GetFilerParameters = function () {
     let nodeList = []
     if (node != "") {
         nodeList = [node]
-    } else if (hub != "" && node == "" && hubNodeList.length>0) {
+    } else if (hub != "" && node == "" && hubNodeList.length > 0) {
         let hubNodes = hubNodeList.filter(a => a.unit == hub)
         nodeList = hubNodes.map(a => a.id)
     }
@@ -164,6 +165,20 @@ const AddFilterListening = function () {
     $("#indent-action a").on("click", ChangeIndentAction)
 }
 
+const checkUCORestricted = async function () {
+    if (roleName == "UCO") {
+        await axios.post("/checkUCORestricted", {
+            roleName: roleName,
+        }).then(res => {
+            if (!res.data.data) {
+                approveBtn = ""
+                rejectBtn = ""
+                cancelBtn = ""
+            }
+        })
+    }
+}
+
 const GetTodayIndentsCount = async function () {
     await axios.post("/indent/getPendingMyActionAndTodayActionCount", {
         roleName: roleName,
@@ -184,11 +199,10 @@ const TableColumn = {
             if (!full.instanceId || full.btns.indexOf("Approve") == -1) {
                 return ""
             }
-        } else {
-            if (!hasCancelBtn) {
-                return ""
-            }
+        } else if (action != 2 && !hasCancelBtn) {
+            return ""
         }
+
 
         return `<div class="form-check">
             <input class="form-check-input" type="checkbox" value="${full.tripId}" data-indent-date="${full.executionDate}" name="checkboxTrip" onclick="CheckTrip(this)">
@@ -391,9 +405,9 @@ const TableColumn = {
 
 const AddCollapseExpandClickEvent = function () {
     $('.table tbody').on('click', 'td.details-control', function () {
-        var tr = $(this).closest('tr');
-        var row = table.row(tr);
-        var expandDatas = row.data().trips
+        let tr = $(this).closest('tr');
+        let row = table.row(tr);
+        let expandDatas = row.data().trips
         if (row.child.isShown()) {
             // This row is already open - close it
             row.child.hide();
@@ -401,7 +415,7 @@ const AddCollapseExpandClickEvent = function () {
         }
         else {
             // Open this row
-            var details = format(expandDatas)
+            let details = format(expandDatas)
             row.child(details).show();
             tr.addClass('shown');
         }
@@ -409,7 +423,7 @@ const AddCollapseExpandClickEvent = function () {
 }
 
 function format(datas) {
-    var columnWidth = ["2%", "1%", "6%", "8%", "13%", "10%", "10%", "8%", "10%", "5%", "5%"]
+    let columnWidth = ["2%", "1%", "6%", "8%", "13%", "10%", "10%", "8%", "10%", "5%", "5%"]
     if (datas.length == 0) {
         return `<table class="table table-details">
         <tr class="text-center"><td>No Datas</td></tr>
@@ -417,7 +431,7 @@ function format(datas) {
     }
     let tr = ""
     // console.log(lastOptTripIds)
-    for (var item of datas) {
+    for (let item of datas) {
         let taskStatus = item.status
 
         tr += `<tr ${lastOptTripIds.length > 0 && lastOptTripIds.includes(item.tripId) ? 'class="pending-action-background"' : ''}>

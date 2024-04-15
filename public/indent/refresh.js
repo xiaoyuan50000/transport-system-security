@@ -1,5 +1,5 @@
-var v = null
-var refreshInterval = 10000
+let v = null
+let refreshInterval = 10000
 
 const StartRefreshIndent = function () {
     if (v == null) {

@@ -1,8 +1,8 @@
-var table;
-var hubNodeList;
-var urgentDriverModal = document.getElementById('urgentDriverModal');
-var selectTaskId;
-var isEdit = true;
+let table;
+let hubNodeList;
+let urgentDriverModal = document.getElementById('urgentDriverModal');
+let selectTaskId;
+let isEdit = true;
 $(function () {
     $("#execution-date").val(`${moment().format("DD/MM/YYYY")} ~ ${moment().add(1, 'M').format("DD/MM/YYYY")}`)
     // if(roleName === 'RF'){

@@ -431,7 +431,9 @@
 
 .tui-datepicker-dropdown {
     display: inline-block;
-    width: 120px
+    width: 120px;
+    position: relative;
+
 }
 
 .tui-datepicker-dropdown .tui-dropdown-button {
@@ -446,9 +448,7 @@
     cursor: pointer
 }
 
-.tui-datepicker-dropdown {
-    position: relative
-}
+
 
 .tui-datepicker-dropdown .tui-ico-caret {
     position: absolute;

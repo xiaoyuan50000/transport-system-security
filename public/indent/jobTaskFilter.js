@@ -1,6 +1,6 @@
-var unitDatas;
-var occ = ["OCC Mgr"]
-var OCCMGR = "OCC Mgr"
+let unitDatas;
+let occ = ["OCC Mgr"]
+let OCCMGR = "OCC Mgr"
 
 $(async function () {
     let elemIds = ['#execution-date', '#created-date']

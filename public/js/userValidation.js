@@ -1,8 +1,8 @@
 // Password length has to be minimum 12 characters includes 1 uppercase, 1 numeric and 1 symbol.
-var pwdRegExp = new RegExp(/^(?=.*[A-Z])(?=.*\d)(?=.*[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]])[A-Za-z\d`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]]{12,}$/);
-var emailExp = new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+let pwdRegExp = new RegExp(/^(?=.*[A-Z])(?=.*\d)(?=.*[`~!@#$%^&*()_\-+=<>?:"{}|,./;'\\[\]])[A-Za-z\d`~!@#$%^&*()_\-+=<>?:"{}|,./;'\\[\]]{12,}$/);
+let emailExp = new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
 
-var ErrorMessage = {
+let ErrorMessage = {
     InvalidNric: "Invalid NRIC.",
     ExistNric: "NRIC already exists.",
     ExistLoginName: "Login Name already exists.",
@@ -17,7 +17,7 @@ var ErrorMessage = {
     InvalidEmail: "Invalid Email.",
 }
 
-var emailReg = {
+let emailReg = {
     valid: function (data) {
         let result = { success: true, errorMsg: "" }
         if (!emailExp.test(data)) {
@@ -28,7 +28,7 @@ var emailReg = {
     },
 }
 
-var mobileNumberReg = {
+let mobileNumberReg = {
     valid: function (data) {
         let result = { success: true, errorMsg: "" }
         let firstNumber = data.substring(0, 1)
@@ -59,7 +59,7 @@ var mobileNumberReg = {
     },
 }
 
-var passwordReg = {
+let passwordReg = {
     valid: function (data) {
         let result = { success: true, errorMsg: "" }
         if (!pwdRegExp.test(data)) {
@@ -97,7 +97,7 @@ var passwordReg = {
     }
 }
 
-var nricReg = {
+let nricReg = {
     test: function (data) {
         return validateNRIC(data)
     },
@@ -119,7 +119,7 @@ var nricReg = {
     }
 };
 
-var loginNameReg = {
+let loginNameReg = {
     loginNameExist: function (nric, username) {
         let result = false
         $.ajax({
@@ -160,7 +160,7 @@ var loginNameReg = {
     }
 }
 
-var oldPasswordReg = {
+let oldPasswordReg = {
     valid: function (userId, oldPassword) {
         let result = { success: true, errorMsg: "" }
         $.ajax({
@@ -211,7 +211,7 @@ function validateNRIC(str) {
 
     str = str.toUpperCase();
 
-    var i, icArray = [];
+    let i, icArray = [];
     for (i = 0; i < 9; i++) {
         icArray[i] = str.charAt(i);
     }
@@ -224,18 +224,18 @@ function validateNRIC(str) {
     icArray[6] = parseInt(icArray[6], 10) * 3;
     icArray[7] = parseInt(icArray[7], 10) * 2;
 
-    var weight = 0;
+    let weight = 0;
     for (i = 1; i < 8; i++) {
         weight += icArray[i];
     }
 
-    var offset = (icArray[0] == "T" || icArray[0] == "G") ? 4 : 0;
-    var temp = (offset + weight) % 11;
+    let offset = (icArray[0] == "T" || icArray[0] == "G") ? 4 : 0;
+    let temp = (offset + weight) % 11;
 
-    var st = ["J", "Z", "I", "H", "G", "F", "E", "D", "C", "B", "A"];
-    var fg = ["X", "W", "U", "T", "R", "Q", "P", "N", "M", "L", "K"];
+    let st = ["J", "Z", "I", "H", "G", "F", "E", "D", "C", "B", "A"];
+    let fg = ["X", "W", "U", "T", "R", "Q", "P", "N", "M", "L", "K"];
 
-    var theAlpha;
+    let theAlpha;
     if (icArray[0] == "S" || icArray[0] == "T") {
         theAlpha = st[temp];
     } else if (icArray[0] == "F" || icArray[0] == "G") {

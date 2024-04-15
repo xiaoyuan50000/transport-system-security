@@ -1,4 +1,4 @@
-var publidHolidays = [];
+let publidHolidays = [];
 
     $(async function() {
         $(".create-info-item").on("click", function() {

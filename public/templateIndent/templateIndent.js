@@ -1,4 +1,4 @@
-var table
+let table
         let templateResourceTypeElem = $("#template-indent-right-form select[name='serviceType']")
         let templateServiceModeElem = $("#template-indent-right-form select[name='serviceMode']")
         let templateResourceElem = $("#template-indent-right-form select[name='typeOfVehicle']")
@@ -117,12 +117,12 @@ var table
                 currentSelectedId = null
             })
             modal.addEventListener('show.bs.modal', async function (event) {
-                var button = event.relatedTarget
-                var rowIndex = button.getAttribute('data-bs-row')
+                let button = event.relatedTarget
+                let rowIndex = button.getAttribute('data-bs-row')
                 let row = table.row(rowIndex).data();
                 let { groupId, category, resourceTypeId, serviceModeId, resource, noOfResource, noOfDriver, driver } = row
                 currentSelectedId = row.id
-                var modalTitle = modal.querySelector('.modal-title')
+                let modalTitle = modal.querySelector('.modal-title')
                 modalTitle.textContent = 'Edit ' + row.name
 
                 await InitCategory(groupId)
@@ -337,7 +337,7 @@ var table
             }
             if (data.category == 'CV' || data.category == 'MV') {
                 let keyList = ['category', 'resourceTypeId', 'serviceModeId', 'resource']
-                for (var key in data) {
+                for (let key in data) {
                     if (data[key] == "" && keyList.indexOf(key) != -1) {
                         simplyAlert(errorLabel[key] + " is required.")
                         return false

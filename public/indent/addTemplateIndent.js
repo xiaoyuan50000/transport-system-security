@@ -89,7 +89,7 @@ const SetTemplateDataToForm = async function () {
 }
 
 const setDataWithTemplate = async function (data) {
-    let { category, resourceTypeId, serviceModeId, resource, noOfResource, recurring, driver, noOfDriver } = data
+    let { resourceTypeId, serviceModeId, resource, noOfResource, driver, noOfDriver } = data
     // if (category.toUpperCase() != "FUEL") {
     //     await initServiceMode(resourceTypeId)
     //     $("#serviceMode").val(serviceModeId)
@@ -130,7 +130,7 @@ const setDataWithTemplate = async function (data) {
 }
 
 const setDataWithTrip = async function (data) {
-    let { category, resourceTypeId, serviceModeId, trip } = data
+    let { resourceTypeId, serviceModeId, trip } = data
 
     // if (category.toUpperCase() != "FUEL") {
     await initServiceMode(resourceTypeId)
@@ -144,7 +144,7 @@ const setDataWithTrip = async function (data) {
 
     $("#pocName").val(trip.pocName)
     $("#contactNumber").val(trip.contactNumber)
-    let repeats = await InitRecurring()
+    await InitRecurring()
     // $("#repeats").val(repeats)
     // ChangeRepeats(repeats)
     $("#executionDate").val(parent.changeDateFormatDMY(trip.executionDate))
@@ -248,11 +248,8 @@ const saveTemplateIndent = function () {
                     trip.preParkDate = null
                 }
 
-                if (category == "CV" && ["1-way", "ferry service"].indexOf(activeIndentRow.serviceMode.toLowerCase()) != -1 && ["1-way", "ferry service"].indexOf(serviceMode.toLowerCase()) == -1) {
-                    trip.duration = null
-                    row.trip = trip
-                }
-                else if (category == "CV" && ["1-way", "ferry service"].indexOf(activeIndentRow.serviceMode.toLowerCase()) == -1 && ["1-way", "ferry service"].indexOf(serviceMode.toLowerCase()) != -1) {
+                if (category == "CV" && ["1-way", "ferry service"].indexOf(activeIndentRow.serviceMode.toLowerCase()) != -1 && ["1-way", "ferry service"].indexOf(serviceMode.toLowerCase()) == -1
+                    || category == "CV" && ["1-way", "ferry service"].indexOf(activeIndentRow.serviceMode.toLowerCase()) == -1 && ["1-way", "ferry service"].indexOf(serviceMode.toLowerCase()) != -1) {
                     trip.duration = null
                     row.trip = trip
                 }

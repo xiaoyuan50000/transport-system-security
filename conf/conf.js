@@ -9,7 +9,7 @@ module.exports.dbConf = {
     // port: 6446,
     port: 3306,
     // database: 'tms_test_migrate',
-    database: 'tms2',
+    database: 'tms3',
     timezone: 'GMT%2B8',
     multipleStatements: true,
 	connectionLimit: 2000,

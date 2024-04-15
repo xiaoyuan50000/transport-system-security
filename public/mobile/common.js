@@ -7,19 +7,19 @@ $(function() {
     } 
 });
 
-var getDecodeAESCode = async function (data) {
+let getDecodeAESCode = async function (data) {
     return await axios.post('/getDecodeAESCode', {data: data}).then(res => {
         return res.data.data;
     });
 }
 
 // DD/MM/YYYY to YYYY-MM-DD
-var changeDateFormat = function (date) {
+let changeDateFormat = function (date) {
     if (!date) {
         return date
     }
     let dateArr = date.split(" ")
-    var dateParts = dateArr[0].split('/');
+    let dateParts = dateArr[0].split('/');
     let output = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`
     if (dateArr.length > 1) {
         output = `${output} ${dateArr[1]}`
@@ -27,7 +27,7 @@ var changeDateFormat = function (date) {
     return output
 }
 
-var changeFilterExecutionDateFmt = function (date) {
+let changeFilterExecutionDateFmt = function (date) {
     if (!date) {
         return date
     }
@@ -41,12 +41,12 @@ var changeFilterExecutionDateFmt = function (date) {
 }
 
 // YYYY-MM-DD to DD/MM/YYYY
-var changeDateFormatDMY = function (date) {
+let changeDateFormatDMY = function (date) {
     if (!date) {
         return date
     }
     let dateArr = date.split(" ")
-    var dateParts = dateArr[0].split('-');
+    let dateParts = dateArr[0].split('-');
     let output = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`
     if (dateArr.length > 1) {
         output = `${output} ${dateArr[1]}`

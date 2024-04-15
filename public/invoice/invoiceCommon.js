@@ -73,7 +73,7 @@ const ConfirmDownload = function (callback) {
 }
 
 const DownUrlList = function (name) {
-    var eleLink = document.createElement('a');
+    let eleLink = document.createElement('a');
     eleLink.style.display = 'none';
     eleLink.download = name
     eleLink.href = `${window.location.origin}/download/file?filename=` + name.replaceAll("&", "%26")

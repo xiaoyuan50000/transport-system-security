@@ -1,8 +1,9 @@
-var mobiusUnitList = null;
-var unitPrefix = "unit-"
-var user = top.user;
-var roleName = user.roleName;
-var uploadContractNo = ""
+let mobiusUnitList = null;
+let unitPrefix = "unit-"
+let user = top.user;
+let roleName = user.roleName;
+let uploadContractNo = ""
+let table = null
 $(async function () {
     // mobiusUnitList = await GetMobiusSubUnits()
     // AppendMobiusUnit("filter-company")
@@ -128,9 +129,7 @@ const initTableListPage = function () {
                     if (!full.isInvalid) {
                         html += `<button class="btn btn-sm me-1 btn-action" data-bs-toggle="modal" data-bs-target="#contractModal" data-bs-action="edit" data-bs-index="${meta.row}" title="Edit"><img src="/images/indent/action/edit.svg"></button>`
                         html += `<button class="btn btn-sm me-1 btn-action" title="Invalid" onclick="DoInvalid('${full.contractNo}')"><img src="/images/invalid.svg"></button>`
-                        // if ((roleName == 'CM' || roleName == 'RA') && full.status != 'Approved') {
-                        //     html += `<button class="btn btn-sm me-1 btn-action" title="Upload" onclick="openFileDialog('${full.contractNo}')"><img src="/images/upload.svg"></button>`
-                        // }
+                        
                         html += `<button class="btn btn-sm me-1 btn-action" title="Upload" onclick="openFileDialog('${full.contractNo}')"><img src="/images/upload.svg"></button>`
                         if(roleName == 'RA' && full.status != 'Approved'){
                             html += `<button class="btn btn-sm me-1 btn-action" title="Delete" onclick="deleteDialog('${full.contractNo}')"><img src="/images/delete.svg"></button>`
@@ -146,15 +145,15 @@ const initTableListPage = function () {
 function splitArrayIntoNParts(arr, n) {
     n = Math.min(n, arr.length);
 
-    var partLength = Math.ceil(arr.length / n);
+    let partLength = Math.ceil(arr.length / n);
 
-    var result = [];
-    for (var i = 0; i < n; i++) {
+    let result = [];
+    for (let i = 0; i < n; i++) {
         result.push([]);
     }
 
-    for (var i = 0; i < arr.length; i++) {
-        var partIndex = Math.floor(i / partLength);
+    for (let i = 0; i < arr.length; i++) {
+        let partIndex = Math.floor(i / partLength);
         result[partIndex].push(arr[i]);
     }
 
@@ -205,8 +204,8 @@ const AppendMobiusUnit = function (elemId) {
 const UploadFile = async function () {
     const file = $('#fileUpload')[0].files[0];
     const filename = file.name
-    var extStart = filename.lastIndexOf(".");
-    var ext = filename.substring(extStart, filename.length);
+    let extStart = filename.lastIndexOf(".");
+    let ext = filename.substring(extStart, filename.length);
     if (ext != ".xlsx") {
         simplyAlert("Only supports uploading xlsx.", "red");
         return;
@@ -231,7 +230,6 @@ const UploadFile = async function () {
         } else {
             simplyAlert(data.msg, "red");
         }
-        return
     } else {
         simplyAlert("Upload failed", "red");
     }

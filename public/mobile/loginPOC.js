@@ -1,1 +1,1 @@
-var currentSystemType = "POC";
+let currentSystemType = "POC";

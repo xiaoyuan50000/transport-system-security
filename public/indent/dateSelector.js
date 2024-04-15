@@ -1,4 +1,4 @@
-var $ServiceMode = $("#serviceMode")
+let $ServiceMode = $("#serviceMode")
 
 const noSecond = function () {
     $(".layui-laydate-list>li:last").css("display", "none");
@@ -38,7 +38,7 @@ const SelectWeekListening = function () {
 
 const InitDateEndsOnSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let option = {
             elem: '#endsOn',
             lang: 'en',
@@ -320,12 +320,12 @@ const InitPreParkDateSelector = function () {
 }
 
 const DisabledLayDate = function () {
-    // var elem = $(".layui-laydate-content");
+    // let elem = $(".layui-laydate-content");
     // let publidHolidays = parent.publidHolidays
     // layui.each(elem.find('tr'), function (trIndex, trElem) {
     //     layui.each($(trElem).find('td'), function (tdIndex, tdElem) {
 
-    //         var tdTemp = $(tdElem);
+    //         let tdTemp = $(tdElem);
     //         if (publidHolidays.indexOf(tdTemp.attr("lay-ymd")) > -1) {
     //             tdTemp.addClass('laydate-disabled');
     //         }
@@ -334,7 +334,7 @@ const DisabledLayDate = function () {
 }
 
 // const SelectTimeListening = function () {
-//     var timeDom = $('.layui-laydate-footer').find("span[lay-type='datetime']")[0];
+//     let timeDom = $('.layui-laydate-footer').find("span[lay-type='datetime']")[0];
 
 //     $(timeDom).on('click', function () {
 //         interval5Min()

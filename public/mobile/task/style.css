@@ -19,7 +19,6 @@
 *, ::after, ::before {
   box-sizing: inherit;
   -webkit-tap-highlight-color: transparent;
-  /*outline:medium;*/
   padding: 0;
   margin: 0;
   outline: 0;
@@ -44,9 +43,9 @@ html {
 	color: #000;
   font-family: 'youai','Helvetica Neue',Tahoma,Arial,PingFangSC-Regular,
   						'Hiragino Sans GB','Microsoft Yahei',sans-serif;
+	font-size: 16px;
 }
 
-html{font-size:16px}
 .bd_w{
 	background-color: #fff;
 }
@@ -103,9 +102,7 @@ html{font-size:16px}
 	padding: 0.5rem 0;
 	position: relative;
 }
-.calendar_week{
-	/*border-bottom: solid 1px #ddd;*/
-}
+
 .calendar_week > li{
 	padding: 1rem 0;
 }
@@ -197,14 +194,12 @@ html{font-size:16px}
 	padding: 0;
 }
 .jcalendar_week .calendar_header{
-	/*border-bottom: solid 1px #ddd;*/
 	padding-bottom: 0.25rem;
 }
 .jcalendar_week .calendar_day_bar{
 	padding: 0.75rem 0 0.75rem;
 }
 .jcalendar_week .calendar_week{
-	/*padding-bottom: 1rem;*/
 	font-size: 0.625rem;
 }
 .jc_week_act .calendar_day_i{

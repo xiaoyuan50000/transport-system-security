@@ -1,13 +1,13 @@
-// var currentUser = JSON.parse(localStorage.user);
-// var roleName = currentUser.roleName;
+// let currentUser = JSON.parse(localStorage.user);
+// let roleName = currentUser.roleName;
 
-var currentUser = null;
-var roleName = null;
+let currentUser = null;
+let roleName = null;
 
-var requestId = '';
-var optType = 'Create';
-var currentGroupId = null;
-var currentPurposeType = '';
+let requestId = '';
+let optType = 'Create';
+let currentGroupId = null;
+let currentPurposeType = '';
 
 $(async function () {
     currentUser = await getDecodeAESCode(localStorage.user);
@@ -107,8 +107,8 @@ const initIndentData = async function() {
 };
 
 const getParams = function(key) {
-    var reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
-    var r = window.location.search.substr(1).match(reg);
+    let reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
+    let r = window.location.search.substr(1).match(reg);
     if (r != null) {
         return unescape(r[2]);
     }

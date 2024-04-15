@@ -1,7 +1,7 @@
-var user = parent.user;
-var roleName = user.roleName;
-var expandIndent = [];
-var isOpen = $("body").data("type") == 1 ? 1 : 0
+let user = parent.user;
+let roleName = user.roleName;
+let expandIndent = [];
+let isOpen = $("body").data("type") == 1 ? 1 : 0
 
 if (roleName == "RF" || roleName == "RQ" || roleName == "UCO") {
     let now = moment().format('YYYY-MM-DD HH:mm:ss')
@@ -41,7 +41,7 @@ if (roleName == "RF" || occ.indexOf(roleName) != -1) {
 }
 
 $(document).on("click", function (e) {
-    var target = e.target;
+    let target = e.target;
     if (target.id != "search1" && target.id != "search2" && target.id != "pickupDestination" && target.id != "dropoffDestination"
         && target.id != "search3" && target.id != "polPoint"
         && target.id != "search-unit1" && target.id != "groupSelectId"

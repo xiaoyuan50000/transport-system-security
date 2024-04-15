@@ -1,12 +1,12 @@
-// var currentUser = JSON.parse(localStorage.user);
-// var roleName = currentUser.roleName;
-var currentUser = null;
-var roleName = null;
+// let currentUser = JSON.parse(localStorage.user);
+// let roleName = currentUser.roleName;
+let currentUser = null;
+let roleName = null;
 
-var taskId = '';
-var optType = 'Create';
-var currentGroupId = null;
-var currentUrgentIndentStartTime = '';
+let taskId = '';
+let optType = 'Create';
+let currentGroupId = null;
+let currentUrgentIndentStartTime = '';
 
 $(async function () {
     currentUser = await getDecodeAESCode(localStorage.user);
@@ -295,8 +295,8 @@ const updateUrgentIndent = async function() {
 }
 
 const getParams = function(key) {
-    var reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
-    var r = window.location.search.substr(1).match(reg);
+    let reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
+    let r = window.location.search.substr(1).match(reg);
     if (r != null) {
         return unescape(r[2]);
     }

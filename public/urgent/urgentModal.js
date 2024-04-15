@@ -1,13 +1,13 @@
-var urgentModal = document.getElementById('urgentModal')
-var reportingLocationList
-var resourceElem = $('#urgentModal input[name="resource"]')
-var reportingLocationElem = $('#urgentModal input[name="reportingLocation"]')
-var pocElem = $('#urgentModal input[name="poc"]')
-var mobileNumberElem = $('#urgentModal input[name="mobileNumber"]')
-var dateElem = $('#urgentModal span[name="date"]')
-var timeElem = $('#urgentModal #time-select button')
-var timeList = ["09:30", "12:30", "15:00"]
-var currentSelectedTask = null
+let urgentModal = document.getElementById('urgentModal')
+let reportingLocationList
+let resourceElem = $('#urgentModal input[name="resource"]')
+let reportingLocationElem = $('#urgentModal input[name="reportingLocation"]')
+let pocElem = $('#urgentModal input[name="poc"]')
+let mobileNumberElem = $('#urgentModal input[name="mobileNumber"]')
+let dateElem = $('#urgentModal span[name="date"]')
+let timeElem = $('#urgentModal #time-select button')
+let timeList = ["09:30", "12:30", "15:00"]
+let currentSelectedTask = null
 $(async function () {
     // reportingLocationList = await axios.post("/getDestination").then(res => {
     //     let datas = res.data.data
@@ -147,7 +147,7 @@ const GetUnitLocationByUnitId = async function () {
 // }
 
 $(document).on("click", function (e) {
-    var target = e.target;
+    let target = e.target;
     if (target.id != "reportingLocationSearchDiv" && target.id != "reportingLocationSearch" && target.id != 'reportingLocationInput'
         && target.id != "urgent-unit-input" && target.id != "urgent-unit-div" && target.id != 'urgent-unit-search') {
         $('#urgentModal #reportingLocationSearchDiv').css("display", "none");
@@ -163,7 +163,7 @@ const ValidUrgentForm = function (data) {
         poc: 'POC', mobileNumber: 'Mobile Number'
     }
 
-    for (var key in data) {
+    for (let key in data) {
         if (key == "unitId" && roleName != "RF" && occ.indexOf(roleName) == -1) {
             continue
         }

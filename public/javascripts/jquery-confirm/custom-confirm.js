@@ -51,7 +51,7 @@ function simplyForm1(content, callback) {
         },
         onContentReady: function () {
             // bind to events
-            var jc = this;
+            let jc = this;
             this.$content.find('form').on('submit', function (e) {
                 jc.$confirm.trigger('click'); // reference the button and click it
             });

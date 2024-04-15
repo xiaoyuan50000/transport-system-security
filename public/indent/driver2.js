@@ -1,8 +1,8 @@
-var driverDetailModal;
-var driverModal;
-var driverTable
-var needInitDateEle = [];
-var lastOptTask = [];
+let driverDetailModal;
+let driverModal;
+let driverTable
+let needInitDateEle = [];
+let lastOptTask = [];
 
 $(function () {
     driverDetailModal = document.getElementById('driverDetailModal')
@@ -144,9 +144,7 @@ $(function () {
                     "render": function (data, type, full, meta) {
                         if (isLoanMV(full)) return "-"
                         if (data) {
-                            if (roleName != "RF" || full.endorse
-                                || (full.taskStatus != 'acknowledged' && full.taskStatus.toLowerCase() != 'assigned'
-                                    && full.taskStatus != 'Started' && full.taskStatus != 'Arrived')) {
+                            if (validateTime(full)) {
                                 return moment(data).format("DD/MM/YYYY HH:mm")
                             }
                             let dateEleId = "departOptTime" + full.externalJobId
@@ -183,9 +181,7 @@ $(function () {
                     "render": function (data, type, full, meta) {
                         if (isLoanMV(full)) return "-"
                         if (data) {
-                            if (roleName != "RF" || full.endorse
-                                || (full.taskStatus != 'acknowledged' && full.taskStatus.toLowerCase() == 'assigned'
-                                    && full.taskStatus != 'Started' && full.taskStatus != 'Arrived')) {
+                            if (validateTime(full)) {
                                 return moment(data).format("YYYY/MM/DD HH:mm")
                             }
                             let dateEleId = "completeOptTime" + full.externalJobId
@@ -246,6 +242,12 @@ $(function () {
     })
 })
 
+const validateTime = function (full) {
+    return roleName != "RF" || full.endorse
+        || (full.taskStatus != 'acknowledged' && full.taskStatus.toLowerCase() == 'assigned'
+            && full.taskStatus != 'Started' && full.taskStatus != 'Arrived')
+}
+
 const isLoanMV = function (full) {
     return full.category.toLowerCase() == 'mv' && (full.vehicleType == "-" || full.driver == 0)
 }
@@ -254,7 +256,6 @@ const ChangeTsp = function (e) {
     let row = driverTable.row($(e).data("row")).data();
     let taskId = row.taskId
     let serviceProviderId = $(e).find('option:selected').val()
-    let serviveProviderName = $(e).find('option:selected').text()
     if (serviceProviderId != "") {
         $.confirm({
             title: 'Are you sure to choose TSP?',
@@ -305,7 +306,7 @@ const confirmChangeTsp = async function ($this, taskId, serviceProviderId) {
 
 const InitChangeTspOptateTimeSelector = async function () {
     await layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         laydate.render({
             elem: '#operateTime',
             lang: 'en',
@@ -391,7 +392,8 @@ const EditDriver = function (e) {
         });
     }
 
-    const SaveEditDriver = async function (taskId, poc, pocMobileNumber, executionDate, executionTime, duration, newTsp, startDate, endDate) {
+    const SaveEditDriver = async function (data) {
+        let {taskId, poc, pocMobileNumber, executionDate, executionTime, duration, newTsp, startDate, endDate} = data
         await axios.post("/indent/editDriver", {
             taskId: taskId,
             poc: poc,
@@ -446,35 +448,10 @@ const EditDriver = function (e) {
                         btns: ['clear', 'confirm'],
                         ready: () => { noSecond(); },
                         done: function (value, date, endDate) {
-                            if (serviceProviderId) {
-                                axios.post("/getDriverCheckboxByVehicle", {
-                                    vehicle: vehicleType,
-                                    serviceModeId: serviceModeId,
-                                    dropoffPoint: dropoffPoint,
-                                    pickupPoint: pickupPoint,
-                                    executionDate: parent.changeDateFormat($this.$content.find('input[name="executionDate"]').val()),
-                                    executionTime: $this.$content.find('input[name="executionTime"]').val()
-                                }).then(res => {
-                                    let datas = res.data.data
-                                    if (datas) {
-                                        let needChangeTsp = true;
-                                        let data = `<option value=""></option>`
-                                        for (let item of datas) {
-                                            if (item.id == serviceProviderId) {
-                                                data += `<option value="${item.id}" selected>${item.name}</option>`
-                                                needChangeTsp = false;
-                                            } else {
-                                                data += `<option value="${item.id}">${item.name}</option>`
-                                            }
-                                        }
-                                        if (needChangeTsp === true) {
-                                            $this.$content.find(".sp-div").show();
-                                            $this.$content.find("#serviceProvider").empty()
-                                            $this.$content.find("#serviceProvider").append(data)
-                                        }
-                                    }
-                                })
-                            }
+                            
+                            let executionDate = $this.$content.find('input[name="executionDate"]').val()
+                            let executionTime = $this.$content.find('input[name="executionTime"]').val()
+                            doneEditTaskTime(serviceProviderId, vehicleType, serviceModeId, dropoffPoint, pickupPoint, executionDate, executionTime)
                         },
                     });
                 });
@@ -524,7 +501,10 @@ const EditDriver = function (e) {
                             return false;
                         }
                     }
-                    SaveEditDriver(taskId, poc, pocMobileNumber, executionDate, executionTime, duration, newTsp, null, null)
+                    let data = {
+                        taskId, poc, pocMobileNumber, executionDate, executionTime, duration, newTsp, startDate: null, endDate: null
+                    }
+                    SaveEditDriver(data)
                 }
             })
     } else {
@@ -601,10 +581,44 @@ const EditDriver = function (e) {
                         simplyAlert("Start Date should be earlier than End Date!");
                         return false;
                     }
-
-                    SaveEditDriver(taskId, poc, pocMobileNumber, null, null, null, null, startDate, endDate)
+                    let data = {
+                        taskId, poc, pocMobileNumber, executionDate: null, executionTime: null, duration: null, newTsp: null, startDate, endDate
+                    }
+                    SaveEditDriver(data)
                 }
             })
+    }
+}
+
+const doneEditTaskTime = function (serviceProviderId, vehicleType, serviceModeId, dropoffPoint, pickupPoint, executionDate, executionTime) {
+    if (serviceProviderId) {
+        axios.post("/getDriverCheckboxByVehicle", {
+            vehicle: vehicleType,
+            serviceModeId: serviceModeId,
+            dropoffPoint: dropoffPoint,
+            pickupPoint: pickupPoint,
+            executionDate: parent.changeDateFormat(executionDate),
+            executionTime: executionTime
+        }).then(res => {
+            let datas = res.data.data
+            if (datas) {
+                let needChangeTsp = true;
+                let data = `<option value=""></option>`
+                for (let item of datas) {
+                    if (item.id == serviceProviderId) {
+                        data += `<option value="${item.id}" selected>${item.name}</option>`
+                        needChangeTsp = false;
+                    } else {
+                        data += `<option value="${item.id}">${item.name}</option>`
+                    }
+                }
+                if (needChangeTsp === true) {
+                    $this.$content.find(".sp-div").show();
+                    $this.$content.find("#serviceProvider").empty()
+                    $this.$content.find("#serviceProvider").append(data)
+                }
+            }
+        })
     }
 }
 
@@ -667,7 +681,6 @@ const updateTaskState = async function (taskId, optType, eleId, justification) {
             operationTime: optTime,
             optType: optType
         }).then(res => {
-            let data = res.data.data;
             if (res.data.code == 2) {
                 simplyAlert("The task has been canceled !", 'red');
             }

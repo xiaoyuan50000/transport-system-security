@@ -12,7 +12,7 @@ const { Task2 } = require('../model/task.js');
 const { Location } = require('../model/location');
 const { PolPoint } = require('../model/polPoint');
 const WorkFlow = require('../util/workFlow');
-const {validDateTime} = require('../util/utils');
+const { validDateTime } = require('../util/utils');
 const { Job2, OperationHistory, Job2History } = require('../model/job2.js');
 const { ServiceMode } = require('../model/serviceMode.js');
 const { ServiceType } = require('../model/serviceType');
@@ -172,16 +172,16 @@ const QueryIndentsByFilter = async function (roleName, action, execution_date,
     if (sortParams) {
         if (sortParams.exeSort && sortParams.exeSort == 'asc') {
             orderBySql += ` b.executionDate asc `;
-        } else if(sortParams.exeSort && sortParams.exeSort == 'desc'){
+        } else if (sortParams.exeSort && sortParams.exeSort == 'desc') {
             orderBySql += ` b.executionDate desc `;
         }
         if (sortParams.createdSort) {
             if (orderBySql) {
                 orderBySql += ` ,`
             }
-            if(sortParams.createdSort == 'asc'){
+            if (sortParams.createdSort == 'asc') {
                 orderBySql += ` b.createdAt asc`;
-            } else if(sortParams.createdSort == 'desc'){
+            } else if (sortParams.createdSort == 'desc') {
                 orderBySql += ` b.createdAt desc`;
             }
         }
@@ -774,7 +774,7 @@ const FilterServiceProvider = async function (vehicle, serviceModeId, dropoffPoi
                 CONCAT('2020-01-01',' ',?) BETWEEN CONCAT('2020-01-01',' ',SUBSTRING_INDEX(d.dailyTripCondition,'-',1)) and CONCAT('2020-01-02',' ',SUBSTRING_INDEX(d.dailyTripCondition,'-',-1))
             )
         )`
-        replacements.push(...[executionTime,executionTime,executionTime])
+        replacements.push(...[executionTime, executionTime, executionTime])
     }
     let data = await sequelizeObj.query(
         `SELECT
@@ -835,7 +835,7 @@ module.exports.FilterServiceProvider = FilterServiceProvider
 module.exports.UpdateTSP = async function (req, res) {
     try {
         let { tripId, serviceProviderId, optTime, userId, isCategoryMV } = req.body
-        if(!validDateTime(optTime)){
+        if (!validDateTime(optTime)) {
             log.error(`Notified Time ${optTime} is invalid.`)
             return Response.error(res, 'Create TSP Failed. Notified Time is invalid.')
         }
@@ -1368,7 +1368,7 @@ module.exports.GetMobiusSubUnits = async function (req, res) {
 module.exports.SendToWOG = async function (req, res) {
     try {
         let { tripId, optTime, serviceProviderId, userId } = req.body
-        if(!validDateTime(optTime)){
+        if (!validDateTime(optTime)) {
             log.error(`Notified Time ${optTime} is invalid.`)
             return Response.error(res, 'Create TSP Failed. Notified Time is invalid.')
         }
@@ -1483,7 +1483,7 @@ const SendTaskToWOGCommon = async function (taskList, optTime, userId, servicePr
 module.exports.SendTaskToWOG = async function (req, res) {
     try {
         let { taskIdArray, optTime, serviceProviderId, userId } = req.body
-        if(!validDateTime(optTime)){
+        if (!validDateTime(optTime)) {
             log.error(`Notified Time ${optTime} is invalid.`)
             return Response.error(res, 'Create TSP Failed. Notified Time is invalid.')
         }
@@ -1506,4 +1506,14 @@ module.exports.SendTaskToWOG = async function (req, res) {
         log.error(ex)
         return Response.error(res, 'Create TSP Failed.')
     }
+}
+
+module.exports.checkUCORestricted = async function (req, res) {
+    let roleName = req.body.roleName
+    let groupId = req.body.groupId
+    let isEndorsed = true
+    if (roleName == ROLE.UCO) {
+        isEndorsed = await requestService.CheckTaskIsEndorsedByUnitId(groupId)
+    }
+    return Response.success(res, isEndorsed)
 }

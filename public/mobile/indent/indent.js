@@ -1,15 +1,15 @@
-var currentNav = 'upcomming'
-// var currentUser = JSON.parse(localStorage.user);
-// var roleName = currentUser.roleName;
-var currentUser = null;
-var roleName = null;
+let currentNav = 'upcomming'
+// let currentUser = JSON.parse(localStorage.user);
+// let roleName = currentUser.roleName;
+let currentUser = null;
+let roleName = null;
 
-var loginPagePath = localStorage.getItem("loginPagePath");
-var currentPage = 1;
-var pageSize = 10;
-var totalPage = 1;
-var lastOptTripIds = [];
-var indentNavBgColors = {"Pending for approval(UCO)":"#1abfc0",
+let loginPagePath = localStorage.getItem("loginPagePath");
+let currentPage = 1;
+let pageSize = 10;
+let totalPage = 1;
+let lastOptTripIds = [];
+let indentNavBgColors = {"Pending for approval(UCO)":"#1abfc0",
      "Pending for approval(RF)":"#1abfc0",
      "Pending for cancellation(UCO)":"#f8e814",
      "Pending for cancellation(RF)":"#f8e814",
@@ -20,7 +20,7 @@ var indentNavBgColors = {"Pending for approval(UCO)":"#1abfc0",
      "Late Trip":"#fd7624",
      "declined":"#eb3531",
      "No Show": "#ff80a5"};
-var urgentIndentNavBgColors = {"pending":"#1abfc0",
+let urgentIndentNavBgColors = {"pending":"#1abfc0",
      "cancelled":"#9d9d9d",
      "completed":"#1b7981",
      "ready":"#CF6161"};
@@ -422,7 +422,15 @@ const buildIndentsPage = function(indentList) {
         currentIndex++;
     }
 };
-
+const getActionBtnHtml = function(action, taskAction){
+    if(taskAction['Edit']){
+        return taskAction['Edit']
+    }
+    if(action){
+        return action
+    }
+    return ''
+}
 const buildUrgentIndnetsPage = function(urgentIndentList) {
     if (urgentIndentList === undefined || urgentIndentList == null || urgentIndentList.length == 0) {
         return;
@@ -458,7 +466,7 @@ const buildUrgentIndnetsPage = function(urgentIndentList) {
         }
 
         let action = indent.action;
-        let actionBtnHtml = action ? (taskAction['Edit'] ? taskAction['Edit'] : '') : '';
+        let actionBtnHtml = getActionBtnHtml(action, taskAction)
 
   
         let tripStatusBgColor = urgentIndentNavBgColors[taskStatus] ? urgentIndentNavBgColors[taskStatus] :"#2bb982";

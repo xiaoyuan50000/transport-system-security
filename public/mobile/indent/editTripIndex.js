@@ -1,4 +1,4 @@
-var publidHolidays = [];
+let publidHolidays = [];
 
     $(async function() {
         $(".create-info-item").on("click", function() {
@@ -49,7 +49,6 @@ var publidHolidays = [];
     });
 
     const getSingaporePublicHolidays = async function(){
-        let thisYear = moment().format("YYYY")
         let hols = []
         await axios.get(`/singapore_public_holidays`).then(res=>{
             let datas = res.data.data

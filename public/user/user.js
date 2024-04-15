@@ -1,29 +1,29 @@
 
-var form = $("#user-form")
-var searchBtn = $("#search-btn")
-var modalCloseBtn = $(".btn-cancel")
-var modalOpenBtn = $("#add-user-btn")
-var formSubmitBtn = $(".btn-save")
-var nricInput = form.find("input[name='nric']")
-var usernameInput = form.find("input[name='username']")
-var mobileNumberInput = form.find("input[name='mobileNumber']")
-var groupSelect = form.find("select[name='group']")
-var roleSelect = form.find("select[name='role']")
-var serviceProviderSelect = form.find("select[name='serviceProvider']")
-var emailInput = form.find("input[name='email']")
-var ordInput = form.find("input[name='ord']")
-var table;
-var dateFormat = "DD/MM/YYYY";
-var isEdit = false;
+let form = $("#user-form")
+let searchBtn = $("#search-btn")
+let modalCloseBtn = $(".btn-cancel")
+let modalOpenBtn = $("#add-user-btn")
+let formSubmitBtn = $(".btn-save")
+let nricInput = form.find("input[name='nric']")
+let usernameInput = form.find("input[name='username']")
+let mobileNumberInput = form.find("input[name='mobileNumber']")
+let groupSelect = form.find("select[name='group']")
+let roleSelect = form.find("select[name='role']")
+let serviceProviderSelect = form.find("select[name='serviceProvider']")
+let emailInput = form.find("input[name='email']")
+let ordInput = form.find("input[name='ord']")
+let table;
+let dateFormat = "DD/MM/YYYY";
+let isEdit = false;
 const occ = ["OCC MGR"]
-var userHistoryTable;
+let userHistoryTable;
 
-var viewHistoryBtn = `<img src="../images/user/View History.svg">`
-var deactivateBtn = `<img src="../images/user/Deactivate.svg">`
-var editBtn = `<img src="../images/user/Edit.svg" style="width:20px">`
-var resetPwdBtn = `<img src="../images/user/Reset Password.svg">`
-var activateBtn = `<img src="../images/user/Activate.svg">`
-var unlockBtn = `<img src="../images/user/Unlock.svg">`
+let viewHistoryBtn = `<img src="../images/user/View History.svg">`
+let deactivateBtn = `<img src="../images/user/Deactivate.svg">`
+let editBtn = `<img src="../images/user/Edit.svg" style="width:20px">`
+let resetPwdBtn = `<img src="../images/user/Reset Password.svg">`
+let activateBtn = `<img src="../images/user/Activate.svg">`
+let unlockBtn = `<img src="../images/user/Unlock.svg">`
 
 const resetForm = function () {
     $("#user-id").val("")
@@ -317,16 +317,16 @@ const initUserTable = function () {
             {
                 "data": "id", "title": "Action",
                 "render": function (data, type, full, meta) {
-                    // var a = `<button data-row="${meta.row}" data-action="Lock Out" onclick="lock(this)" class="btn btn-lockout btn-sm me-2">Lock Out</button>`;
-                    var b = `<button data-row="${meta.row}" data-action="Deactivate" onclick="lock(this)" class="btn  btn-sm me-2" title="Deactivate">${deactivateBtn}</button>`;
-                    var c = `<button data-row="${meta.row}" data-action="Activate" onclick="activity(this)" class="btn  btn-sm me-2" title="Activate">${activateBtn}</button>`;
-                    var d = `<button data-row="${meta.row}" data-action="Unlocked" onclick="lock(this)" class="btn  btn-sm me-2" title="Unlock">${unlockBtn}</button>`;
-                    // var e = `<button disabled class="btn btn-lockout btn-sm me-2">Lock Out</button>`;
-                    var f = `<button data-row="${meta.row}" onclick="edit(this)" class="btn  btn-sm me-2" title="Edit">${editBtn}</button>`;
-                    // var g = `<button disabled class="btn  btn-sm me-2" title="Edit">${editBtn}</button>`;
-                    // var changePwd = `<button data-row="${meta.row}" class="btn btn-edit btn-sm me-2" onclick="changePwd(this)">Change Password</button>`;
-                    var resetPwd = `<button data-row="${meta.row}" class="btn  btn-sm me-2" onclick="resetPwd(this)" title="Reset Password">${resetPwdBtn}</button>`;
-                    var viewHistory = `<button data-bs-toggle="modal" data-bs-target="#viewUserHistoryActionModal" data-bs-row="${meta.row}" class="btn  btn-sm me-2" title="View History">${viewHistoryBtn}</button>`;
+                    // let a = `<button data-row="${meta.row}" data-action="Lock Out" onclick="lock(this)" class="btn btn-lockout btn-sm me-2">Lock Out</button>`;
+                    let b = `<button data-row="${meta.row}" data-action="Deactivate" onclick="lock(this)" class="btn  btn-sm me-2" title="Deactivate">${deactivateBtn}</button>`;
+                    let c = `<button data-row="${meta.row}" data-action="Activate" onclick="activity(this)" class="btn  btn-sm me-2" title="Activate">${activateBtn}</button>`;
+                    let d = `<button data-row="${meta.row}" data-action="Unlocked" onclick="lock(this)" class="btn  btn-sm me-2" title="Unlock">${unlockBtn}</button>`;
+                    // let e = `<button disabled class="btn btn-lockout btn-sm me-2">Lock Out</button>`;
+                    let f = `<button data-row="${meta.row}" onclick="edit(this)" class="btn  btn-sm me-2" title="Edit">${editBtn}</button>`;
+                    // let g = `<button disabled class="btn  btn-sm me-2" title="Edit">${editBtn}</button>`;
+                    // let changePwd = `<button data-row="${meta.row}" class="btn btn-edit btn-sm me-2" onclick="changePwd(this)">Change Password</button>`;
+                    let resetPwd = `<button data-row="${meta.row}" class="btn  btn-sm me-2" onclick="resetPwd(this)" title="Reset Password">${resetPwdBtn}</button>`;
+                    let viewHistory = `<button data-bs-toggle="modal" data-bs-target="#viewUserHistoryActionModal" data-bs-row="${meta.row}" class="btn  btn-sm me-2" title="View History">${viewHistoryBtn}</button>`;
                     let btn = ""
                     if (full.status == "Active") {
                         btn = f + b
@@ -379,8 +379,8 @@ const edit = async function (e) {
         roleSelect.attr("disabled", true)
     } else if (roleName == "TSP") {
         if (row.serviceProviderId) {
-            var serviceProviderIdArray = row.serviceProviderId.split(",");
-            for (var i = 0; i < serviceProviderIdArray.length; i++) {
+            let serviceProviderIdArray = row.serviceProviderId.split(",");
+            for (let i = 0; i < serviceProviderIdArray.length; i++) {
                 serviceProviderIdArray[i] = serviceProviderIdArray[i].trim();
             }
             serviceProviderSelect.val(serviceProviderIdArray)
@@ -423,7 +423,7 @@ const InitViewHistory = function () {
         let rowIndex = button.getAttribute('data-bs-row')
         let row = table.row(rowIndex).data();
         let rowUserId = row.id
-        var modalTitle = viewUserHistoryActionModalObj.querySelector('.modal-title')
+        let modalTitle = viewUserHistoryActionModalObj.querySelector('.modal-title')
         modalTitle.textContent = `View User History (${row.username})`
         userHistoryTable = $('#viewUserHistoryActionModal .view-user-history').DataTable({
             "ordering": false,

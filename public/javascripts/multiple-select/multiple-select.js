@@ -1,6 +1,6 @@
 (function ($) {
 
-    var defaults = {
+    let defaults = {
         splitStr: ',',
         dataKey: 'id',
         dataName: 'name',
@@ -127,8 +127,8 @@
     }
 
     function getElementLeft(element) {
-        var actualLeft = element.offsetLeft;
-        var current = element.offsetParent;
+        let actualLeft = element.offsetLeft;
+        let current = element.offsetParent;
 
         while (current !== null) {
             actualLeft += current.offsetLeft;
@@ -139,8 +139,8 @@
     }
 
     function getElementTop(element) {
-        var actualTop = element.offsetTop;
-        var current = element.offsetParent;
+        let actualTop = element.offsetTop;
+        let current = element.offsetParent;
 
         while (current !== null) {
             actualTop += current.offsetTop;

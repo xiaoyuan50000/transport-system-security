@@ -12,30 +12,30 @@ const categoryElem = $("#contractDetail-modal-form input[name='category']")
 const maxTripsElem = $("#contractDetail-modal-form input[name='maxTrips']")
 const maxTripsPerDayElem = $("#contractDetail-modal-form input[name='maxTripsPerDay']")
 const maxTripsPerMonthElem = $("#contractDetail-modal-form input[name='maxTripsPerMonth']")
-var contractDetailModal = new bootstrap.Modal(document.getElementById('contractDetailModal'))
-var destinations = [];
-var contractRateServiceModeMultiSelect
+let contractDetailModal = new bootstrap.Modal(document.getElementById('contractDetailModal'))
+let destinations = [];
+let contractRateServiceModeMultiSelect
 
 $(document).on("click", function (e) {
-    var target = e.target;
+    let target = e.target;
     if (target.id != "search1" && target.id != "search2" && target.id != "startPointModal" && target.id != "endPointModal") {
         $('.search-select').css("display", "");
     }
 });
-var contractNo;
+let contractNo;
 $(async function () {
     contractNo = $("#contractNo").text()
     InitDestinations()
     contractRateServiceModeMultiSelect = InitContractRateServiceModeSelect()
 
-    var modal = document.getElementById('contractDetailModal')
+    let modal = document.getElementById('contractDetailModal')
     modal.addEventListener('hidden.bs.modal', function (event) {
         CleanForm()
     })
     modal.addEventListener('show.bs.modal', async function (event) {
-        var button = event.relatedTarget
-        var action = button.getAttribute('data-bs-action')
-        var modalTitle = modal.querySelector('.modal-title')
+        let button = event.relatedTarget
+        let action = button.getAttribute('data-bs-action')
+        let modalTitle = modal.querySelector('.modal-title')
         $(contractNoElem).val(contractNo)
 
         if (action == "new") {
@@ -44,7 +44,7 @@ $(async function () {
             await GetContractPartNoByContractNo(contractNo)
 
         } else {
-            var index = button.getAttribute('data-bs-index')
+            let index = button.getAttribute('data-bs-index')
             let row = tableDetail.row(index).data();
             // let contractNo = row.contractNo
             let contractPartNo = row.contractPartNo
@@ -62,7 +62,7 @@ $(async function () {
             $(maxTripsElem).val(row.maxTrips)
             $(maxTripsPerDayElem).val(row.maxTripsPerDay)
             $(maxTripsPerMonthElem).val(row.maxTripsPerMonth)
-            const length = await GetContractPartNoByContractNo(contractNo)
+            await GetContractPartNoByContractNo(contractNo)
             $(contractPartNoElem).prepend(`<option value="${contractPartNo}">${contractPartNo}</option>`);
             $(contractPartNoElem).val(contractPartNo)
         }
@@ -131,16 +131,11 @@ const GetContractPartNoByContractNo = async function (val) {
         return length
     })
 }
-// const AddContractChangeEvent = function () {
-//     $(contractNoElem).on('change', async function () {
-//         let val = $(this).val()
-//         await GetContractPartNoByContractNo(val)
-//     })
-// }
+
 
 
 const ValidFormBeforeSubmit = function (data) {
-    for (var key in data) {
+    for (let key in data) {
         if (data[key] == "" || data[key] == []) {
             let errorLabel = $(`#contractDetail-modal-form input[name='${key}'],#contractDetail-modal-form select[name='${key}']`).closest(".col-sm-7").prev().html()
             errorLabel = errorLabel.replace(":", "")

@@ -1,11 +1,11 @@
-var searchBtn = $("#search-btn")
-var addBtn = $("#add-btn")
-var cancelBtn = $(".btn-cancel")
-var form = document.getElementById('group-form');
-var unassignedUserTable
-var assignedUserTable
-var isEdit = false
-
+let searchBtn = $("#search-btn")
+let addBtn = $("#add-btn")
+let cancelBtn = $(".btn-cancel")
+let form = document.getElementById('group-form');
+let unassignedUserTable
+let assignedUserTable
+let isEdit = false
+let table
 const initTable = function () {
     table = $('.group-table').DataTable({
         "ordering": false,
@@ -59,7 +59,7 @@ const initTable = function () {
                 "width": "120px",
                 "data": "id", "title": "Action",
                 "render": function (data, type, full, meta) {
-                    var f = `<button data-row="${meta.row}" onclick="edit(this)" class="btn btn-edit btn-sm me-2">Edit</button>`;
+                    let f = `<button data-row="${meta.row}" onclick="edit(this)" class="btn btn-edit btn-sm me-2">Edit</button>`;
                     if (full.unlockRestrictionBtn) {
                         f += `<button data-row="${meta.row}" onclick="unlockRestriction(this)" class="btn btn-success btn-sm me-2">Unlock</button>`;
                     }
@@ -234,7 +234,7 @@ const InitUserTable = function (elementClass) {
         });
     }
 
-    var userTable = $(elementClass).DataTable({
+    let userTable = $(elementClass).DataTable({
         "searching": false,
         "lengthChange": false,
         "ordering": false,
@@ -289,14 +289,14 @@ function addListeningFilterForTable($table1, $table2) {
 // Listening choose btn
 function addListeningInOutBtn(table1, table2) {
     $("#add-in").on("click", function () {
-        var selectedData = table1.row(".selected").data();
+        let selectedData = table1.row(".selected").data();
         if (selectedData != null) {
             table2.row.add(selectedData).draw();
             table1.row(".selected").remove().draw();
         }
     });
     $("#remove-out").on("click", function () {
-        var selectedData = table2.row(".selected").data();
+        let selectedData = table2.row(".selected").data();
         if (selectedData != null) {
             table1.row.add(selectedData).draw();
             table2.row(".selected").remove().draw();

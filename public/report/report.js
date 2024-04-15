@@ -1,4 +1,4 @@
-var table;
+let table;
         $(function () {
             initMonthSelect()
             initTableByMonthly()

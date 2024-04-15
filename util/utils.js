@@ -70,7 +70,7 @@ module.exports.SendDataTo3rd = async function (allocateeId, data) {
         return JobReturn.JobReturnJson()
     }
 
-    var config = {
+    let config = {
         method: 'post',
         url: url,
         headers: {
@@ -96,7 +96,7 @@ module.exports.UpdateJob = async function (jobId, data) {
         return
     }
 
-    var config = {
+    let config = {
         method: 'put',
         url: url,
         headers: {
@@ -119,7 +119,7 @@ module.exports.CancelJob = async function (jobId) {
     systemSendTo3rdLog.info("3rd Request Driver url: " + url)
     if (!conf.request_3rd_part) { return { message: ["success"] } }
 
-    var config = {
+    let config = {
         method: 'put',
         url: url,
         headers: {
@@ -141,7 +141,7 @@ module.exports.GetDriverFrom3rd = async function (driverId, secretID, secretKey)
     systemSendTo3rdLog.info("3rd Request Driver url: " + url)
     if (!conf.request_3rd_part) { return DriverReturn.DriverJSON() }
 
-    var config = {
+    let config = {
         method: 'get',
         url: url,
         headers: {
@@ -164,7 +164,7 @@ module.exports.GetVehicleFrom3rd = async function (vehicleId, secretID, secretKe
     systemSendTo3rdLog.info("3rd Request Vehicle url: " + url)
     if (!conf.request_3rd_part) { return VehicleReturn.VehicleJSON() }
 
-    var config = {
+    let config = {
         method: 'get',
         url: url,
         headers: {
@@ -186,7 +186,7 @@ module.exports.GetTaskPinFrom3rd = async function (externalTaskId, secretID, sec
     systemSendTo3rdLog.info("3rd Task Pin url: " + url)
     if (!conf.request_3rd_part) { return TaskReturn.TaskPinJson }
 
-    var config = {
+    let config = {
         method: 'get',
         url: url,
         headers: {
@@ -307,7 +307,7 @@ module.exports.SendDataToFirebase = async function (taskList, content, title = "
     log.info("Firebase Request url: " + url)
     log.info("Firebase Request data: " + JSON.stringify(data, null, 2))
 
-    var config = {
+    let config = {
         method: 'post',
         url: url,
         headers: {
@@ -339,10 +339,10 @@ module.exports.FormatPrice = function (number) {
         number = Math.abs(parseFloat(number))
     }
     number = parseFloat((number + "").replace(/[^\d\.-]/g, "")).toFixed(n) + "";
-    var sub_val = number.split(".")[0].split("").reverse();
-    var sub_xs = number.split(".")[1];
+    let sub_val = number.split(".")[0].split("").reverse();
+    let sub_xs = number.split(".")[1];
 
-    var show_html = "";
+    let show_html = "";
     for (i = 0; i < sub_val.length; i++) {
         show_html += sub_val[i] + ((i + 1) % 3 == 0 && (i + 1) != sub_val.length ? "," : "");
     }
@@ -380,7 +380,7 @@ module.exports.SendTripToMobiusServer = async function (tripIdList) {
     let url = `${conf.mobius_server_url}/assign/initSystemTaskByTripId`
     log.info(`(SendTripToMobiusServer) ${url}`);
     for (let tripId of tripIdList) {
-        var config = {
+        let config = {
             method: 'post',
             url: url,
             headers: {

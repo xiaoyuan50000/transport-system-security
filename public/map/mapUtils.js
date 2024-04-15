@@ -1,5 +1,5 @@
-var map;
-var mapUtil = function(){
+let map;
+let mapUtil = function(){
 
     let osmUrl = '../map/Tiles/{z}/{x}/{y}.png';
     let corner1 = L.latLng(1.50152, 103.45), // left top corner

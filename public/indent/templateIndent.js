@@ -220,7 +220,7 @@ const ValidTemplateIndentForm = function (data) {
     }
     if (data.category == 'CV' || data.category == 'MV') {
         let keyList = ['category', 'resourceTypeId', 'serviceModeId', 'resource']
-        for (var key in data) {
+        for (let key in data) {
             if (data[key] == "" && keyList.indexOf(key) != -1) {
                 simplyAlert(errorLabel[key] + " is required.")
                 return false
@@ -242,7 +242,7 @@ const ValidTemplateIndentForm = function (data) {
     } 
     // else if (data.category == 'Fuel') {
     //     let keyList = ['category', 'resourceTypeId', 'resource', 'litres']
-    //     for (var key in data) {
+    //     for (let key in data) {
     //         if (data[key] == "" && keyList.indexOf(key) != -1) {
     //             simplyAlert(errorLabel[key] + " is required.")
     //             return false

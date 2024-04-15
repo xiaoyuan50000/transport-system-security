@@ -23,7 +23,7 @@ let formatDate = 'DD/MM/YYYY'
 
     const InitStartDateSelectorModal = function () {
         layui.use(['laydate'], function () {
-            laydate = layui.laydate;
+            let laydate = layui.laydate;
             laydate.render({
                 elem: startDateElem,
                 lang: 'en',

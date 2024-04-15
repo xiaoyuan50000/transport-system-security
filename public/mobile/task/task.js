@@ -1,9 +1,9 @@
 let intervalFlag = null;
-// var currentUser = JSON.parse(localStorage.user);
-// var roleName = currentUser.roleName;
-var loginPagePath = localStorage.getItem("loginPagePath");
-var currentUser = null;
-var roleName = null;
+// let currentUser = JSON.parse(localStorage.user);
+// let roleName = currentUser.roleName;
+let loginPagePath = localStorage.getItem("loginPagePath");
+let currentUser = null;
+let roleName = null;
 $(async function () {
     currentUser = await getDecodeAESCode(localStorage.user);
     roleName = currentUser.roleName;

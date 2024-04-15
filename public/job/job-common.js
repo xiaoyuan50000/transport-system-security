@@ -1,6 +1,6 @@
 const AppendJSONData2InputHtml = function (obj, appendClass) {
-    for (var key in obj) {
-        var html = `<div class="col">
+    for (let key in obj) {
+        let html = `<div class="col">
             <div class="form-floating">
                 <input type="text" class="form-control ${key}" name="${key}" value="${obj[key]}" autocomplete="off">
                 <label>${key}</label>
@@ -11,9 +11,9 @@ const AppendJSONData2InputHtml = function (obj, appendClass) {
 }
 
 const AppendJSONData2InputHtml2 = function (obj, appendClass) {
-    for (var key in obj) {
-        var val = obj[key] == null ? "" : obj[key];
-        var html = `<div class="col-12 col-lg-6 col-xl-4">
+    for (let key in obj) {
+        let val = obj[key] == null ? "" : obj[key];
+        let html = `<div class="col-12 col-lg-6 col-xl-4">
             <div class="row">
                 <div class="col-5">
                     <label class="col-form-label float-end">${key}</label>
@@ -28,7 +28,7 @@ const AppendJSONData2InputHtml2 = function (obj, appendClass) {
 }
 
 const AppendJSONData2InputHtml3 = function (key, val, appendClass) {
-    var html = `<div class="col-auto mt-3">
+    let html = `<div class="col-auto mt-3">
         <div class="form-floating">
             <input type="text" class="form-control ${key}" name="${key}" value="${val}" autocomplete="off">
             <label>${key}</label>

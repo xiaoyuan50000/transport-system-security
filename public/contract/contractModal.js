@@ -15,31 +15,31 @@ const noshowTripsBElem = "#contract-modal-form input[name='noshowTripsB']"
 const serviceLevelCElem = "#contract-modal-form input[name='serviceLevelC']"
 const noshowTripsCElem = "#contract-modal-form input[name='noshowTripsC']"
 const allocateCMElem = "#contract-modal-form select[name='allocateCM']"
-var currentContractStatus;
-var contractModal = new bootstrap.Modal(document.getElementById('contractModal'))
-var poTypeMultiSelect, serviceModeMultiSelect;
+let currentContractStatus;
+let contractModal = new bootstrap.Modal(document.getElementById('contractModal'))
+let poTypeMultiSelect, serviceModeMultiSelect;
 
-var yellowSlider, orangeSlider, redSlider;
-var yellowValue, orangeValue, redValue;
+let yellowSlider, orangeSlider, redSlider;
+let yellowValue, orangeValue, redValue;
 
 $(function () {
     poTypeMultiSelect = InitPoTypeSelect()
     serviceModeMultiSelect = InitServiceModeSelect()
 
     InitSlider(false, 0, 0, 0)
-    var modal = document.getElementById('contractModal')
+    let modal = document.getElementById('contractModal')
     modal.addEventListener('hidden.bs.modal', function (event) {
         CleanForm()
     })
     modal.addEventListener('show.bs.modal', async function (event) {
-        var button = event.relatedTarget
-        var action = button.getAttribute('data-bs-action')
-        var modalTitle = modal.querySelector('.modal-title')
+        let button = event.relatedTarget
+        let action = button.getAttribute('data-bs-action')
+        let modalTitle = modal.querySelector('.modal-title')
         if (action == "new") {
             modalTitle.textContent = 'Add New Contract'
             modalConfirmBtnElem.append(`<button type="button" class="btn btn-system" onclick="CreateContract(this)">Add</button>`)
         } else {
-            var index = button.getAttribute('data-bs-index')
+            let index = button.getAttribute('data-bs-index')
             let row = table.row(index).data();
             AddRolePermission(row)
             let contractNo = row.contractNo
@@ -53,69 +53,19 @@ $(function () {
             $(endDateElem).val(top.changeDateFormatDMY(row.endDate))
             $(extensionDateElem).val(top.changeDateFormatDMY(row.extensionDate))
             $(allocateCMElem).val(row.allocateCM)
-            if (row.serviceProviderId) {
-                serviceProviderSelectElem.val(row.serviceProviderId)
-            } else if (row.mobiusUnitId) {
-                serviceProviderSelectElem.val(unitPrefix + row.mobiusUnitId)
-            }
+
+            setServiceProviderSelectVal(row, unitPrefix)
+
             serviceModeMultiSelect.setValue(row.serviceModeId)
             poTypeMultiSelect.setValue(row.poType)
-            let performanceMatrix = row.performanceMatrix
-            if (performanceMatrix) {
-                let datas = performanceMatrix.split(',')
-                $(serviceLevelAElem).val(datas[1])
-                $(noshowTripsAElem).val(datas[2])
-                $(serviceLevelBElem).val(datas[4])
-                $(noshowTripsBElem).val(datas[5])
-                $(serviceLevelCElem).val(datas[7])
-                $(noshowTripsCElem).val(datas[8])
-            }
+            setPerformanceMatrix(row)
 
-            yellowValue = row.alertYellowPct ? row.alertYellowPct : 0
-            orangeValue = row.alertOrangePct ? row.alertOrangePct : 0
-            redValue = row.alertRedPct ? row.alertRedPct : 0
-            if (row.status == "Approved") {
-                InitSlider(true, yellowValue, orangeValue, redValue)
-            } else {
-                InitSlider(false, yellowValue, orangeValue, redValue)
-            }
+            setSpendingSilder(row)
 
-            let balanceContractData = await GetBalanceByContractNo(contractNo)
-            let length = balanceContractData.length
             $("#total-start-date").val(top.changeDateFormatDMY(row.startDate))
             $("#total-end-date").val(top.changeDateFormatDMY(row.extensionDate ? row.extensionDate : row.endDate))
-            if (length == 1) {
-                $("#total-value").val(balanceContractData[0].total)
-                $("#total-value").parent().attr("data-id", balanceContractData[0].id)
-            } else if (length > 1) {
-                $("#total-value").val(balanceContractData[0].total)
-                $("#total-value").parent().attr("data-id", balanceContractData[0].id)
-                let list = balanceContractData.slice(1)
-                list.forEach((item, index) => {
-                    const tbody = $("#annual-table tbody")
-                    const len = $("#annual-table tbody tr").length
-                    tbody.find("tr:last").find("td:last").empty()
-                    if (len > 1) {
-                        tbody.find("tr:last").find("td:eq(2) input").attr("disabled", true)
-                    }
-                    let AnnualTrHtml = $("#AnnualTrHtml").html()
-                    AnnualTrHtml = AnnualTrHtml.replaceAll("{{id}}", len).replaceAll("{{contract-balance-id}}", item.id)
-                    tbody.append(AnnualTrHtml)
-
-                    if (row.status != "Approved") {
-                        InitAnnualStartDate(`annual-start-date-${len}`, len)
-                        InitAnnualEndDate(`annual-end-date-${len}`, len)
-                    } else {
-                        if (index + 1 == list.length) {
-                            InitAnnualEndDate(`annual-end-date-${len}`, len)
-                        }
-                    }
-                    $(`#annual-start-date-${len}`).val(top.changeDateFormatDMY(item.startDate))
-                    $(`#annual-end-date-${len}`).val(top.changeDateFormatDMY(item.endDate))
-                    $(`#annual-total-${len}`).val(item.total)
-
-                })
-            }
+            let balanceContractData = await GetBalanceByContractNo(contractNo)
+            setContractBalance(row, balanceContractData)
 
             if (row.status == "Approved") {
                 // $("#btn-add-balance").remove()
@@ -133,6 +83,72 @@ $(function () {
     // AddServiceTypeChangeEvent()
 })
 
+const setServiceProviderSelectVal = function (row, unitPrefix) {
+    if (row.serviceProviderId) {
+        serviceProviderSelectElem.val(row.serviceProviderId)
+    } else if (row.mobiusUnitId) {
+        serviceProviderSelectElem.val(unitPrefix + row.mobiusUnitId)
+    }
+}
+
+const setPerformanceMatrix = function (row) {
+    let performanceMatrix = row.performanceMatrix
+    if (performanceMatrix) {
+        let datas = performanceMatrix.split(',')
+        $(serviceLevelAElem).val(datas[1])
+        $(noshowTripsAElem).val(datas[2])
+        $(serviceLevelBElem).val(datas[4])
+        $(noshowTripsBElem).val(datas[5])
+        $(serviceLevelCElem).val(datas[7])
+        $(noshowTripsCElem).val(datas[8])
+    }
+}
+
+const setSpendingSilder = function (row) {
+    yellowValue = row.alertYellowPct ? row.alertYellowPct : 0
+    orangeValue = row.alertOrangePct ? row.alertOrangePct : 0
+    redValue = row.alertRedPct ? row.alertRedPct : 0
+    if (row.status == "Approved") {
+        InitSlider(true, yellowValue, orangeValue, redValue)
+    } else {
+        InitSlider(false, yellowValue, orangeValue, redValue)
+    }
+}
+
+const setContractBalance = function (row, balanceContractData) {
+    let length = balanceContractData.length
+    if (length == 1) {
+        $("#total-value").val(balanceContractData[0].total)
+        $("#total-value").parent().attr("data-id", balanceContractData[0].id)
+    } else if (length > 1) {
+        $("#total-value").val(balanceContractData[0].total)
+        $("#total-value").parent().attr("data-id", balanceContractData[0].id)
+        let list = balanceContractData.slice(1)
+        list.forEach((item, index) => {
+            const tbody = $("#annual-table tbody")
+            const len = $("#annual-table tbody tr").length
+            tbody.find("tr:last").find("td:last").empty()
+            if (len > 1) {
+                tbody.find("tr:last").find("td:eq(2) input").attr("disabled", true)
+            }
+            let AnnualTrHtml = $("#AnnualTrHtml").html()
+            AnnualTrHtml = AnnualTrHtml.replaceAll("{{id}}", len).replaceAll("{{contract-balance-id}}", item.id)
+            tbody.append(AnnualTrHtml)
+
+            if (row.status != "Approved") {
+                InitAnnualStartDate(`annual-start-date-${len}`, len)
+                InitAnnualEndDate(`annual-end-date-${len}`, len)
+            } else if (index + 1 == list.length) {
+                InitAnnualEndDate(`annual-end-date-${len}`, len)
+            }
+            
+            $(`#annual-start-date-${len}`).val(top.changeDateFormatDMY(item.startDate))
+            $(`#annual-end-date-${len}`).val(top.changeDateFormatDMY(item.endDate))
+            $(`#annual-total-${len}`).val(item.total)
+        })
+    }
+}
+
 const GetBalanceByContractNo = async function (contractNo) {
     return await axios.post("/contract/getContractBalanceByContractNo",
         {
@@ -149,7 +165,7 @@ const GetBalanceByContractNo = async function (contractNo) {
 
 const InitStartDateSelectorModal = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         laydate.render({
             elem: startDateElem,
             lang: 'en',
@@ -320,7 +336,7 @@ const AddRolePermission = function (row) {
         $(allocateCMElem).attr("disabled", "disabled")
     } else if (roleName == 'RA') {
         if (status == 'Approved') {
-            if (moment(extensionDate ? extensionDate : endDate).isBefore(moment())) {
+            if (moment(extensionDate || endDate).isBefore(moment())) {
                 $(allocateCMElem).attr("disabled", "disabled")
             } else {
                 $(allocateCMElem).attr("disabled", false)
@@ -330,7 +346,7 @@ const AddRolePermission = function (row) {
 }
 
 const ValidFormBeforeSubmit = function (data) {
-    for (var key in data) {
+    for (let key in data) {
         if (key == 'extensionDate' && data[key] == "") {
             continue
         }
@@ -465,7 +481,7 @@ const InitSlider = function (disable, value1, value2, value3) {
     $("#slide-orange-value").text(value2 + '%')
     $("#slide-red-value").text(value3 + '%')
     layui.use('slider', function () {
-        var $ = layui.$, slider = layui.slider;
+        let $ = layui.$, slider = layui.slider;
         yellowSlider = slider.render({
             elem: '#slide-yellow',
             theme: '#E9C341',
@@ -656,7 +672,6 @@ const InitAnnualEndDate = function (id, len) {
                         content: 'End Date should be later than Start Date!',
                     });
                     tbody.find(`tr:eq(${len}) td:eq(2) input:text`).val(null)
-                    return
                 }
             }
         });

@@ -1,4 +1,4 @@
-var isEdit = false
+let isEdit = false
 $(function () {
 
     urgentModal.addEventListener('hidden.bs.modal', function (event) {

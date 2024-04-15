@@ -26,10 +26,9 @@
 	height: 30px;
 	font-size: 16px;
 	line-height: 30px;
-}
-.TickerNews.default_theme_2 .leftside h4{
 	background-color: #272727;
 }
+
 
 .TickerNews.default_theme_2 .ti_wrapper{
 	position: absolute;
@@ -41,22 +40,9 @@
 .TickerNews.default_theme_2 .ti_news span{
 	font-size: 100%;
 	margin-right: 20px;
-}
-.TickerNews.default_theme_2 .ti_news span{
 	color:white;
 }
 
-/*.TickerNews.default_theme_2 .leftside div{
-	width: 10px;
-	height: 10px;
-	transform: rotate(45deg);
-	position: absolute;
-	left: 235px;
-	top: 7px;
-}
-.TickerNews.default_theme_2 .leftside div{
-	background-color: #BD2B2B;
-}*/
 /* template 2 */
 
 /* style css */

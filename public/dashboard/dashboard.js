@@ -25,7 +25,7 @@ const YEAR = 3
         })
         
         const InitPieChart = function (id, colors, datas) {
-            var chart = Highcharts.chart(id, {
+            let chart = Highcharts.chart(id, {
                 chart: {
                     spacing: [0, 0, 0, 0]
                 },
@@ -77,7 +77,7 @@ const YEAR = 3
         }
        
         const InitColumnChart = function (id, colors, categories, datas) {
-            var chart = Highcharts.chart(id, {
+            let chart = Highcharts.chart(id, {
                 chart: {
                     type: 'column',
                     

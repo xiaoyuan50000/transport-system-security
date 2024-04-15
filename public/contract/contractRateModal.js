@@ -22,20 +22,20 @@ const chargeTypeRightFormElem = $("#chargeTypeRightForm")
 const formElem = $("#contractRate-modal-form")
 
 const transCostSurchargeElem = $("#transCostSurcharge")
-var contractRateModal = new bootstrap.Modal(document.getElementById('contractRateModal'))
-var fundingMultiSelect;
+let contractRateModal = new bootstrap.Modal(document.getElementById('contractRateModal'))
+let fundingMultiSelect;
 
 $(async function () {
     // fundingMultiSelect = InitFundingSelect()
-    var modal = document.getElementById('contractRateModal')
+    let modal = document.getElementById('contractRateModal')
     await getAllChargeType(contractNo)
     modal.addEventListener('hidden.bs.modal', function (event) {
         CleanForm2()
     })
     modal.addEventListener('show.bs.modal', async function (event) {
-        var button = event.relatedTarget
-        var action = button.getAttribute('data-bs-action')
-        var modalTitle = modal.querySelector('.modal-title')
+        let button = event.relatedTarget
+        let action = button.getAttribute('data-bs-action')
+        let modalTitle = modal.querySelector('.modal-title')
         formElem.find("select[name='contractNo']").val(contractNo)
         let chargeTypeVal = $(".filter-div-btn button.active").attr("data-charge-type")
         if (action == "new") {
@@ -44,7 +44,7 @@ $(async function () {
             modalTitle.textContent = 'Add New Contract Rate'
             modalConfirmBtnElem2.append(`<button type="button" class="btn btn-system" onclick="CreateContractRate(this)">Add</button>`)
         } else {
-            var index = button.getAttribute('data-bs-index')
+            let index = button.getAttribute('data-bs-index')
             let row = tableRate.row(index).data();
             let contractPartNo = row.contractPartNo
 
@@ -65,18 +65,23 @@ $(async function () {
             formElem.find("input[name='surcharge24To48']").val(row.surchargeLessThen48)
             formElem.find("input[name='departWaitingFee']").val(row.surchargeDepart)
 
-            if (chargeTypeVal == 1 || chargeTypeVal == 2) {
+            if (chargeTypeVal == 1) {
                 formElem.find("input[name='basePrice']").val(row.price)
                 formElem.find("input[name='driverFee']").val(row.hasDriver)
                 formElem.find("input[name='weekendFee']").val(row.isWeekend)
                 formElem.find("input[name='peakFee']").val(row.isPeak)
                 formElem.find("input[name='lateFee']").val(row.isLate)
-                if (chargeTypeVal == 1) {
-                    formElem.find("input[name='hourlyPrice']").val(row.hourlyPrice)
-                    formElem.find("input[name='dailyPrice']").val(row.dailyPrice)
-                    formElem.find("input[name='weeklyPrice']").val(row.weeklyPrice)
-                    formElem.find("input[name='monthlyPrice']").val(row.monthlyPrice)
-                }
+
+                formElem.find("input[name='hourlyPrice']").val(row.hourlyPrice)
+                formElem.find("input[name='dailyPrice']").val(row.dailyPrice)
+                formElem.find("input[name='weeklyPrice']").val(row.weeklyPrice)
+                formElem.find("input[name='monthlyPrice']").val(row.monthlyPrice)
+            } else if (chargeTypeVal == 2) {
+                formElem.find("input[name='basePrice']").val(row.price)
+                formElem.find("input[name='driverFee']").val(row.hasDriver)
+                formElem.find("input[name='weekendFee']").val(row.isWeekend)
+                formElem.find("input[name='peakFee']").val(row.isPeak)
+                formElem.find("input[name='lateFee']").val(row.isLate)
             } else if (chargeTypeVal == 3) {
                 formElem.find("input[name='blockPeriod']").val(row.blockPeriod)
                 formElem.find("input[name='blockPrice']").val(row.blockPrice)
@@ -89,144 +94,11 @@ $(async function () {
                 formElem.find("input[name='blockHourlyPrice']").val(row.blockHourly)
                 formElem.find("input[name='overTimeHourlyPrice']").val(row.OTHourly)
             } else if (chargeTypeVal == 5) {
-                formElem.find("input[name='transportCost']").val(row.transCost)
-                formElem.find("input[name='transCostSurcharge']").val(row.transCostSurchargeLessThen4)
-                let datas = await getMixChargeType(contractPartNo)
-                let mixDatas = []
-                datas.forEach(item => {
-                    let chargeType = item.chargeType
-                    let basePrice = item.price
-                    let driverFee = item.hasDriver
-                    let weekendFee = item.isWeekend
-                    let record = { chargeType: chargeType, basePrice: basePrice, driverFee: driverFee, weekendFee: weekendFee }
-                    if (chargeType == "Daily") {
-                        record["sort"] = 1
-                    } else if (chargeType == "Weekly") {
-                        record["sort"] = 2
-                    } else if (chargeType == "Monthly") {
-                        record["sort"] = 3
-                    } else if (chargeType == "Yearly") {
-                        record["sort"] = 4
-                    }
-                    mixDatas.push(record)
-                });
-                mixDatas.sort((a, b) => a["sort"] - b["sort"])
-
-                let tbodyElem = $("#mix-table").find("tbody")
-                tbodyElem.empty()
-                for (var i = 0; i < mixDatas.length; i++) {
-                    let row = mixDatas[i]
-                    if (i == mixDatas.length - 1 && i != 0) {
-                        tbodyElem.append(`<tr>
-                        <td>${row["chargeType"]}</td>
-                        <td><input class="form-control" value="${row["basePrice"]}" oninput="CheckOnInput(this)"></td>
-                        <td><input class="form-control" value="${row["driverFee"]}" oninput="CheckOnInput(this)"></td>
-                        <td><input class="form-control" value="${row["weekendFee"]}" oninput="CheckOnInput(this)"></td>
-                        <td><button type="button" class="btn btn-outline-dark w-100" onclick="DeleteMixRow(this)">-</button></td>
-                    </tr>`)
-                    } else {
-                        tbodyElem.append(`<tr>
-                        <td>${row["chargeType"]}</td>
-                        <td><input class="form-control" value="${row["basePrice"]}" oninput="CheckOnInput(this)"></td>
-                        <td><input class="form-control" value="${row["driverFee"]}" oninput="CheckOnInput(this)"></td>
-                        <td><input class="form-control" value="${row["weekendFee"]}" oninput="CheckOnInput(this)"></td>
-                        <td></td>
-                    </tr>`)
-                    }
-                }
-
+                await setChargeTypeVal5(row, contractPartNo)
             } else if (chargeTypeVal == 6) {
-                formElem.find("input[name='dailyTripTime']").val(row.dailyTripCondition.split("-").join(" ~ "))
-                formElem.find("input[name='perDayMaxTrips']").val(row.maxTripPerDay)
-                formElem.find("input[name='exceedPerTripPrice']").val(row.excessPerTripPrice)
-                let tripPerDayArr = row.tripPerDay.split(",")
-                let perTripPriceArr = row.perTripPrice.split(",")
-                let tbodyElem = $("#daily-trip-table").find("tbody")
-                tbodyElem.empty()
-                for (var i = 1; i <= tripPerDayArr.length; i++) {
-                    if (i == 1) {
-                        tbodyElem.append(`<tr>
-                        <td>
-                            <div class="input-group">
-                                <input type="text" class="form-control" value="0" readonly>
-                                <span class="input-group-text">-</span>
-                                <input type="text" class="form-control" value="${tripPerDayArr[i - 1]}" onpaste="return false" oninput="OnInputDailyTripPrice(this)" onblur="OnBlurDailyTripPrice(this)">
-                            </div>
-                        </td>
-                        <td><input class="form-control" value="${perTripPriceArr[i - 1]}"></td>
-                        <td></td>
-                    </tr>`)
-                    } else if (i == tripPerDayArr.length) {
-                        tbodyElem.append(`<tr>
-                        <td>
-                            <div class="input-group">
-                                <input type="text" class="form-control" value="${tripPerDayArr[i - 2]}" readonly>
-                                <span class="input-group-text">-</span>
-                                <input type="text" class="form-control" value="${tripPerDayArr[i - 1]}" onpaste="return false" oninput="OnInputDailyTripPrice(this)" onblur="OnBlurDailyTripPrice(this)">
-                            </div>
-                        </td>
-                        <td><input class="form-control" value="${perTripPriceArr[i - 1]}"></td>
-                        <td><button type="button" class="btn btn-outline-dark w-100" onclick="DeleteDailyTripRow(this)">-</button></td>
-                    </tr>`)
-                    } else {
-                        tbodyElem.append(`<tr>
-                        <td>
-                            <div class="input-group">
-                                <input type="text" class="form-control" value="${tripPerDayArr[i - 2]}" readonly>
-                                <span class="input-group-text">-</span>
-                                <input type="text" class="form-control" value="${tripPerDayArr[i - 1]}" onpaste="return false" oninput="OnInputDailyTripPrice(this)" onblur="OnBlurDailyTripPrice(this)">
-                            </div>
-                        </td>
-                        <td><input class="form-control" value="${perTripPriceArr[i - 1]}"></td>
-                        <td></td>
-                    </tr>`)
-                    }
-                }
+                setChargeTypeVal6(row)
             } else if (chargeTypeVal == 7) {
-                if (row.chargeType == "Block_Daily") {
-                    chargeTypeFormElem.find("input[name='blockPeriod']").val(row.blockPeriod)
-                    chargeTypeFormElem.find("input[name='blockPrice']").val(row.blockPrice)
-                    chargeTypeFormElem.find("input[name='blockHourlyPrice']").val(row.blockHourly)
-                    chargeTypeFormElem.find("input[name='overTimeBlockPeriod']").val(row.OTBlockPeriod)
-                    chargeTypeFormElem.find("input[name='overTimeBlockPrice']").val(row.OTBlockPrice)
-                    chargeTypeFormElem.find("input[name='overTimeHourlyPrice']").val(row.OTHourly)
-                    chargeTypeFormElem.find("input[name='dailyPrice']").val(row.dailyPrice)
-                } else {
-                    let datas = await getMixChargeType(contractPartNo)
-                    if (datas.length == 2) {
-                        chargeTypeRightFormElem.append(NeedSurchargeLabelHtml)
-                        chargeTypeRightFormElem.append(BlockDailyHtml)
-                        $("#chargeTypeForm").find("input[name='monthlyPrice']").attr("disabled", false)
-                        $("#chargeTypeRightForm").find("input[name='monthlyPrice']").attr("disabled", false)
-                        $("#chargeTypeForm").find("input[name='needSurcharge']").prop("checked", true)
-                        let blockDaily1 = null
-                        let blockDaily2 = null
-                        if (datas[0].blockPrice < datas[1].blockPrice) {
-                            blockDaily1 = datas[0]
-                            blockDaily2 = datas[1]
-                        } else {
-                            blockDaily2 = datas[0]
-                            blockDaily1 = datas[1]
-                        }
-                        chargeTypeFormElem.find("input[name='blockPeriod']").val(blockDaily1.blockPeriod)
-                        chargeTypeFormElem.find("input[name='blockPrice']").val(blockDaily1.blockPrice)
-                        chargeTypeFormElem.find("input[name='blockHourlyPrice']").val(blockDaily1.blockHourly)
-                        chargeTypeFormElem.find("input[name='overTimeBlockPeriod']").val(blockDaily1.OTBlockPeriod)
-                        chargeTypeFormElem.find("input[name='overTimeBlockPrice']").val(blockDaily1.OTBlockPrice)
-                        chargeTypeFormElem.find("input[name='overTimeHourlyPrice']").val(blockDaily1.OTHourly)
-                        chargeTypeFormElem.find("input[name='dailyPrice']").val(blockDaily1.dailyPrice)
-                        chargeTypeFormElem.find("input[name='monthlyPrice']").val(blockDaily1.monthlyPrice)
-
-                        chargeTypeRightFormElem.find("input[name='blockPeriod']").val(blockDaily2.blockPeriod)
-                        chargeTypeRightFormElem.find("input[name='blockPrice']").val(blockDaily2.blockPrice)
-                        chargeTypeRightFormElem.find("input[name='blockHourlyPrice']").val(blockDaily2.blockHourly)
-                        chargeTypeRightFormElem.find("input[name='overTimeBlockPeriod']").val(blockDaily2.OTBlockPeriod)
-                        chargeTypeRightFormElem.find("input[name='overTimeBlockPrice']").val(blockDaily2.OTBlockPrice)
-                        chargeTypeRightFormElem.find("input[name='overTimeHourlyPrice']").val(blockDaily2.OTHourly)
-                        chargeTypeRightFormElem.find("input[name='dailyPrice']").val(blockDaily2.dailyPrice)
-                        chargeTypeRightFormElem.find("input[name='monthlyPrice']").val(blockDaily2.monthlyPrice)
-                    }
-                }
+                await setChargeTypeVal7(row, contractPartNo)
             } else if (chargeTypeVal == 8) {
                 formElem.find("input[name='monthlyPrice']").val(row.price)
             } else if (chargeTypeVal == 9) {
@@ -251,6 +123,150 @@ $(async function () {
 
 
 })
+
+const setChargeTypeVal5 = async function (row, contractPartNo) {
+    formElem.find("input[name='transportCost']").val(row.transCost)
+    formElem.find("input[name='transCostSurcharge']").val(row.transCostSurchargeLessThen4)
+    let datas = await getMixChargeType(contractPartNo)
+    let mixDatas = []
+    datas.forEach(item => {
+        let chargeType = item.chargeType
+        let basePrice = item.price
+        let driverFee = item.hasDriver
+        let weekendFee = item.isWeekend
+        let record = { chargeType: chargeType, basePrice: basePrice, driverFee: driverFee, weekendFee: weekendFee }
+        if (chargeType == "Daily") {
+            record["sort"] = 1
+        } else if (chargeType == "Weekly") {
+            record["sort"] = 2
+        } else if (chargeType == "Monthly") {
+            record["sort"] = 3
+        } else if (chargeType == "Yearly") {
+            record["sort"] = 4
+        }
+        mixDatas.push(record)
+    });
+    mixDatas.sort((a, b) => a["sort"] - b["sort"])
+
+    let tbodyElem = $("#mix-table").find("tbody")
+    tbodyElem.empty()
+    for (let i = 0; i < mixDatas.length; i++) {
+        let row = mixDatas[i]
+        if (i == mixDatas.length - 1 && i != 0) {
+            tbodyElem.append(`<tr>
+            <td>${row["chargeType"]}</td>
+            <td><input class="form-control" value="${row["basePrice"]}" oninput="CheckOnInput(this)"></td>
+            <td><input class="form-control" value="${row["driverFee"]}" oninput="CheckOnInput(this)"></td>
+            <td><input class="form-control" value="${row["weekendFee"]}" oninput="CheckOnInput(this)"></td>
+            <td><button type="button" class="btn btn-outline-dark w-100" onclick="DeleteMixRow(this)">-</button></td>
+        </tr>`)
+        } else {
+            tbodyElem.append(`<tr>
+            <td>${row["chargeType"]}</td>
+            <td><input class="form-control" value="${row["basePrice"]}" oninput="CheckOnInput(this)"></td>
+            <td><input class="form-control" value="${row["driverFee"]}" oninput="CheckOnInput(this)"></td>
+            <td><input class="form-control" value="${row["weekendFee"]}" oninput="CheckOnInput(this)"></td>
+            <td></td>
+        </tr>`)
+        }
+    }
+}
+
+const setChargeTypeVal6 = function (row) {
+    formElem.find("input[name='dailyTripTime']").val(row.dailyTripCondition.split("-").join(" ~ "))
+    formElem.find("input[name='perDayMaxTrips']").val(row.maxTripPerDay)
+    formElem.find("input[name='exceedPerTripPrice']").val(row.excessPerTripPrice)
+    let tripPerDayArr = row.tripPerDay.split(",")
+    let perTripPriceArr = row.perTripPrice.split(",")
+    let tbodyElem = $("#daily-trip-table").find("tbody")
+    tbodyElem.empty()
+    for (let i = 1; i <= tripPerDayArr.length; i++) {
+        if (i == 1) {
+            tbodyElem.append(`<tr>
+            <td>
+                <div class="input-group">
+                    <input type="text" class="form-control" value="0" readonly>
+                    <span class="input-group-text">-</span>
+                    <input type="text" class="form-control" value="${tripPerDayArr[i - 1]}" onpaste="return false" oninput="OnInputDailyTripPrice(this)" onblur="OnBlurDailyTripPrice(this)">
+                </div>
+            </td>
+            <td><input class="form-control" value="${perTripPriceArr[i - 1]}"></td>
+            <td></td>
+        </tr>`)
+        } else if (i == tripPerDayArr.length) {
+            tbodyElem.append(`<tr>
+            <td>
+                <div class="input-group">
+                    <input type="text" class="form-control" value="${tripPerDayArr[i - 2]}" readonly>
+                    <span class="input-group-text">-</span>
+                    <input type="text" class="form-control" value="${tripPerDayArr[i - 1]}" onpaste="return false" oninput="OnInputDailyTripPrice(this)" onblur="OnBlurDailyTripPrice(this)">
+                </div>
+            </td>
+            <td><input class="form-control" value="${perTripPriceArr[i - 1]}"></td>
+            <td><button type="button" class="btn btn-outline-dark w-100" onclick="DeleteDailyTripRow(this)">-</button></td>
+        </tr>`)
+        } else {
+            tbodyElem.append(`<tr>
+            <td>
+                <div class="input-group">
+                    <input type="text" class="form-control" value="${tripPerDayArr[i - 2]}" readonly>
+                    <span class="input-group-text">-</span>
+                    <input type="text" class="form-control" value="${tripPerDayArr[i - 1]}" onpaste="return false" oninput="OnInputDailyTripPrice(this)" onblur="OnBlurDailyTripPrice(this)">
+                </div>
+            </td>
+            <td><input class="form-control" value="${perTripPriceArr[i - 1]}"></td>
+            <td></td>
+        </tr>`)
+        }
+    }
+}
+
+const setChargeTypeVal7 = async function (row, contractPartNo) {
+    if (row.chargeType == "Block_Daily") {
+        chargeTypeFormElem.find("input[name='blockPeriod']").val(row.blockPeriod)
+        chargeTypeFormElem.find("input[name='blockPrice']").val(row.blockPrice)
+        chargeTypeFormElem.find("input[name='blockHourlyPrice']").val(row.blockHourly)
+        chargeTypeFormElem.find("input[name='overTimeBlockPeriod']").val(row.OTBlockPeriod)
+        chargeTypeFormElem.find("input[name='overTimeBlockPrice']").val(row.OTBlockPrice)
+        chargeTypeFormElem.find("input[name='overTimeHourlyPrice']").val(row.OTHourly)
+        chargeTypeFormElem.find("input[name='dailyPrice']").val(row.dailyPrice)
+    } else {
+        let datas = await getMixChargeType(contractPartNo)
+        if (datas.length == 2) {
+            chargeTypeRightFormElem.append(NeedSurchargeLabelHtml)
+            chargeTypeRightFormElem.append(BlockDailyHtml)
+            $("#chargeTypeForm").find("input[name='monthlyPrice']").attr("disabled", false)
+            $("#chargeTypeRightForm").find("input[name='monthlyPrice']").attr("disabled", false)
+            $("#chargeTypeForm").find("input[name='needSurcharge']").prop("checked", true)
+            let blockDaily1 = null
+            let blockDaily2 = null
+            if (datas[0].blockPrice < datas[1].blockPrice) {
+                blockDaily1 = datas[0]
+                blockDaily2 = datas[1]
+            } else {
+                blockDaily2 = datas[0]
+                blockDaily1 = datas[1]
+            }
+            chargeTypeFormElem.find("input[name='blockPeriod']").val(blockDaily1.blockPeriod)
+            chargeTypeFormElem.find("input[name='blockPrice']").val(blockDaily1.blockPrice)
+            chargeTypeFormElem.find("input[name='blockHourlyPrice']").val(blockDaily1.blockHourly)
+            chargeTypeFormElem.find("input[name='overTimeBlockPeriod']").val(blockDaily1.OTBlockPeriod)
+            chargeTypeFormElem.find("input[name='overTimeBlockPrice']").val(blockDaily1.OTBlockPrice)
+            chargeTypeFormElem.find("input[name='overTimeHourlyPrice']").val(blockDaily1.OTHourly)
+            chargeTypeFormElem.find("input[name='dailyPrice']").val(blockDaily1.dailyPrice)
+            chargeTypeFormElem.find("input[name='monthlyPrice']").val(blockDaily1.monthlyPrice)
+
+            chargeTypeRightFormElem.find("input[name='blockPeriod']").val(blockDaily2.blockPeriod)
+            chargeTypeRightFormElem.find("input[name='blockPrice']").val(blockDaily2.blockPrice)
+            chargeTypeRightFormElem.find("input[name='blockHourlyPrice']").val(blockDaily2.blockHourly)
+            chargeTypeRightFormElem.find("input[name='overTimeBlockPeriod']").val(blockDaily2.OTBlockPeriod)
+            chargeTypeRightFormElem.find("input[name='overTimeBlockPrice']").val(blockDaily2.OTBlockPrice)
+            chargeTypeRightFormElem.find("input[name='overTimeHourlyPrice']").val(blockDaily2.OTHourly)
+            chargeTypeRightFormElem.find("input[name='dailyPrice']").val(blockDaily2.dailyPrice)
+            chargeTypeRightFormElem.find("input[name='monthlyPrice']").val(blockDaily2.monthlyPrice)
+        }
+    }
+}
 
 const NeedSurchargeClick = function (e) {
     let checked = $(e).prop("checked")
@@ -389,27 +405,31 @@ const DeleteDailyTripRow = function (e) {
     tbody.find("tr:last").find("td:last").append(`<button type="button" class="btn btn-outline-dark w-100" onclick="DeleteDailyTripRow(this)">-</button>`)
 }
 
+const ValidFormBeforeSubmit3 = function (data) {
+    if (data["chargeType"] == '1' && data["basePrice"] == "" && data["hourlyPrice"] != "" || data["basePrice"] != "" && data["hourlyPrice"] == "") {
+        return true
+    }
+    return false
+}
 
 const ValidFormBeforeSubmit2 = function (data) {
-    if (data["chargeType"] == '1') {
-        if (data["basePrice"] == "" && data["hourlyPrice"] != "" || data["basePrice"] != "" && data["hourlyPrice"] == "") {
-            return true
-        }
-    }
-    for (var key in data) {
-        if (data[key] == "" || data[key] == []) {
-            let errorLabel = $(`#contractRate-modal-form input[name='${key}'],#contractRate-modal-form select[name='${key}']`).closest(".row").find("label").html()
-            errorLabel = errorLabel.replace(":", "")
-            simplyAlert(errorLabel + " is required.")
-            return false
-        } else if (typeof data[key] == 'object') {
-            console.log(typeof data[key]);
-            for (var i = 0; i < data[key].length; i++) {
-                if (data[key][i] == "") {
-                    let errorLabel = $(`#contractRate-modal-form input[name='${key}'],#contractRate-modal-form select[name='${key}']`).closest(".row").find("label").html()
-                    errorLabel = errorLabel.replace(":", "")
-                    simplyAlert(errorLabel + " is required.")
-                    return false
+    if (!ValidFormBeforeSubmit3(data)) {
+        for (let key in data) {
+            if (data[key] == "" || data[key] == []) {
+                let errorLabel = $(`#contractRate-modal-form input[name='${key}'],#contractRate-modal-form select[name='${key}']`).closest(".row").find("label").html()
+                errorLabel = errorLabel.replace(":", "")
+                simplyAlert(errorLabel + " is required.")
+                return false
+            } else if (typeof data[key] == 'object') {
+                console.log(typeof data[key]);
+                
+                for (let val of data[key]) {
+                    if (val == "") {
+                        let errorLabel = $(`#contractRate-modal-form input[name='${key}'],#contractRate-modal-form select[name='${key}']`).closest(".row").find("label").html()
+                        errorLabel = errorLabel.replace(":", "")
+                        simplyAlert(errorLabel + " is required.")
+                        return false
+                    }
                 }
             }
         }

@@ -1,4 +1,4 @@
-var tableBalance = null;
+let tableBalance = null;
 $(function () {
     tableBalance = $('.contract-balance-table').DataTable({
         "ordering": false,

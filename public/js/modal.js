@@ -1,5 +1,5 @@
-var modal;
-var _selfModal = {
+let modal;
+let _selfModal = {
     init: function(modalId){
         modal = new bootstrap.Modal(document.getElementById(modalId))
         return modal

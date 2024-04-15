@@ -1,5 +1,5 @@
-var activeHtml = $("#activeHtml").html()
-var remarkHtml = $("#remarkHtml").html()
+let activeHtml = $("#activeHtml").html()
+let remarkHtml = $("#remarkHtml").html()
 
 const lock = function (e) {
     let row = table.row($(e).data("row")).data();
@@ -15,7 +15,7 @@ const lock = function (e) {
             if (form.checkValidity() === false) {
                 return false
             } else {
-                var remark = $this.$content.find('textarea').val();
+                let remark = $this.$content.find('textarea').val();
                 confirmLock(userId, remark, action)
             }
         })
@@ -48,8 +48,8 @@ const activity = function (e) {
         if (form.checkValidity() === false) {
             return false
         } else {
-            var remark = $this.$content.find('textarea').val();
-            var password = $this.$content.find('form').find("input[name='password']").val();
+            let remark = $this.$content.find('textarea').val();
+            let password = $this.$content.find('form').find("input[name='password']").val();
             confirmActive(userId, remark, action, password)
         }
     })
@@ -112,8 +112,8 @@ const changePwd = function (e) {
         if (form.checkValidity() === false) {
             return false
         } else {
-            var remark = $this.$content.find('textarea').val();
-            var password = $this.$content.find('form').find("input[name='password']").val();
+            let remark = $this.$content.find('textarea').val();
+            let password = $this.$content.find('form').find("input[name='password']").val();
             confirmChangePassword(userId, remark, password)
         }
     })

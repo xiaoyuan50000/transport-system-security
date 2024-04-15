@@ -1,4 +1,4 @@
-var review = {
+let review = {
     "maxStarVal": 5,
     "defaultStarVal": 5,
     "negativeStarVal": 2,

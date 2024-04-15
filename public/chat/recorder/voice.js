@@ -2,6 +2,7 @@ let RongIMLib;
 (function (RongIMLib) {
     let RongIMVoice = (function () {
         function RongIMVoice() {
+            console.log("RongIMLib init")
         }
         RongIMVoice.init = function () {
             if (this.isIE) {
@@ -54,11 +55,10 @@ let RongIMLib;
             if (me.isIE) {
                 me.thisMovie().doAction("stop");
             }
-            else {
-                if (me.element) {
+            else if (me.element) {
                     me.element.stop();
-                }
             }
+            
         };
         RongIMVoice.onprogress = function () {
             this.checkInit("onprogress");
@@ -115,14 +115,14 @@ let RongIMLib;
                 }).decode(reader.result);
                 me.element = AMR.util.play(samples);
             };
-            reader.readAsBinaryString(blob);
+            reader.readAsArrayBuffer(blob);
         };
         RongIMVoice.isIE = /Trident/.test(navigator.userAgent);
         RongIMVoice.isInit = false;
         return RongIMVoice;
     })();
     RongIMLib.RongIMVoice = RongIMVoice;
-    if ("function" === typeof require && "object" === typeof module && module && module.id && "object" === typeof exports && exports) {
+    if ("function" === typeof require && "object" === typeof module && module?.id && "object" === typeof exports && exports) {
         module.exports = RongIMVoice;
     }
     else if ("function" === typeof define && define.amd) {

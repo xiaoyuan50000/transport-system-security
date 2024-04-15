@@ -57,8 +57,8 @@ function initTaskSchedule() {
     let schedules = [];
 
     for (let schedule of scheduleList) {
-        var schedule_date = schedule.schedule_date
-        var tasks = schedule.tasks
+        let schedule_date = schedule.schedule_date
+        let tasks = schedule.tasks
 
         schedules.push({
             category: 'allday',
@@ -94,9 +94,9 @@ const FilterScheduleList = function () {
     });
 
     for (let schedule of scheduleList) {
-        var schedule_date = schedule.schedule_date
-        var tasks = schedule.tasks
-        var newTasks = []
+        let schedule_date = schedule.schedule_date
+        let tasks = schedule.tasks
+        let newTasks = []
         tasks.forEach(task => {
             if (states.indexOf(task["state"].toLowerCase()) != -1) {
                 newTasks.push(task)

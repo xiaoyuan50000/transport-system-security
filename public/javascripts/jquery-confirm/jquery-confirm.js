@@ -43,7 +43,7 @@
     "use strict";
 
     // locally assign window
-    var w = window;
+    let w = window;
     // w.jconfirm
     // w.Jconfirm;
 
@@ -59,7 +59,7 @@
          *  Alias of $.confirm to emulate native confirm()
          */
         $(this).each(function(){
-            var $this = $(this);
+            let $this = $(this);
             if($this.attr('jc-attached')){
                 console.warn('jConfirm has already been attached to this element ', $this[0]);
                 return;
@@ -67,7 +67,7 @@
 
             $this.on('click', function(e){
                 e.preventDefault();
-                var jcOption = $.extend({}, options);
+                let jcOption = $.extend({}, options);
                 if($this.attr('data-title'))
                     jcOption['title'] = $this.attr('data-title');
                 if($this.attr('data-content'))
@@ -77,15 +77,15 @@
 
                 jcOption['$target'] = $this;
                 if($this.attr('href') && Object.keys(jcOption['buttons']).length === 0){
-                    var buttons = $.extend(true, {}, w.jconfirm.pluginDefaults.defaultButtons, (w.jconfirm.defaults || {}).defaultButtons || {});
-                    var firstBtn = Object.keys(buttons)[0];
+                    let buttons = $.extend(true, {}, w.jconfirm.pluginDefaults.defaultButtons, (w.jconfirm.defaults || {}).defaultButtons || {});
+                    let firstBtn = Object.keys(buttons)[0];
                     jcOption['buttons'] = buttons;
                     jcOption.buttons[firstBtn].action = function(){
                         location.href = $this.attr('href');
                     };
                 }
                 jcOption['closeIcon'] = false;
-                var instance = $.confirm(jcOption);
+                let instance = $.confirm(jcOption);
             });
 
             $this.attr('jc-attached', true);
@@ -101,13 +101,13 @@
             };
         }
 
-        var putDefaultButtons = !(options['buttons'] === false);
+        let putDefaultButtons = !(options['buttons'] === false);
 
         if(typeof options['buttons'] !== 'object')
             options['buttons'] = {};
 
         if(Object.keys(options['buttons']).length === 0 && putDefaultButtons){
-            var buttons = $.extend(true, {}, w.jconfirm.pluginDefaults.defaultButtons, (w.jconfirm.defaults || {}).defaultButtons || {});
+            let buttons = $.extend(true, {}, w.jconfirm.pluginDefaults.defaultButtons, (w.jconfirm.defaults || {}).defaultButtons || {});
             options['buttons'] = buttons;
         }
 
@@ -125,14 +125,14 @@
             };
         }
 
-        var putDefaultButtons = !(options['buttons'] === false);
+        let putDefaultButtons = !(options['buttons'] === false);
 
         if(typeof options.buttons !== 'object')
             options.buttons = {};
 
         if(Object.keys(options['buttons']).length === 0 && putDefaultButtons){
-            var buttons = $.extend(true, {}, w.jconfirm.pluginDefaults.defaultButtons, (w.jconfirm.defaults || {}).defaultButtons || {});
-            var firstBtn = Object.keys(buttons)[0];
+            let buttons = $.extend(true, {}, w.jconfirm.pluginDefaults.defaultButtons, (w.jconfirm.defaults || {}).defaultButtons || {});
+            let firstBtn = Object.keys(buttons)[0];
             options['buttons'][firstBtn] = buttons[firstBtn];
         }
         /*
@@ -171,7 +171,7 @@
         /*
          * initial function for calling.
          */
-        var pluginOptions = $.extend(true, {}, w.jconfirm.pluginDefaults);
+        let pluginOptions = $.extend(true, {}, w.jconfirm.pluginDefaults);
         if(w.jconfirm.defaults){
             pluginOptions = $.extend(true, pluginOptions, w.jconfirm.defaults);
         }
@@ -180,7 +180,7 @@
          * merge options with plugin defaults.
          */
         pluginOptions = $.extend(true, {}, pluginOptions, options);
-        var instance = new w.Jconfirm(pluginOptions);
+        let instance = new w.Jconfirm(pluginOptions);
         w.jconfirm.instances.push(instance);
         return instance;
     };
@@ -194,7 +194,7 @@
     };
     w.Jconfirm.prototype = {
         _init: function(){
-            var that = this;
+            let that = this;
 
             if(!w.jconfirm.instances.length)
                 w.jconfirm.lastFocused = $('body').find(':focus');
@@ -212,7 +212,7 @@
             }
         },
         _buildHTML: function(){
-            var that = this;
+            let that = this;
 
             // prefix the animation string and store in animationParsed
             this._parseAnimation(this.animation, 'o');
@@ -225,7 +225,7 @@
             /*
              * Append html.
              */
-            var template = $(this.template);
+            let template = $(this.template);
             template.find('.jconfirm-box').addClass(this.animationParsed).addClass(this.backgroundDismissAnimationParsed).addClass(this.typeParsed);
 
             if(this.typeAnimated)
@@ -249,7 +249,7 @@
                 template.find('.jconfirm-title-c').addClass(this.titleClass);
 
             template.addClass(this.themeParsed);
-            var ariaLabel = 'jconfirm-box' + this._id;
+            let ariaLabel = 'jconfirm-box' + this._id;
             template.find('.jconfirm-box').attr('aria-labelledby', ariaLabel).attr('tabindex', -1);
             template.find('.jconfirm-content').attr('id', ariaLabel);
             if(this.bgOpacity !== null)
@@ -337,14 +337,14 @@
             this.typeParsed = this._typePrefix + type;
         },
         setType: function(type){
-            var oldClass = this.typeParsed;
+            let oldClass = this.typeParsed;
             this._parseType(type);
             this.$jconfirmBox.removeClass(oldClass).addClass(this.typeParsed);
         },
         themeParsed: '',
         _themePrefix: 'jconfirm-',
         setTheme: function(theme){
-            var previous = this.theme;
+            let previous = this.theme;
             this.theme = theme || this.theme;
             this._parseTheme(this.theme);
             if(previous)
@@ -353,7 +353,7 @@
             this.theme = theme;
         },
         _parseTheme: function(theme){
-            var that = this;
+            let that = this;
             theme = theme.split(',');
             $.each(theme, function(k, a){
                 if(a.indexOf(that._themePrefix) === -1)
@@ -364,8 +364,8 @@
         backgroundDismissAnimationParsed: '',
         _bgDismissPrefix: 'jconfirm-hilight-',
         _parseBgDismissAnimation: function(bgDismissAnimation){
-            var animation = bgDismissAnimation.split(',');
-            var that = this;
+            let animation = bgDismissAnimation.split(',');
+            let that = this;
             $.each(animation, function(k, a){
                 if(a.indexOf(that._bgDismissPrefix) === -1)
                     animation[k] = that._bgDismissPrefix + $.trim(a);
@@ -381,13 +381,13 @@
         },
         _parseAnimation: function(animation, which){
             which = which || 'o'; // parse what animation and store where. open or close?
-            var animations = animation.split(',');
-            var that = this;
+            let animations = animation.split(',');
+            let that = this;
             $.each(animations, function(k, a){
                 if(a.indexOf(that._animationPrefix) === -1)
                     animations[k] = that._animationPrefix + $.trim(a);
             });
-            var a_string = animations.join(' ').toLowerCase();
+            let a_string = animations.join(' ').toLowerCase();
             if(which === 'o')
                 this.animationParsed = a_string;
             else
@@ -414,7 +414,7 @@
             this.$jconfirmBoxContainer.addClass(this.columnClassParsed);
         },
         _updateContentMaxHeight: function(){
-            var height = $(window).height() - (this.$jconfirmBox.outerHeight() - this.$contentPane.outerHeight()) - (this.offsetTop + this.offsetBottom);
+            let height = $(window).height() - (this.$jconfirmBox.outerHeight() - this.$contentPane.outerHeight()) - (this.offsetTop + this.offsetBottom);
             this.$contentPane.css({
                 'max-height': height + 'px'
             });
@@ -429,7 +429,7 @@
         },
         _parseColumnClass: function(colClass){
             colClass = colClass.toLowerCase();
-            var p;
+            let p;
             switch(colClass){
                 case 'xl':
                 case 'xlarge':
@@ -457,8 +457,8 @@
             this.columnClassParsed = p;
         },
         initDraggable: function(){
-            var that = this;
-            var $t = this.$titleContainer;
+            let that = this;
+            let $t = this.$titleContainer;
 
             this.resetDrag();
             if(this.draggable){
@@ -501,16 +501,16 @@
                 return;
 
             this.alignMiddle = false;
-            var boxWidth = this.$jconfirmBox.outerWidth();
-            var boxHeight = this.$jconfirmBox.outerHeight();
-            var windowWidth = $(window).width();
-            var windowHeight = $(window).height();
-            var that = this;
-            var dragUpdate = 1;
+            let boxWidth = this.$jconfirmBox.outerWidth();
+            let boxHeight = this.$jconfirmBox.outerHeight();
+            let windowWidth = $(window).width();
+            let windowHeight = $(window).height();
+            let that = this;
+            let dragUpdate = 1;
             if(that.movingX % dragUpdate === 0 || that.movingY % dragUpdate === 0){
                 if(that.dragWindowBorder){
-                    var leftDistance = (windowWidth / 2) - boxWidth / 2;
-                    var topDistance = (windowHeight / 2) - boxHeight / 2;
+                    let leftDistance = (windowWidth / 2) - boxWidth / 2;
+                    let topDistance = (windowHeight / 2) - boxHeight / 2;
                     topDistance -= that.dragWindowGap;
                     leftDistance -= that.dragWindowGap;
 
@@ -536,20 +536,20 @@
                 return pageYOffset;
             }
             else{
-                var B = document.body; //IE 'quirks'
-                var D = document.documentElement; //IE with doctype
+                let B = document.body; //IE 'quirks'
+                let D = document.documentElement; //IE with doctype
                 D = (D.clientHeight) ? D : B;
                 return D.scrollTop;
             }
         },
         _watchContent: function(){
-            var that = this;
+            let that = this;
             if(this._timer) clearInterval(this._timer);
 
-            var prevContentHeight = 0;
+            let prevContentHeight = 0;
             this._timer = setInterval(function(){
                 if(that.smoothContent){
-                    var contentHeight = that.$content.outerHeight() || 0;
+                    let contentHeight = that.$content.outerHeight() || 0;
                     if(contentHeight !== prevContentHeight){
 
                         // Commented out to prevent scroll to top when updating the content
@@ -559,8 +559,8 @@
                         // }).scrollTop(0);
                         prevContentHeight = contentHeight;
                     }
-                    var wh = $(window).height();
-                    var total = that.offsetTop + that.offsetBottom + that.$jconfirmBox.height() - that.$contentPane.height() + that.$content.height();
+                    let wh = $(window).height();
+                    let total = that.offsetTop + that.offsetBottom + that.$jconfirmBox.height() - that.$contentPane.height() + that.$content.height();
                     if(total < wh){
                         that.$contentPane.addClass('no-scroll');
                     }else{
@@ -575,12 +575,12 @@
             this.hiLightModal();
         },
         hiLightModal: function(){
-            var that = this;
+            let that = this;
             if(this._hilightAnimating)
                 return;
 
             that.$body.addClass('hilight');
-            var duration = parseFloat(that.$body.css('animation-duration')) || 2;
+            let duration = parseFloat(that.$body.css('animation-duration')) || 2;
             this._hilightAnimating = true;
             setTimeout(function(){
                 that._hilightAnimating = false;
@@ -588,7 +588,7 @@
             }, duration * 1000);
         },
         _bindEvents: function(){
-            var that = this;
+            let that = this;
             this.boxClicked = false;
 
             this.$scrollPane.click(function(e){ // Ignore propagated clicks
@@ -597,9 +597,9 @@
                      If backgroundDismiss is a function and its return value is truthy
                      proceed to close the modal.
                      */
-                    var buttonName = false;
-                    var shouldClose = false;
-                    var str;
+                    let buttonName = false;
+                    let shouldClose = false;
+                    let str;
 
                     if(typeof that.backgroundDismiss === 'function')
                         str = that.backgroundDismiss();
@@ -616,7 +616,7 @@
                     }
 
                     if(buttonName){
-                        var btnResponse = that.buttons[buttonName].action.apply(that);
+                        let btnResponse = that.buttons[buttonName].action.apply(that);
                         shouldClose = (typeof btnResponse === 'undefined') || !!(btnResponse);
                     }
 
@@ -632,7 +632,7 @@
                 that.boxClicked = true;
             });
 
-            var isKeyDown = false;
+            let isKeyDown = false;
             $(window).on('jcKeyDown.' + that._id, function(e){
                 if(!isKeyDown){
                     isKeyDown = true;
@@ -662,12 +662,12 @@
             };
         },
         _setButtons: function(){
-            var that = this;
+            let that = this;
             /*
              * Settings up buttons
              */
 
-            var total_buttons = 0;
+            let total_buttons = 0;
             if(typeof this.buttons !== 'object')
                 this.buttons = {};
 
@@ -691,14 +691,14 @@
                     that.buttons[key].keys[i] = a.toLowerCase();
                 });
 
-                var button_element = $('<button type="button" class="btn"></button>')
+                let button_element = $('<button type="button" class="btn"></button>')
                     .html(that.buttons[key].text)
                     .addClass(that.buttons[key].btnClass)
                     .prop('disabled', that.buttons[key].isDisabled)
                     .css('display', that.buttons[key].isHidden ? 'none' : '')
                     .click(function(e){
                         e.preventDefault();
-                        var res = that.buttons[key].action.apply(that, [that.buttons[key]]);
+                        let res = that.buttons[key].action.apply(that, [that.buttons[key]]);
                         that.onAction.apply(that, [key, that.buttons[key]]);
                         that._stopCountDown();
                         if(typeof res === 'undefined' || res)
@@ -750,16 +750,16 @@
             if(this.closeIcon){
                 if(this.closeIconClass){
                     // user requires a custom class.
-                    var closeHtml = '<i class="' + this.closeIconClass + '"></i>';
+                    let closeHtml = '<i class="' + this.closeIconClass + '"></i>';
                     this.$closeIcon.html(closeHtml);
                 }
 
                 this.$closeIcon.click(function(e){
                     e.preventDefault();
 
-                    var buttonName = false;
-                    var shouldClose = false;
-                    var str;
+                    let buttonName = false;
+                    let shouldClose = false;
+                    let str;
 
                     if(typeof that.closeIcon === 'function'){
                         str = that.closeIcon();
@@ -776,7 +776,7 @@
                         shouldClose = false;
                     }
                     if(buttonName){
-                        var btnResponse = that.buttons[buttonName].action.apply(that);
+                        let btnResponse = that.buttons[buttonName].action.apply(that);
                         shouldClose = (typeof btnResponse === 'undefined') || !!(btnResponse);
                     }
                     if(shouldClose){
@@ -798,7 +798,7 @@
                     if(typeof string.promise === 'function')
                         console.error('Promise was returned from title function, this is not supported.');
 
-                    var response = string();
+                    let response = string();
                     if(typeof response === 'string')
                         this.title = response;
                     else
@@ -819,7 +819,7 @@
                 if(typeof iconClass === 'string')
                     this.icon = iconClass;
                 else if(typeof iconClass === 'function'){
-                    var response = iconClass();
+                    let response = iconClass();
                     if(typeof response === 'string')
                         this.icon = response;
                     else
@@ -855,7 +855,7 @@
         },
         setContent: function(content, force){
             force = !!force;
-            var that = this;
+            let that = this;
             if(content)
                 this.contentParsed.html('').append(content);
             if(this.isAjaxLoading && !force)
@@ -887,11 +887,11 @@
         isAjax: false,
         isAjaxLoading: false,
         _parseContent: function(){
-            var that = this;
-            var e = '&nbsp;';
+            let that = this;
+            let e = '&nbsp;';
 
             if(typeof this.content === 'function'){
-                var res = this.content.apply(this);
+                let res = this.content.apply(this);
                 if(typeof res === 'string'){
                     this.content = res;
                 }
@@ -918,7 +918,7 @@
             if(typeof this.content === 'string' && this.content.substr(0, 4).toLowerCase() === 'url:'){
                 this.isAjax = true;
                 this.isAjaxLoading = true;
-                var u = this.content.substring(4, this.content.length);
+                let u = this.content.substring(4, this.content.length);
                 $.get(u).done(function(html){
                     that.contentParsed.html(html);
                 }).always(function(data, status, xhr){
@@ -948,21 +948,21 @@
                 this.$cd.remove();
         },
         _startCountDown: function(){
-            var that = this;
-            var opt = this.autoClose.split('|');
+            let that = this;
+            let opt = this.autoClose.split('|');
             if(opt.length !== 2){
                 console.error('Invalid option for autoClose. example \'close|10000\'');
                 return false;
             }
 
-            var button_key = opt[0];
-            var time = parseInt(opt[1]);
+            let button_key = opt[0];
+            let time = parseInt(opt[1]);
             if(typeof this.buttons[button_key] === 'undefined'){
                 console.error('Invalid button key \'' + button_key + '\' for autoClose');
                 return false;
             }
 
-            var seconds = Math.ceil(time / 1000);
+            let seconds = Math.ceil(time / 1000);
             this.$cd = $('<span class="countdown"> (' + seconds + ')</span>')
                 .appendTo(this['$_' + button_key]);
 
@@ -1000,30 +1000,30 @@
             }
 
             // only trust alphabets with this.
-            var initial = String.fromCharCode(key);
+            let initial = String.fromCharCode(key);
             if(/^[A-z0-9]+$/.test(initial))
                 return initial.toLowerCase();
             else
                 return false;
         },
         reactOnKey: function(e){
-            var that = this;
+            let that = this;
 
             /*
              Prevent keyup event if the dialog is not last!
              */
-            var a = $('.jconfirm');
+            let a = $('.jconfirm');
             if(a.eq(a.length - 1)[0] !== this.$el[0])
                 return false;
 
-            var key = e.which;
+            let key = e.which;
             /*
              Do not react if Enter or Space is pressed on input elements
              */
             if(this.$content.find(':input').is(':focus') && /13|32/.test(key))
                 return false;
 
-            var keyChar = this._getKey(key);
+            let keyChar = this._getKey(key);
 
             // If esc is pressed
             if(keyChar === 'esc' && this.escapeKey){
@@ -1031,7 +1031,7 @@
                     this.$scrollPane.trigger('click');
                 }
                 else if(typeof this.escapeKey === 'string' || typeof this.escapeKey === 'function'){
-                    var buttonKey;
+                    let buttonKey;
                     if(typeof this.escapeKey === 'function'){
                         buttonKey = this.escapeKey();
                     }else{
@@ -1061,7 +1061,7 @@
             clearInterval(this._timer);
         },
         close: function(onClosePayload){
-            var that = this;
+            let that = this;
 
             if(typeof this.onClose === 'function')
                 this.onClose(onClosePayload);
@@ -1088,13 +1088,13 @@
             setTimeout(function(){
                 that.$body.addClass(that.closeAnimationParsed);
                 that.$jconfirmBg.addClass('jconfirm-bg-h');
-                var closeTimer = (that.closeAnimation === 'none') ? 1 : that.animationSpeed;
+                let closeTimer = (that.closeAnimation === 'none') ? 1 : that.animationSpeed;
 
                 setTimeout(function(){
                     that.$el.remove();
 
-                    var l = w.jconfirm.instances;
-                    var i = w.jconfirm.instances.length - 1;
+                    let l = w.jconfirm.instances;
+                    let i = w.jconfirm.instances.length - 1;
                     for(i; i >= 0; i--){
                         if(w.jconfirm.instances[i]._id === that._id){
                             w.jconfirm.instances.splice(i, 1);
@@ -1105,13 +1105,13 @@
                     // no instances should be open, lastFocused should be true, the lastFocused element must exists in DOM
                     if(!w.jconfirm.instances.length){
                         if(that.scrollToPreviousElement && w.jconfirm.lastFocused && w.jconfirm.lastFocused.length && $.contains(document, w.jconfirm.lastFocused[0])){
-                            var $lf = w.jconfirm.lastFocused;
+                            let $lf = w.jconfirm.lastFocused;
                             if(that.scrollToPreviousElementAnimate){
-                                var st = $(window).scrollTop();
-                                var ot = w.jconfirm.lastFocused.offset().top;
-                                var wh = $(window).height();
+                                let st = $(window).scrollTop();
+                                let ot = w.jconfirm.lastFocused.offset().top;
+                                let wh = $(window).height();
                                 if(!(ot > st && ot < (st + wh))){
-                                    var scrollTo = (ot - Math.round((wh / 3)));
+                                    let scrollTo = (ot - Math.round((wh / 3)));
                                     $('html, body').animate({
                                         scrollTop: scrollTo
                                     }, that.animationSpeed, 'swing', function(){
@@ -1141,7 +1141,7 @@
             if(this.isOpen())
                 return false;
 
-            // var that = this;
+            // let that = this;
             this._buildHTML();
             this._bindEvents();
             this._open();
@@ -1149,7 +1149,7 @@
             return true;
         },
         setStartingPoint: function(){
-            var el = false;
+            let el = false;
 
             if(this.animateFromElement !== true && this.animateFromElement){
                 el = this.animateFromElement;
@@ -1164,26 +1164,26 @@
             if(!el)
                 return false;
 
-            var offset = el.offset();
+            let offset = el.offset();
 
-            var iTop = el.outerHeight() / 2;
-            var iLeft = el.outerWidth() / 2;
+            let iTop = el.outerHeight() / 2;
+            let iLeft = el.outerWidth() / 2;
 
             // placing position of jconfirm modal in center of clicked element
             iTop -= this.$jconfirmBox.outerHeight() / 2;
             iLeft -= this.$jconfirmBox.outerWidth() / 2;
 
             // absolute position on screen
-            var sourceTop = offset.top + iTop;
+            let sourceTop = offset.top + iTop;
             sourceTop = sourceTop - this._scrollTop();
-            var sourceLeft = offset.left + iLeft;
+            let sourceLeft = offset.left + iLeft;
 
             // window halved
-            var wh = $(window).height() / 2;
-            var ww = $(window).width() / 2;
+            let wh = $(window).height() / 2;
+            let ww = $(window).width() / 2;
 
-            var targetH = wh - this.$jconfirmBox.outerHeight() / 2;
-            var targetW = ww - this.$jconfirmBox.outerWidth() / 2;
+            let targetH = wh - this.$jconfirmBox.outerHeight() / 2;
+            let targetW = ww - this.$jconfirmBox.outerWidth() / 2;
 
             sourceTop -= targetH;
             sourceLeft -= targetW;
@@ -1195,7 +1195,7 @@
             this.$jconfirmBoxContainer.css('transform', 'translate(' + sourceLeft + 'px, ' + sourceTop + 'px)');
         },
         _open: function(){
-            var that = this;
+            let that = this;
             if(typeof that.onOpenBefore === 'function')
                 that.onOpenBefore();
 
@@ -1356,11 +1356,11 @@
      * Solution:
      * Register a global keydown event, that tells jconfirm if the keydown originated inside jconfirm
      */
-    var keyDown = false;
+    let keyDown = false;
     $(window).on('keydown', function(e){
         if(!keyDown){
-            var $target = $(e.target);
-            var pass = false;
+            let $target = $(e.target);
+            let pass = false;
             if($target.closest('.jconfirm-box').length)
                 pass = true;
             if(pass)

@@ -1,6 +1,6 @@
-var unitDatas;
-var roleName = top.user.roleName
-var occ = ["OCC Mgr"]
+let unitDatas;
+let roleName = top.user.roleName
+let occ = ["OCC Mgr"]
 
 $(async function () {
     let elemIds = ['#execution-date', '#created-date']

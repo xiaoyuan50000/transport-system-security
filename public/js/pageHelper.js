@@ -1,8 +1,8 @@
-var PageHelper = function () {
+let PageHelper = function () {
 
-    var datatablePageClass = ".dataTables_wrapper .dataTables_paginate .pagination";
+    let datatablePageClass = ".dataTables_wrapper .dataTables_paginate .pagination";
 
-    var language = {
+    let language = {
         paginate: {
             previous: "<",
             next: ">",
@@ -18,9 +18,9 @@ var PageHelper = function () {
         infoEmpty: "A Total Of _TOTAL_",
     }
 
-    var lengthMenu = [[10, 25, 50], ["10 Items/Page", "25 Items/Page", "50 Items/Page"]];
+    let lengthMenu = [[10, 25, 50], ["10 Items/Page", "25 Items/Page", "50 Items/Page"]];
 
-    var dom = "tr<'row align-items-center justify-content-end m-3' <'col-auto'i><'col-auto'l><'col-auto'p>>";
+    let dom = "tr<'row align-items-center justify-content-end m-3' <'col-auto'i><'col-auto'l><'col-auto'p>>";
 
     function setPageNumber(val) {
         $(".table").DataTable().page(val).draw(false);
@@ -78,7 +78,7 @@ var PageHelper = function () {
             drawGoPageMenu(tableElem);
         },
         pageLength: function () {
-            return lengthMenu[0][0];
+            return Number(lengthMenu[0][0]);
         },
         lengthMenu: function () {
             return lengthMenu;

@@ -1,8 +1,8 @@
-var user = parent.user;
-var roleName = user.roleName;
-var currentUserId = $('body').data('user-id')
-var table
-var TASK_STATUS = ["completed", "late trip", "no show", "cancelled", "cancelled by TSP"]
+let user = parent.user;
+let roleName = user.roleName;
+let currentUserId = $('body').data('user-id')
+let table
+let TASK_STATUS = ["completed", "late trip", "no show", "cancelled", "cancelled by TSP"]
 $(function () {
     table = $('.jobTask-table').DataTable({
         "ordering": false,
@@ -80,14 +80,12 @@ $(function () {
                             if (full.repeats == 'Period') {
                                 return `<div>Period</div>
                                     <div>${moment(full.startDate).format("DD/MM/YYYY HH:mm")}</div>`
+                            } else if (full.repeats != 'Period' && full.duration){
+                                return `<div>Once(Duration ${full.duration}hr)</div>
+                                    <div>${moment(full.startDate).format("DD/MM/YYYY HH:mm")}</div>`
                             } else {
-                                if (full.duration) {
-                                    return `<div>Once(Duration ${full.duration}hr)</div>
-                                        <div>${moment(full.startDate).format("DD/MM/YYYY HH:mm")}</div>`
-                                } else {
-                                    return `<div>Once(no duration)</div>
-                                        <div>${moment(full.startDate).format("DD/MM/YYYY HH:mm")}</div>`
-                                }
+                                return `<div>Once(no duration)</div>
+                                    <div>${moment(full.startDate).format("DD/MM/YYYY HH:mm")}</div>`
                             }
                         } else {
                             return moment(data).format("DD/MM/YYYY HH:mm");
@@ -181,13 +179,13 @@ $(function () {
                     if (roleName == 'RF') {
                         let baseHtml = ``
                         if (full.notifiedTime) { 
-                            baseHtml += `<div>Notified:${full.notifiedTime ? moment(full.notifiedTime).format("DD/MM/YYYY HH:mm") : '-'}</div>`;
+                            baseHtml += `<div>Notified:${getNotifyTSPTime(full.notifiedTime)}</div>`;
                         }
                         if (full.tspChangeTime) { 
-                            baseHtml += `<div >Amendment:${full.tspChangeTime ? moment(full.tspChangeTime).format("DD/MM/YYYY HH:mm") : '-'}</div>`;
+                            baseHtml += `<div >Amendment:${getNotifyTSPTime(full.tspChangeTime)}</div>`;
                         }
                         if (full.cancellationTime) { 
-                            baseHtml += `<div >Cancellation:${full.cancellationTime ? moment(full.cancellationTime).format("DD/MM/YYYY HH:mm") : '-'}</div>`;
+                            baseHtml += `<div >Cancellation:${getNotifyTSPTime(full.cancellationTime)}</div>`;
                         }
                         return `<div data-cell="tspTime" style="wdith: 100%;height: 100%;" data-row="${meta.row}">${baseHtml}</div>`
                     } else {
@@ -206,7 +204,7 @@ $(function () {
                         View: `<button class="btn btn-sm me-1" data-bs-toggle="modal" data-bs-target="#indentHistoryModal" data-bs-trip="${tripId}" data-bs-taskid="${taskId}" data-bs-tripno="${tripNo}" title="View History"><img src="../images/indent/action/view-workflow.svg"></button>`,
                         Endorse: `<button class="btn btn-sm me-1" onclick="TaskEndorse(${taskId}, '${full.taskStatus}')" title="Endorse"><img src="../images/indent/action/endorse.svg"></button>`,
                         Reset: `<button class="btn btn-sm me-1" onclick="TaskReset(${taskId})" title="Reset"><img style="width: 21px;" src="../images/reset.svg"></button>`,
-                        Arbitrate: `<button class="btn btn-sm me-1" title="Arbitrate" onclick="javascript:ChatUtil.initRoomChatModal(${currentUserId}, \'${parent.user.roleName}\', ${full.serviceProviderId}, ${taskId})">
+                        Arbitrate: `<button class="btn btn-sm me-1" title="Arbitrate" onclick="javascript:ChatUtil.initRoomChatModal(${currentUserId}, '${parent.user.roleName}', ${full.serviceProviderId}, ${taskId})">
                             <img style="width: 25px;" src="../images/indent/action/chat.svg">
                             ${ full.hasNewMessage ? '<span class="position-absolute translate-middle border border-light rounded-circle bg-danger p-1"></span>' : '' }
                         </button>`,
@@ -218,6 +216,10 @@ $(function () {
         ]
     });
 })
+
+const getNotifyTSPTime = function(date){
+    return date ? moment(date).format("DD/MM/YYYY HH:mm") : '-'
+}
 
 const GetFilerParameters = function () {
     let execution_date = $("#indent-filter input[name='execution-date']").val()

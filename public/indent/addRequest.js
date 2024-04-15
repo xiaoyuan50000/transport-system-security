@@ -1,26 +1,26 @@
-var $UnitSelect = $("#groupSelectId")
-var $ServiceType = $("#serviceType")
-var $PurposeType = $("#purposeType")
-var $categoryRadio = $("#category-radio")
-var $AdditionalRemarks = $("#additionalRemarks")
-var destinations;
-var polPoints;
-var tekong = "TEKONG"
-var allTSP = []
-var serviceTypeList = []
-var [pickupNotes, dropoffNotes] = ["", ""]
-var $tripContent = $("#tripContent")
-var tripHtml = $("#tripHtml").html()
-var fuelHtml = $("#fuelHtml").html()
-var occ = ["OCC Mgr"]
+let $UnitSelect = $("#groupSelectId")
+let $ServiceType = $("#serviceType")
+let $PurposeType = $("#purposeType")
+let $categoryRadio = $("#category-radio")
+let $AdditionalRemarks = $("#additionalRemarks")
+let destinations;
+let polPoints;
+let tekong = "TEKONG"
+let allTSP = []
+let serviceTypeList = []
+let [pickupNotes, dropoffNotes] = ["", ""]
+let $tripContent = $("#tripContent")
+let tripHtml = $("#tripHtml").html()
+let fuelHtml = $("#fuelHtml").html()
+// let occ = ["OCC Mgr"]
 
 
-var tripModal = new bootstrap.Modal(document.getElementById('tripModal'))
+let tripModal = new bootstrap.Modal(document.getElementById('tripModal'))
 $(function () {
     addIndentEventListener()
     InitIndentForm()
 
-    var tripModalElem = document.getElementById('tripModal')
+    let tripModalElem = document.getElementById('tripModal')
     tripModalElem.addEventListener('hidden.bs.modal', function (event) {
         StartRefreshIndent()
         CleanIndentForm()
@@ -72,64 +72,14 @@ $(function () {
                 `)
                 DisableTripForm(false)
 
-                if (action == "new-trip") {
-                    AppendTemplateIndentHtml()
-                    if (roleName == "RF" || occ.indexOf(roleName) != -1) {
-                        let groupId = $UnitSelect.attr("data-id")
-                        await initServiceType(groupId)
-                        await GetTemplateIndentList(groupId)
-                    }
-                    else {
-                        await initServiceType()
-                        await GetTemplateIndentList()
-                    }
-                }
-                // show previous trip
-                else if (action == "next-trip") {
-                    let result = await GetPreviousTrip(indentId)
-                    let previousTripId = result.tripId
-                    if (previousTripId != null) {
-                        await SetTripDatas(previousTripId)
-                        SetDestinations()
-                    }
-                }
-                else if (action == "duplicate-trip") {
-                    let tripId = button.getAttribute('data-bs-trip')
-                    await SetTripDatas(tripId)
-                    SetDestinations()
-                }
+                await initTripAction1(action, indentId, button)
                 PurposeTrainingDisabledMV()
             }
             else {
                 let tripId = button.getAttribute('data-bs-trip')
                 let tripNo = button.getAttribute('data-bs-tripno')
 
-                if (action == "edit-trip") {
-                    modalTitle.textContent = 'Edit Trip ' + tripNo
-                    $("#button1-row .action-button").append(`
-                        <button type="button" class="btn btn-system" onclick="EditTrip('${tripId}')">Save</button>
-                    `)
-                    // $AdditionalRemarks.attr("disabled", false)
-                    PurposeTrainingDisabledMV()
-                    DisableTripForm(false)
-                    await SetTripDatas(tripId)
-                    SetDestinations()
-                    $("#endsOn").attr("disabled", true)
-                    $("#week svg").unbind("click");
-                }
-                else if (action == "view-trip") {
-                    modalTitle.textContent = 'View Trip ' + tripNo
-                    if (roleName == "RF" || roleName == "RQ" || occ.indexOf(roleName) != -1) {
-                        $("#button1-row .action-button").append(`
-                            <button type="button" class="btn btn-system" onclick="DuplicateTrip(${tripId}, '${indentId}')">Duplicate</button>
-                        `)
-                    }
-
-                    await SetTripDatas(tripId)
-                    PurposeTrainingDisabledMV()
-                    DisableTripForm(true)
-                    $("#week svg").unbind("click");
-                }
+                initTripAction2(action, indentId, modalTitle, tripNo, tripId)
 
             }
         }
@@ -139,6 +89,65 @@ $(function () {
         PurposeTrainingDisabledMV()
     })
 })
+
+
+const initTripAction1 = async function (action, indentId, button) {
+    if (action == "new-trip") {
+        AppendTemplateIndentHtml()
+        if (roleName == "RF" || occ.indexOf(roleName) != -1) {
+            let groupId = $UnitSelect.attr("data-id")
+            await initServiceType(groupId)
+            await GetTemplateIndentList(groupId)
+        }
+        else {
+            await initServiceType()
+            await GetTemplateIndentList()
+        }
+    }
+    // show previous trip
+    else if (action == "next-trip") {
+        let result = await GetPreviousTrip(indentId)
+        let previousTripId = result.tripId
+        if (previousTripId != null) {
+            await SetTripDatas(previousTripId)
+            SetDestinations()
+        }
+    }
+    else if (action == "duplicate-trip") {
+        let tripId = button.getAttribute('data-bs-trip')
+        await SetTripDatas(tripId)
+        SetDestinations()
+    }
+}
+
+const initTripAction2 = async function (action, indentId, modalTitle, tripNo, tripId) {
+    if (action == "edit-trip") {
+        modalTitle.textContent = 'Edit Trip ' + tripNo
+        $("#button1-row .action-button").append(`
+            <button type="button" class="btn btn-system" onclick="EditTrip('${tripId}')">Save</button>
+        `)
+        // $AdditionalRemarks.attr("disabled", false)
+        PurposeTrainingDisabledMV()
+        DisableTripForm(false)
+        await SetTripDatas(tripId)
+        SetDestinations()
+        $("#endsOn").attr("disabled", true)
+        $("#week svg").off("click");
+    }
+    else if (action == "view-trip") {
+        modalTitle.textContent = 'View Trip ' + tripNo
+        if (roleName == "RF" || roleName == "RQ" || occ.indexOf(roleName) != -1) {
+            $("#button1-row .action-button").append(`
+                <button type="button" class="btn btn-system" onclick="DuplicateTrip(${tripId}, '${indentId}')">Duplicate</button>
+            `)
+        }
+
+        await SetTripDatas(tripId)
+        PurposeTrainingDisabledMV()
+        DisableTripForm(true)
+        $("#week svg").off("click");
+    }
+}
 
 const PurposeTrainingDisabledMV = function () {
     let disabled = false
@@ -651,7 +660,7 @@ const initPurposeMode = async function () {
 
 const GetIndentData = function () {
     let data = { additionalRemarks: '', groupSelectId: '', purposeType: '' }
-    var formData = serializeToJson($("#base-task-form").serializeArray())
+    let formData = serializeToJson($("#base-task-form").serializeArray())
     for (let i in formData) {
         data[i] = formData[i]
     }
@@ -662,7 +671,7 @@ const GetIndentData = function () {
         data.groupSelectId = $UnitSelect.attr("data-id") ?? ''
     }
 
-    var isOK = ValidIndentForm(data)
+    let isOK = ValidIndentForm(data)
     if (isOK) {
         return data
     }
@@ -675,7 +684,7 @@ const ValidIndentForm = function (data) {
         purposeType: 'Purpose',
         additionalRemarks: 'Activity Name',
     }
-    for (var key in data) {
+    for (let key in data) {
         if (data[key] == "" && key != "driver" && key != 'templateIndent') {
             simplyAlert(errorLabel[key] + " is required.")
             return false
@@ -695,7 +704,7 @@ const GetTripDatas = function () {
         periodEndDate: '', endsOn: '',
         preParkDate: null
     }
-    var formData = serializeToJson($("#task-form").serializeArray())
+    let formData = serializeToJson($("#task-form").serializeArray())
     for (let i in formData) {
         data[i] = formData[i]
     }
@@ -771,7 +780,7 @@ const AddTripWithoutTemplate = function (indentId) {
         }
     } else {
         let data = GetTripDatas()
-        var isOK = ValidTripForm(data)
+        let isOK = ValidTripForm(data)
         // console.log(data)
         // return
         if (isOK) {
@@ -804,56 +813,21 @@ const AddTrip = function (indentId) {
     }
 }
 
-
-const ValidTripForm = function (data, isEdit) {
-    let errorLabel = {
-        serviceMode: 'Service Mode', serviceType: 'Resource Type',
-        pickupDestination: 'Reporting Location', dropoffDestination: 'Destination', typeOfVehicle: 'Resource', noOfVehicle: 'No. of Resource',
-        noOfDriver: 'No. Of Driver',
-        serviceProvider: 'Service Provider', pocName: 'POC', contactNumber: 'Mobile Number', repeats: 'Recurring', executionDate: 'Execution Date',
-        executionTime: 'Execution Time', duration: 'Duration', periodStartDate: 'Start Date', periodEndDate: 'End Date', driver: 'Driver',
-        tripRemarks: 'Trip Remarks', endsOn: 'Ends On', repeatsOn: 'Repeat On', preParkDate: 'Pre Park Date'
-    }
-
-    for (var key in data) {
-        if ($('#serviceProvider option:last').val() === null || $('#serviceProvider option:last').val() === '') {
-            simplyAlert('There is no service provider at this time.');
-            return false
-        } else {
-            if (key === 'serviceProvider' || key === 'preParkDate') continue
-            if (data[key] == "" && key != "driver") {
-                simplyAlert(errorLabel[key] + " is required.")
-                return false
-            }
-        }
-    }
-    // vaild mobile
-    let contactNumber = data["contactNumber"]
-    let mobileValid = mobileNumberReg.valid(contactNumber)
-    if (!mobileValid.success) {
-        simplyAlert(mobileValid.errorMsg)
-        return false
-    }
-
-    let serviceMode = $("#serviceMode").find("option:selected").attr("data-minhour");
-    if (parseInt($("#duration").val()) < serviceMode) {
-        simplyAlert(`The execution time must exceed ${serviceMode} hours.`)
-        return false
-    }
-    if(data.executionDate){
-        if(!moment(data.executionDate, "YYYY-MM-DD", true).isValid()){
+const validateDate = function (data) {
+    if (data.executionDate) {
+        if (!moment(data.executionDate, "YYYY-MM-DD", true).isValid()) {
             simplyAlert(`Execution Date ${data.executionDate} is invalid!`)
             return false
         }
     }
-    if(data.executionTime){
-        if(!moment(data.executionTime, "HH:mm", true).isValid()){
+    if (data.executionTime) {
+        if (!moment(data.executionTime, "HH:mm", true).isValid()) {
             simplyAlert(`Execution Time ${data.executionTime} is invalid!`)
             return false
         }
     }
     if (data.preParkDate) {
-        if(!moment(data.preParkDate, "YYYY-MM-DD HH:mm", true).isValid()){
+        if (!moment(data.preParkDate, "YYYY-MM-DD HH:mm", true).isValid()) {
             simplyAlert(`Pre-Park Date ${data.preParkDate} is invalid!`)
             return false
         }
@@ -863,11 +837,11 @@ const ValidTripForm = function (data, isEdit) {
         }
     }
     if (data.periodStartDate && data.periodEndDate) {
-        if(!moment(data.periodStartDate, "YYYY-MM-DD HH:mm", true).isValid()){
+        if (!moment(data.periodStartDate, "YYYY-MM-DD HH:mm", true).isValid()) {
             simplyAlert(`Start Date ${data.periodStartDate} is invalid!`)
             return false
         }
-        if(!moment(data.periodEndDate, "YYYY-MM-DD HH:mm", true).isValid()){
+        if (!moment(data.periodEndDate, "YYYY-MM-DD HH:mm", true).isValid()) {
             simplyAlert(`End Date ${data.periodEndDate} is invalid!`)
             return false
         }
@@ -882,6 +856,10 @@ const ValidTripForm = function (data, isEdit) {
             return false
         }
     }
+    return true
+}
+
+const validateWeekly = function (isEdit, data) {
     if (!isEdit && data.repeats == 'Weekly') {
         let fmt = "YYYY-MM-DD"
         let now = moment(data.executionDate).format(fmt)
@@ -909,6 +887,57 @@ const ValidTripForm = function (data, isEdit) {
     return true
 }
 
+const validateRequiredField = (data, key) => {
+    const errorLabel = {
+        serviceMode: 'Service Mode', serviceType: 'Resource Type',
+        pickupDestination: 'Reporting Location', dropoffDestination: 'Destination', typeOfVehicle: 'Resource', noOfVehicle: 'No. of Resource',
+        noOfDriver: 'No. Of Driver',
+        serviceProvider: 'Service Provider', pocName: 'POC', contactNumber: 'Mobile Number', repeats: 'Recurring', executionDate: 'Execution Date',
+        executionTime: 'Execution Time', duration: 'Duration', periodStartDate: 'Start Date', periodEndDate: 'End Date', driver: 'Driver',
+        tripRemarks: 'Trip Remarks', endsOn: 'Ends On', repeatsOn: 'Repeat On', preParkDate: 'Pre Park Date'
+    }
+    if (data[key] == "" && key != "driver") {
+        simplyAlert(errorLabel[key] + " is required.")
+        return false
+    }
+    return true
+};
+const ValidTripForm = function (data, isEdit) {
+
+    for (let key in data) {
+        if ($('#serviceProvider option:last').val() === null || $('#serviceProvider option:last').val() === '') {
+            simplyAlert('There is no service provider at this time.');
+            return false
+        } else {
+            if (key === 'serviceProvider' || key === 'preParkDate') continue
+            if (!validateRequiredField(data, key)) {
+                return false
+            }
+        }
+    }
+    // vaild mobile
+    let contactNumber = data["contactNumber"]
+    let mobileValid = mobileNumberReg.valid(contactNumber)
+    if (!mobileValid.success) {
+        simplyAlert(mobileValid.errorMsg)
+        return false
+    }
+
+    let serviceMode = $("#serviceMode").find("option:selected").attr("data-minhour");
+    if (parseInt($("#duration").val()) < serviceMode) {
+        simplyAlert(`The execution time must exceed ${serviceMode} hours.`)
+        return false
+    }
+
+    if (!validateDate(data)) {
+        return false
+    }
+
+    if (!validateWeekly(isEdit, data)) {
+        return false
+    }
+    return true
+}
 
 const ChangeRepeats = function (val) {
     let serviceMode = $("#serviceMode").find("option:selected").text().toLowerCase();
@@ -1050,7 +1079,7 @@ const EditTrip = async function (tripId) {
         }
     } else {
         let data = GetEditFormData()
-        var isOK = ValidTripForm(data, true)
+        let isOK = ValidTripForm(data, true)
         console.log(data)
         // return
         if (isOK) {
@@ -1106,7 +1135,7 @@ const CreateIndentAndTripWithoutTemplate = function () {
             }
         } else {
             let data = GetTripDatas()
-            var isOK = ValidTripForm(data)
+            let isOK = ValidTripForm(data)
             if (isOK) {
                 DisableButton(true)
                 axios.post("/indent/create", { indent: createIndentData, trip: data }).then((res) => {
@@ -1209,7 +1238,7 @@ const checkDriverNum = function () {
 }
 
 const getFuelFormData = function () {
-    var formData = serializeToJson($("#task-form").serializeArray())
+    let formData = serializeToJson($("#task-form").serializeArray())
     console.log(formData)
     formData.fuelStartDate = parent.changeDateFormat(formData.fuelStartDate)
     formData.fuelEndDate = parent.changeDateFormat(formData.fuelEndDate)
@@ -1217,7 +1246,7 @@ const getFuelFormData = function () {
 }
 
 const validFuelFormData = function (data) {
-    for (var key in data) {
+    for (let key in data) {
         if (data[key] == "" || data[key] == []) {
             let errorLabel = $(`#task-form input[name='${key}'],#task-form select[name='${key}']`).closest(".row").find("label").html()
             errorLabel = errorLabel.replace(":", "")

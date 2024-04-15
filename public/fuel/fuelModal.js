@@ -1,14 +1,14 @@
-var fuelModal;
-var g10Table;
-var taskId;
+let fuelModal;
+let g10Table;
+let taskId;
 $(function () {
     fuelModal = document.getElementById('taskListModal')
     fuelModal.addEventListener('hidden.bs.modal', function (event) {
         $("#taskListModal").modal("dispose");
     })
     fuelModal.addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget
-        var index = button.getAttribute('data-bs-index')
+        let button = event.relatedTarget
+        let index = button.getAttribute('data-bs-index')
         let row = fuelTable.row(index).data();
         taskId = row.id
         let requestId = row.requestId
@@ -86,7 +86,7 @@ const addTaskFuel = function () {
     let balanceElem = $(".g10-table tfoot input[name='balance']")
     let vehicleNoElem = $(".g10-table tfoot input[name='vehicleNo']")
     let odbmeterElem = $(".g10-table tfoot input[name='odbmeter']")
-    var row = {
+    let row = {
         date: dateElem.val(),
         typeOfFuel: typeOfFuelElem.val(),
         qtyReceived: qtyReceivedElem.val(),
@@ -137,7 +137,7 @@ const delTaskFuel = function (id) {
 
 const InitDateSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let option = {
             elem: "#date",
             lang: 'en',
@@ -155,18 +155,7 @@ const InitDateSelector = function () {
     });
 }
 
-const DisabledLayDate = function () {
-    // var elem = $(".layui-laydate-content");
-    // let publidHolidays = top.publidHolidays
-    // layui.each(elem.find('tr'), function (trIndex, trElem) {
-    //     layui.each($(trElem).find('td'), function (tdIndex, tdElem) {
-    //         var tdTemp = $(tdElem);
-    //         if (publidHolidays.indexOf(tdTemp.attr("lay-ymd")) > -1) {
-    //             tdTemp.addClass('laydate-disabled');
-    //         }
-    //     });
-    // });
-}
+
 
 const CheckOnInput = function (e) {
     e.value = e.value

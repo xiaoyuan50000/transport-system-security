@@ -42,6 +42,8 @@ body[class*=jconfirm-no-scroll-] {
     z-index: 99999999;
     font-family: inherit;
     overflow: hidden;
+    -webkit-perspective: 400px;
+    perspective: 400px;
 }
 
 .jconfirm .jconfirm-bg {
@@ -104,6 +106,9 @@ body[class*=jconfirm-no-scroll-] {
     overflow: hidden;
     margin-left: auto;
     margin-right: auto;
+    opacity: 1;
+    -webkit-transition-property: all;
+    transition-property: all;
 }
 
 @-webkit-keyframes type-blue {
@@ -787,16 +792,9 @@ body[class*=jconfirm-no-scroll-] {
 }
 
 /*Transition rules*/
-.jconfirm {
-    -webkit-perspective: 400px;
-    perspective: 400px;
-}
 
-.jconfirm .jconfirm-box {
-    opacity: 1;
-    -webkit-transition-property: all;
-    transition-property: all;
-}
+
+
 
 .jconfirm .jconfirm-box.jconfirm-animation-top,
 .jconfirm .jconfirm-box.jconfirm-animation-left,

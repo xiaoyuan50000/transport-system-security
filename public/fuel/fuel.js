@@ -2,7 +2,7 @@ $(function () {
     initTableListPage()
 });
 const dateFmt = 'DD/MM/YYYY'
-var fuelTable
+let fuelTable
 const initTableListPage = function () {
     fuelTable = $('.fuel-table').DataTable({
         "ordering": false,
@@ -68,7 +68,7 @@ const initTableListPage = function () {
                 "width": "120px",
                 "data": "id", "title": "Action", render: function (data, type, full, meta) {
                     if (['cancelled', 'rejected'].indexOf(full.status.toLowerCase()) == -1) {
-                        var html = `<button class="btn btn-sm btn-trip rounded-pill" style="font-size:12px;" data-bs-toggle="modal" data-bs-target="#taskListModal" data-bs-index="${meta.row}">Enter G10</button>`
+                        let html = `<button class="btn btn-sm btn-trip rounded-pill" style="font-size:12px;" data-bs-toggle="modal" data-bs-target="#taskListModal" data-bs-index="${meta.row}">Enter G10</button>`
                         return html
                     }
                     return "-"

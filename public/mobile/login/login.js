@@ -2,9 +2,9 @@ $(function () {
     document.documentElement.style.webkitUserSelect='none';
     document.documentElement.style.webkitTouchCallout='none';
 
-    var platName = navigator.userAgent;
-    var isAndroid = platName.indexOf("Android")>-1 || platName.indexOf('Lindex')>-1;
-    var isIos = !!platName.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+    let platName = navigator.userAgent;
+    let isAndroid = platName.indexOf("Android")>-1 || platName.indexOf('Lindex')>-1;
+    let isIos = !!platName.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
 
     autoLogin();
 
@@ -17,8 +17,7 @@ $(function () {
             if (res.data.code == 0) {
                 simplyAlert(res.data.msg, 'red');
                 return;
-            } else {
-                if (isAndroid) {
+            } else if (isAndroid) {
                     window.android.singpassLogin(res.data.singpassUrl);
                 } else if (isIos) {
                     window.webkit.messageHandlers.singpassLogin.postMessage(res.data.singpassUrl);
@@ -26,7 +25,7 @@ $(function () {
                     //simplyAlert("Unsupport Operating System", 'red');
                     window.location.href = res.data.singpassUrl
                 }
-            }
+            
         });
     })
 
@@ -109,20 +108,14 @@ async function autoLogin() {
             //no expired, but token is null, user is kick out by others.
             localStorage.clear();
             simplyAlert("You have logged in at another location. Your session has expired.", "red");
-        } else {
-            // let user = localStorage.getItem("user")
-            // if (user != null) {
-            //     user = JSON.parse(user)
-            //     await loginRequest(user.loginName, user.password, 1);
-            // }
-            if (currentSystemType == 'CV') {
+        } else if (currentSystemType == 'CV') {
                 localStorage.setItem("loginPagePath", "mobileCV");
                 window.location.href = '/mobileCV/';
             }else {
                 localStorage.setItem("loginPagePath", "mobilePOC");
                 window.location.href = '/mobilePOC/';
             }
-        }
+        
     }
 }
 

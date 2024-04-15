@@ -10,26 +10,26 @@ const queryActionHistory = async function (params, callback) {
 }
 let historyTaskId = ""
 $(function () {
-    var indentHistoryModal = document.getElementById('indentHistoryModal')
+    let indentHistoryModal = document.getElementById('indentHistoryModal')
     indentHistoryModal.addEventListener('hidden.bs.modal', function (event) {
         if (historyTaskId == "") {
             StartRefreshIndent()
         }
     })
     indentHistoryModal.addEventListener('show.bs.modal', async function (event) {
-        var button = event.relatedTarget
-        var tripId = button.getAttribute('data-bs-trip')
-        var tripNo = button.getAttribute('data-bs-tripno')
+        let button = event.relatedTarget
+        let tripId = button.getAttribute('data-bs-trip')
+        let tripNo = button.getAttribute('data-bs-tripno')
         historyTaskId = button.getAttribute('data-bs-taskid')
         if (historyTaskId == "") {
             StopRefreshIndent()
         }
-        var modalTitle = indentHistoryModal.querySelector('.modal-title')
+        let modalTitle = indentHistoryModal.querySelector('.modal-title')
         modalTitle.textContent = 'View Trip History ' + tripNo
 
         await queryActionHistory({ tripId, historyTaskId }, function (datas) {
-            var modalIndentFlow = indentHistoryModal.querySelector('.modal-indent-flow')
-            var modalDriverFlow = indentHistoryModal.querySelector('.modal-driver-flow')
+            let modalIndentFlow = indentHistoryModal.querySelector('.modal-indent-flow')
+            let modalDriverFlow = indentHistoryModal.querySelector('.modal-driver-flow')
             let content = ``
             for (let row of datas.indentFlow) {
                 let action = row.action.toLowerCase()
@@ -58,13 +58,13 @@ $(function () {
                         <div class="custom-timeline-status custom-timeline-content-action text-capitalize" ${changeHistoryHtml}>${action}</div>
                         <div class="row custom-timeline-content mt-1">
                             <div class="mb-2">
-                                <label class="fw-bold">${username}${role? "("+role+")": ""}</label>
+                                <label class="fw-bold">${username}${role ? "(" + role + ")" : ""}</label>
                             </div>
                             <div class="mb-2">
-                            <label class="fw-bold">${groupName}${contactNumber? "("+contactNumber+")": ""}</label>
+                            <label class="fw-bold">${groupName}${contactNumber ? "(" + contactNumber + ")" : ""}</label>
                             </div>
                             <div class="mb-2">
-                            <label class="fw-bold">${row.email?row.email:""}</label>
+                            <label class="fw-bold">${row.email ? row.email : ""}</label>
                             </div>
                             <div class="mb-2">
                                 <label class="color-time">${createdAt}</label>
@@ -103,28 +103,27 @@ $(function () {
                     let details = ""
                     if (row.action == "Change Status" || row.action == "Reset") {
                         details = `<div class="mb-1">
-                                <label class="fw-bold">${username}${role? "("+role+")": ""}</label>
+                                <label class="fw-bold">${username}${role ? "(" + role + ")" : ""}</label>
                             </div>
                             <div class="mb-1">
-                            <label class="fw-bold">${groupName}${contactNumber? "("+contactNumber+")": ""}</label>
+                            <label class="fw-bold">${groupName}${contactNumber ? "(" + contactNumber + ")" : ""}</label>
+                            </div>`
+                    } else if (row.operatorId != -1) {
+                        details = `<div class="mb-1">
+                                    <label class="fw-bold">${username}${role ? "(" + role + ")" : ""}</label>
+                                </div>
+                                <div class="mb-1">
+                                <label class="fw-bold">${groupName}${contactNumber ? "(" + contactNumber + ")" : ""}</label>
+                                </div>
+                                <div class="mb-1">
+                            <label class="fw-bold">${row.email ? row.email : ""}</label>
                             </div>`
                     } else {
-                        if (row.operatorId != -1) {
-                            details = `<div class="mb-1">
-                                    <label class="fw-bold">${username}${role? "("+role+")": ""}</label>
-                                </div>
-                                <div class="mb-1">
-                                <label class="fw-bold">${groupName}${contactNumber? "("+contactNumber+")": ""}</label>
-                                </div>
-                                <div class="mb-1">
-                            <label class="fw-bold">${row.email?row.email:""}</label>
-                            </div>`
-                        }else {
-                            details = `<div class="mb-1">
+                        details = `<div class="mb-1">
                                     <label class="fw-bold">Third party</label>
                                 </div>`
-                        }
                     }
+
                     statusFlow += `<li class="mt-2 custom-timeline-item custom-timeline-item-${itemClass}">
                         <i class="custom-timeline-axis"></i>
                         <div class="row custom-timeline-content">

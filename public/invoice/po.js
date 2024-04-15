@@ -1,4 +1,4 @@
-var table;
+let table;
             const initTableByMonthly = async function () {
                 table = $('.table-invoice').DataTable({
                     "ordering": false,
@@ -174,32 +174,32 @@ var table;
 
                 filterSearch(1)
 
-                var details = []
-                var invoiceDetailModal = document.getElementById('invoiceDetailModal')
-                var myModal = new bootstrap.Modal(invoiceDetailModal)
+                let details = []
+                let invoiceDetailModal = document.getElementById('invoiceDetailModal')
+                let myModal = new bootstrap.Modal(invoiceDetailModal)
 
                 if (parent.user.roleName === "TSP") {
                     $('.table tbody').on('click', 'td.service-monthly', async function () {
-                        var tr = $(this).closest('tr');
-                        var data = table.row(tr).data();
+                        let tr = $(this).closest('tr');
+                        let data = table.row(tr).data();
 
                         changeNav('OPEN');
                         window.location.href = `../task/1?executionDate=${data.monthly}&requestId=${data.requestId}&serviceProviderId=${data.id}`;
                     });
                 } else {
                     $('.table tbody').on('click', 'td.service-provider-name', async function () {
-                        var tr = $(this).closest('tr');
-                        var data = table.row(tr).data();
+                        let tr = $(this).closest('tr');
+                        let data = table.row(tr).data();
                         details = data.details;
                         myModal.show()
                     });
                 }
 
                 $('.table tbody').on('click', 'td.poNumber', async function () {
-                    var tr = $(this).closest('tr');
-                    var data = table.row(tr).data();
-                    var taskIds = data.taskIds
-                    var poNumber = data.poNumber ?? ""
+                    let tr = $(this).closest('tr');
+                    let data = table.row(tr).data();
+                    let taskIds = data.taskIds
+                    let poNumber = data.poNumber ?? ""
 
                     parent.simplyRemarks(`<div class="p-2">Confirm</div>`, `<div class="p-2"><div>Please input PO Number:</div>
                     <div><input class="form-control" type="text" value="${poNumber}"></div></div>`,

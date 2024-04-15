@@ -12,7 +12,7 @@ $(function () {
 
 ;(function ($, window, document, undefined) {
 
-  var Calendar = function (elem, options) {
+  let Calendar = function (elem, options) {
     this.$calendar = elem;
 
     this.defaults = {
@@ -28,12 +28,12 @@ $(function () {
 
   Calendar.prototype = {
     showHoverInfo: function (obj) {
-      var _dateStr = $(obj).attr('data');
-      var offset_t = $(obj).offset().top + (this.$calendar_today.height() - $(obj).height()) / 2;
-      var offset_l = $(obj).offset().left + $(obj).width();
-      var changeStr = _dateStr.substr(0, 4) + '-' + _dateStr.substr(4, 2) + '-' + _dateStr.substring(6);
-      var _week = changingStr(changeStr).getDay();
-      var _weekStr = '';
+      let _dateStr = $(obj).attr('data');
+      let offset_t = $(obj).offset().top + (this.$calendar_today.height() - $(obj).height()) / 2;
+      let offset_l = $(obj).offset().left + $(obj).width();
+      let changeStr = _dateStr.substr(0, 4) + '-' + _dateStr.substr(4, 2) + '-' + _dateStr.substring(6);
+      let _week = changingStr(changeStr).getDay();
+      let _weekStr = '';
 
       this.$calendar_today.show();
 
@@ -100,17 +100,17 @@ $(function () {
 
         }
       }
-      var self = this;
-      var year = dateObj.getDate().getFullYear();
-      var month = dateObj.getDate().getMonth() + 1;
-      var dateStr = returnDateStr(dateObj.getDate());
-      var firstDay = new Date(year, month - 1, 1);
+      let self = this;
+      let year = dateObj.getDate().getFullYear();
+      let month = dateObj.getDate().getMonth() + 1;
+      let dateStr = returnDateStr(dateObj.getDate());
+      let firstDay = new Date(year, month - 1, 1);
 
       this.$calendarTitle_text.text(year + ' ' + getMonth(Number.parseInt(dateStr.substr(4, 2)) - 1));
 
       this.$calendarDate_item.each(function (i) {
-        var allDay = new Date(year, month - 1, i + 1 - firstDay.getDay());
-        var allDay_str = returnDateStr(allDay);
+        let allDay = new Date(year, month - 1, i + 1 - firstDay.getDay());
+        let allDay_str = returnDateStr(allDay);
 
         // $(this).text(allDay.getDate()).attr('data', allDay_str);
         $(this).html(`<span class="calendar_day_i" style="">${allDay.getDate()}</span>`).attr('data', allDay_str);
@@ -132,25 +132,25 @@ $(function () {
       this.$calendar_today = $('<div class="calendar-today"></div>');
 
 
-      var _titleStr = '<a href="#" class="title"></a>'+
+      let _titleStr = '<a href="#" class="title"></a>'+
                       '<a href="javascript:;" id="backToday">T</a>'+
                       '<div class="arrow">'+
                         '<span class="arrow-prev"><</span>'+
                         '<span class="arrow-next">></span>'+
                       '</div>';
-      var _weekStr = '<li class="item">Sun</li>'+
+                      let _weekStr = '<li class="item">Sun</li>'+
                       '<li class="item">Mon</li>'+
                       '<li class="item">Tus</li>'+
                       '<li class="item">Wed</li>'+
                       '<li class="item">Thur</li>'+
                       '<li class="item">Fri</li>'+
                       '<li class="item">Sat</li>';
-      var _dateStr = '';
-      var _dayStr = '<i class="triangle"></i>'+
+                      let _dateStr = '';
+                      let _dayStr = '<i class="triangle"></i>'+
                     '<p class="date"></p>'+
                     '<p class="week"></p>';
 
-      for (var i = 0; i < 6; i++) {
+      for (let i = 0; i < 6; i++) {
         _dateStr += '<li class="item">26</li>'+
                     '<li class="item">26</li>'+
                     '<li class="item">26</li>'+
@@ -171,7 +171,7 @@ $(function () {
     },
 
     inital: function () {
-      var self = this;
+      let self = this;
 
       this.renderDOM();
 
@@ -187,7 +187,7 @@ $(function () {
 
       if (this.opts.ifSwitch) {
         this.$arrow_prev.bind('click', function () {
-          var _date = dateObj.getDate();
+          let _date = dateObj.getDate();
 
           dateObj.setDate(new Date(_date.getFullYear(), _date.getMonth() - 1, 1));
 
@@ -195,7 +195,7 @@ $(function () {
         });
 
         this.$arrow_next.bind('click', function () {
-          var _date = dateObj.getDate();
+          let _date = dateObj.getDate();
 
           dateObj.setDate(new Date(_date.getFullYear(), _date.getMonth() + 1, 1));
 
@@ -223,15 +223,15 @@ $(function () {
   };
 
   $.fn.calendar = function (options) {
-    var calendar = new Calendar(this, options);
+    let calendar = new Calendar(this, options);
 
     return calendar.inital();
   };
 
 
 
-  var dateObj = (function () {
-    var _date = new Date();
+  let dateObj = (function () {
+    let _date = new Date();
 
     return {
       getDate: function () {
@@ -245,9 +245,9 @@ $(function () {
   })();
 
   function returnDateStr(date) {
-    var year = date.getFullYear();
-    var month = date.getMonth() + 1;
-    var day = date.getDate();
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
 
     month = month <= 9 ? ('0' + month) : ('' + month);
     day = day < 9 ? ('0' + day) : ('' + day);
@@ -256,7 +256,7 @@ $(function () {
   };
 
   function changingStr(fDate) {
-    var fullDate = fDate.split("-");
+    let fullDate = fDate.split("-");
     
     return new Date(fullDate[0], fullDate[1] - 1, fullDate[2]); 
   };

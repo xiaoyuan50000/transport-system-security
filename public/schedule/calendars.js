@@ -1,6 +1,6 @@
 // set calendars
-var type = {'unassigned': '1', 'assigned': '2', 'acknowledged': '3', 'collected': '4', 'started': '5', 'arrived': '6', 'successful': '7', 'failed': '8', 'cancelled': '9'}
-var CalendarList = [
+let type = {'unassigned': '1', 'assigned': '2', 'acknowledged': '3', 'collected': '4', 'started': '5', 'arrived': '6', 'successful': '7', 'failed': '8', 'cancelled': '9'}
+let CalendarList = [
     {
         id: '1',
         name: 'Unassigned',
@@ -94,7 +94,7 @@ var CalendarList = [
 ]
 
 function findCalendar(id) {
-    var found;
+    let found;
 
     CalendarList.forEach(function(calendar) {
         if (calendar.id === id) {

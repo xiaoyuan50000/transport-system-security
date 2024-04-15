@@ -244,16 +244,15 @@
     position: absolute;
     top: 50%;
     right: 8px;
-    margin: -6px 0 0 0
+    margin: -6px 0 0 0;
+    background-position: 0 -30px;
 }
 
 .tui-time-input.tui-has-focus {
     border-color: #aaa
 }
 
-.tui-time-input .tui-ico-time {
-    background-position: 0 -30px
-}
+
 
 .tui-time-input.tui-has-focus .tui-ico-time {
     background-position: 0 -44px

@@ -1,7 +1,7 @@
-var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
-        var brownColorList = ['#754206', '#986122', '#B9803D', '#DA9D58', '#F8B870']
-        var platformColorList = ['#BD8BF8', '#91CC75', '#FAC858', '#EE6666', '#8CC1E3', '#FC8452', '#CA7056', '#CC9E3E', '#D2B99B', '#F0F0F0']
-        var purposeColorList = ['#546FC6', '#73C0DE', '#EE6766', '#90A790']
+let blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
+let brownColorList = ['#754206', '#986122', '#B9803D', '#DA9D58', '#F8B870']
+let platformColorList = ['#BD8BF8', '#91CC75', '#FAC858', '#EE6666', '#8CC1E3', '#FC8452', '#CA7056', '#CC9E3E', '#D2B99B', '#F0F0F0']
+let purposeColorList = ['#546FC6', '#73C0DE', '#EE6766', '#90A790']
         $(async function () {
             initPageSelect()
             await initChartPage($('#unit-select').val(), $('.range-date').val())
@@ -123,9 +123,10 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
             }
             const initTotal = function(numArr){
                 let total = 0;
-                for (var i = 0; i < numArr.length; i++) {
-                    total += Number(numArr[i]);
+                for(let v of numArr){
+                    total += Number(v);
                 }
+                
                 return total
             }
 
@@ -246,6 +247,17 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                     return res.data.data
                 })
             }
+
+            const getServiceTypeName = function(name){
+                if((name.substr(0, 3)).toLowerCase() == 'bus'){
+                    if(name.substr(5, name.length)) {
+                        return name.substr(5, name.length)
+                    } else {
+                        return 'Other'
+                    }
+                }
+                return name
+            }
             const initServiceTypeChart = function (serviceTypeDataList) {
                 let totalService = serviceTypeDataList.map(item => item.total);
                 let totalServiceNum = initTotal(totalService);
@@ -253,7 +265,7 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                 let legenDataList = [];
                 for (let index = 0; index < serviceTypeDataList.length; index++) {
                     let seriesObj = { 
-                        name: (serviceTypeDataList[index].serviceName.substr(0, 3)).toLowerCase() == 'bus' ? serviceTypeDataList[index].serviceName.substr(5, serviceTypeDataList[index].serviceName.length) ? serviceTypeDataList[index].serviceName.substr(5, serviceTypeDataList[index].serviceName.length) : 'Other' : serviceTypeDataList[index].serviceName,
+                        name: getServiceTypeName(serviceTypeDataList[index].serviceName),
                         value: serviceTypeDataList[index].total
                     }
                     if(serviceTypeDataList[index].total > 0){
@@ -360,86 +372,90 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                     return res.data.data
                 })
             }
-            const initServiceTypeByGroupChart = function (serviceTypeDataByGroup) {
-                const initChartData = function(serviceTypeDataByGroup){
-                    let xAxisData = serviceTypeDataByGroup.map(obj => obj.groupName);
-                    let totalData = serviceTypeDataByGroup.map(obj => obj.totalNum);
-                    let seriesList = [];
-                    let dataTotalList = [];
-                    let purposeList = ['Training', 'Admin', 'Ops', 'Exercise'];
-                    for (let index = 0; index < purposeList.length; index++) {
-                        let seriesObj =  {
-                            name: purposeList[index],
-                            type: 'bar',
-                            stack: 'total',
-                            label: {
-                                show: true,
-                                normal: {
-                                    show: true,
-                                    formatter: function (params) {
-                                        if (params.value > 0) {
-                                            return params.value;
-                                        } else {
-                                            return '';
-                                        }
-                                    }
-                                }
-                            },
-                            emphasis: {
-                                focus: 'series'
-                            },
-                            color: purposeColorList[index],
-                        }
-                            
-                        let dataList = [];
-                        for(let xitem of xAxisData){
-                            let newserviceTypeDataByGroup = serviceTypeDataByGroup.filter(obj => obj.groupName == xitem);
-                            newserviceTypeDataByGroup = newserviceTypeDataByGroup[0]
-                            let purposeDataList = newserviceTypeDataByGroup.dataList;
-                            if(purposeDataList.length > 0) {
-                                for(let pitem of purposeDataList){
-                                    if(purposeList[index] == pitem.name) {
-                                        dataList.push(pitem.value)
-                                        dataTotalList.push(0)
-                                    }
-                                }
-                            } else {
-                                dataList.push(0)
-                                dataTotalList.push(0)
-                            }
-                            
-                        }
-                        
-                        seriesObj['data'] = dataList;
-                        seriesList.push(seriesObj)
-                    }
-                    dataTotalList = dataTotalList.splice(0, dataTotalList.length / 4)
-                    let seriesTotalObj = {
-                        name: 'total',
+            const initChartData = function(serviceTypeDataByGroup){
+                let xAxisData = serviceTypeDataByGroup.map(obj => obj.groupName);
+                let totalData = serviceTypeDataByGroup.map(obj => obj.totalNum);
+                let seriesList = [];
+                let dataTotalList = [];
+                let purposeList = ['Training', 'Admin', 'Ops', 'Exercise'];
+                for (let index = 0; index < purposeList.length; index++) {
+                    let seriesObj =  {
+                        name: purposeList[index],
                         type: 'bar',
                         stack: 'total',
                         label: {
                             show: true,
-                            position:'top',
-                            formatter:function (params) {
-                                var index = params.dataIndex;
-                                if (totalData[index] > 0) {
-                                    return totalData[index];
-                                } else {
-                                    return '';
+                            normal: {
+                                show: true,
+                                formatter: function (params) {
+                                    if (params.value > 0) {
+                                        return params.value;
+                                    } else {
+                                        return '';
+                                    }
                                 }
-                            },   
+                            }
                         },
                         emphasis: {
                             focus: 'series'
                         },
-                        color: 'white',
-                        data: dataTotalList
-                    };
-                    seriesList.push(seriesTotalObj)
-
-                    return { xAxisData, seriesList }
+                        color: purposeColorList[index],
+                    }
+                        
+                    let dataList = [];
+                    for(let xitem of xAxisData){
+                        let newserviceTypeDataByGroup = serviceTypeDataByGroup.filter(obj => obj.groupName == xitem);
+                        newserviceTypeDataByGroup = newserviceTypeDataByGroup[0]
+                        let purposeDataList = newserviceTypeDataByGroup.dataList;
+                        if(purposeDataList.length > 0) {
+                            // for(let pitem of purposeDataList){
+                            //     if(purposeList[index] == pitem.name) {
+                            //         dataList.push(pitem.value)
+                            //         dataTotalList.push(0)
+                            //     }
+                            // }
+                            purposeDataList.filter(o=>o.name == purposeList[index]).forEach(item=> {
+                                dataList.push(item.value)
+                                dataTotalList.push(0)
+                            })
+                        } else {
+                            dataList.push(0)
+                            dataTotalList.push(0)
+                        }
+                        
+                    }
+                    
+                    seriesObj['data'] = dataList;
+                    seriesList.push(seriesObj)
                 }
+                dataTotalList = dataTotalList.splice(0, dataTotalList.length / 4)
+                let seriesTotalObj = {
+                    name: 'total',
+                    type: 'bar',
+                    stack: 'total',
+                    label: {
+                        show: true,
+                        position:'top',
+                        formatter:function (params) {
+                            let index = params.dataIndex;
+                            if (totalData[index] > 0) {
+                                return totalData[index];
+                            } else {
+                                return '';
+                            }
+                        },   
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    color: 'white',
+                    data: dataTotalList
+                };
+                seriesList.push(seriesTotalObj)
+
+                return { xAxisData, seriesList }
+            }
+            const initServiceTypeByGroupChart = function (serviceTypeDataByGroup) {
     
                 let myChart = echarts.init(document.querySelector(`.purposeTotalByGroup-chart`));
                 initLoading($('.purposeTotalByGroup-chart'), $('.purposeTotalByGroup-chart div'))
@@ -509,7 +525,7 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                     let newServiceTypeDataByGroup = serviceTypeDataByGroup.filter(item => item.totalNum > 0)
                     newServiceTypeDataByGroup = newServiceTypeDataByGroup.length > 0 ? newServiceTypeDataByGroup : []
                     let allData = initChartData(newServiceTypeDataByGroup)
-                    var newChart = echarts.init(document.querySelector(`.purposeTotalByGroup-all-chart`), null, {
+                    let newChart = echarts.init(document.querySelector(`.purposeTotalByGroup-all-chart`), null, {
                         width: newServiceTypeDataByGroup.length * 90 > 300 ? newServiceTypeDataByGroup.length * 90 : 300
                     });
                     
@@ -652,7 +668,7 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                     newAddlateIndentDataByGroup = newAddlateIndentDataByGroup.length > 0 ? newAddlateIndentDataByGroup : [];
                     let xAxisData2 = newAddlateIndentDataByGroup.map(item => item.groupName)
                     let seriesData2 = newAddlateIndentDataByGroup.map(item => item.total)    
-                    var newChart = echarts.init(document.querySelector(`.addLateIndentByGroup-all-chart`), null, {
+                    let newChart = echarts.init(document.querySelector(`.addLateIndentByGroup-all-chart`), null, {
                         width: newAddlateIndentDataByGroup.length * 90 > 300 ?  newAddlateIndentDataByGroup.length * 90 : 300
                     });
                     initLoading($('.addLateIndentByGroup-all-chart'), $('.addLateIndentByGroup-all-chart div'))
@@ -852,24 +868,24 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                     return res.data.data
                 })
             }
+            const getChartData = function (moneyIndentDataByServiceType){
+                let xAxisData = moneyIndentDataByServiceType.map(item => item.serviceName)
+                let totalData = moneyIndentDataByServiceType.map(item => item.total)
+                let seriesData = []
+                for (let index = 0; index < totalData.length; index++) {
+                    seriesData.push(
+                        {
+                            value: totalData[index],
+                            itemStyle: {
+                                color: platformColorList[index]
+                            }
+                        }
+                    )
+                }
+                return { xAxisData, totalData, seriesData }
+            }
             let moneyIndentDataByServiceType = await getExpenditureByPlatform(dataType, currentDate)
             const initPlatformExpenditureChart = function (moneyIndentDataByServiceType) {
-                const getChartData = function (moneyIndentDataByServiceType){
-                    let xAxisData = moneyIndentDataByServiceType.map(item => item.serviceName)
-                    let totalData = moneyIndentDataByServiceType.map(item => item.total)
-                    let seriesData = []
-                    for (let index = 0; index < totalData.length; index++) {
-                        seriesData.push(
-                            {
-                                value: totalData[index],
-                                itemStyle: {
-                                    color: platformColorList[index]
-                                }
-                            }
-                        )
-                    }
-                    return { xAxisData, totalData, seriesData }
-                }
                 let myChart = echarts.init(document.querySelector(`.moneyServiceType1-chart`));
                 initLoading($('.moneyServiceType1-chart'), $('.moneyServiceType1-chart div'))
                 let chartData1 = getChartData(moneyIndentDataByServiceType);
@@ -894,7 +910,7 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                                 fontSize: 9
                             } ,
                             formatter: function (params) {
-                                params = (params.substr(0, 3)).toLowerCase() == 'bus' ? params.substr(5, params.length) ? params.substr(5, params.length) : 'Other' : params;
+                                params = getServiceTypeName(params);
                                 return params.length > 20 ? `${params.substr(0, 20)}...` : params;
                             },
                         },
@@ -907,13 +923,12 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                         alignTicks: true,
                         axisLabel: {
                             formatter: function(value, index){
-                                let thousand = value;
                                 if (value >= 1000) {
-                                    thousand = value / 1000 + 'k';
+                                    value = value / 1000 + 'k';
                                 } else {
-                                    thousand = value
+                                    value = value
                                 }
-                                return '$'+thousand;
+                                return '$'+value;
 
                             }
                         }
@@ -929,13 +944,11 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                                 fontWeight: 600,
                                 formatter: function (params) {
                                     if (params.value > 0) {
-                                        let thousand = params.value;
                                         if (params.value >= 1000) {
-                                            thousand = params.value / 1000 + 'k';
+                                            return '$'+params.value / 1000 + 'k';
                                         } else {
-                                            thousand = params.value
+                                            return '$'+params.value
                                         }
-                                        return '$'+thousand;
                                     } else {
                                         return '';
                                     }
@@ -980,7 +993,7 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                                     fontSize: 9
                                 } ,
                                 formatter: function (params) {
-                                    params = (params.substr(0, 3)).toLowerCase() == 'bus' ? params.substr(5, params.length) ? params.substr(5, params.length) : 'Other' : params;
+                                    params = getServiceTypeName(params);
                                     return params;
                                 },
                             },
@@ -993,13 +1006,12 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                             alignTicks: true,
                             axisLabel: {
                                 formatter: function(value, index){
-                                    let thousand = value;
                                     if (value >= 1000) {
-                                        thousand = value / 1000 + 'k';
+                                        value = value / 1000 + 'k';
                                     } else {
-                                        thousand = value
+                                        value = value
                                     }
-                                    return '$'+thousand;
+                                    return '$'+value;
                                 }
                             }
                         }],
@@ -1014,13 +1026,10 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                                     fontWeight: 600,
                                     formatter: function (params) {
                                         if (params.value > 0) {
-                                            let thousand = params.value;
                                             if (params.value >= 1000) {
-                                                thousand = params.value / 1000 + 'k';
-                                            } else {
-                                                thousand = params.value
-                                            }
-                                            return '$'+thousand;
+                                                return '$'+params.value / 1000 + 'k';
+                                            } 
+                                            return '$'+params.value;
                                         } else {
                                             return '';
                                         }
@@ -1041,23 +1050,9 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
             }
             if($('#unit-select').val() != 'Non-Bus') initPlatformExpenditureChart(moneyIndentDataByServiceType)
 
+            
             const initPlatformExpenditureChart2 = function (moneyIndentDataByServiceType) {
-                const getChartData = function (moneyIndentDataByServiceType){
-                    let xAxisData = moneyIndentDataByServiceType.map(item => item.serviceName)
-                    let totalData = moneyIndentDataByServiceType.map(item => item.total)
-                    let seriesData = []
-                    for (let index = 0; index < totalData.length; index++) {
-                        seriesData.push(
-                            {
-                                value: totalData[index],
-                                itemStyle: {
-                                    color: platformColorList[index]
-                                }
-                            }
-                        )
-                    }
-                    return { xAxisData, totalData, seriesData }
-                }
+                
                 let myChart = echarts.init(document.querySelector(`.moneyServiceType2-chart`));
                 initLoading($('.moneyServiceType2-chart'), $('.moneyServiceType2-chart div'))
                 let chartData1 = getChartData(moneyIndentDataByServiceType)
@@ -1091,13 +1086,10 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                         alignTicks: true,
                         axisLabel: {
                             formatter: function(value, index){
-                                let thousand = value;
                                 if (value >= 1000) {
-                                    thousand = value / 1000 + 'k';
-                                } else {
-                                    thousand = value
-                                }
-                                return '$'+thousand;
+                                    value = value / 1000 + 'k';
+                                } 
+                                return '$'+value;
 
                             }
                         }
@@ -1113,13 +1105,10 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                                 fontWeight: 600,
                                 formatter: function (params) {
                                     if (params.value > 0) {
-                                        let thousand = params.value;
                                         if (params.value >= 1000) {
-                                            thousand = params.value / 1000 + 'k';
-                                        } else {
-                                            thousand = params.value
+                                            return '$'+params.value / 1000 + 'k';
                                         }
-                                        return '$'+thousand;
+                                        return '$'+params.value;
                                     } else {
                                         return '';
                                     }
@@ -1172,13 +1161,10 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                             alignTicks: true,
                             axisLabel: {
                                 formatter: function(value, index){
-                                    let thousand = value;
                                     if (value >= 1000) {
-                                        thousand = value / 1000 + 'k';
-                                    } else {
-                                        thousand = value
-                                    }
-                                    return '$'+thousand;
+                                        value = value / 1000 + 'k';
+                                    } 
+                                    return '$'+value;
                                 }
                             }
                         }],
@@ -1193,13 +1179,10 @@ var blueColorList = ['#0A3179', '#2B539F', '#3D65B0', '#5B86D7', '#76A2F5']
                                     fontWeight: 600,
                                     formatter: function (params) {
                                         if (params.value > 0) {
-                                            let thousand = params.value;
                                             if (params.value >= 1000) {
-                                                thousand = params.value / 1000 + 'k';
-                                            } else {
-                                                thousand = params.value
+                                                return '$'+params.value / 1000 + 'k';
                                             }
-                                            return '$'+thousand;
+                                            return '$'+params.value;
                                         } else {
                                             return '';
                                         }

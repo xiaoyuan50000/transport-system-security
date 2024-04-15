@@ -1,9 +1,9 @@
-var table = null;
+
 const dateFmt = 'DD/MM/YYYY'
 
 const InitDateSelector = function (elem) {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         laydate.render({
             elem: elem,
             lang: 'en',
@@ -58,9 +58,9 @@ const noSecond = function () {
 
 const InputPositiveInteger = function (val) {
     return val
-        .replace(/^0[0-9]+/, val => val[1])
-        .replace(/^(\.)+/, '')
+        .replace(/^0+/, '')
+        .replace(/^\./g, '')
         .replace(/[^\d.]/g, '')
-        .replace(/\.+/, '')
-        .replace(/^(\-)*(\d+)*$/, '$1$2');
+        .replace(/\./g, '.')
+        .replace(/^(-)?(\d+)*$/, '$1$2');
 }

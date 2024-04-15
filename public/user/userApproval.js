@@ -13,7 +13,7 @@ $(function () {
     })
     InitPendingApprovalNumber()
 })
-var dateFormat1 = "DD/MM/YYYY HH:mm";
+let dateFormat1 = "DD/MM/YYYY HH:mm";
 
 const InitPendingApprovalNumber = async function () {
     if (["RF", "CM", "RA"].indexOf(top.user.roleName) != -1) {

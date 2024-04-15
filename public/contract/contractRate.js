@@ -1,5 +1,5 @@
-var tableRate = null
-var roleName = top.user.roleName
+let tableRate = null
+let roleName = top.user.roleName
 $(function () {
     chargeBtnListening()
     initContractRateTableListPage()

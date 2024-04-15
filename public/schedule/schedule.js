@@ -7,8 +7,8 @@
 // let ScheduleList = [], generateSchedule = [];
 
 (function(window, Calendar) {
-    var cal, resizeThrottled;
-    var selectedCalendar;
+    let cal, resizeThrottled;
+    let selectedCalendar;
     cal = new Calendar('#calendar', {
         defaultView: 'month',
         useCreationPopup: false,
@@ -60,8 +60,8 @@
             console.log('beforeCreateSchedule', e);
         },
         'beforeUpdateSchedule': function(e) {
-            var schedule = e.schedule;
-            var changes = e.changes;
+            let schedule = e.schedule;
+            let changes = e.changes;
 
             console.log('beforeUpdateSchedule', e);
 
@@ -77,8 +77,8 @@
             cal.deleteSchedule(e.schedule.id, e.schedule.calendarId);
         },
         'afterRenderSchedule': function(e) {
-            var schedule = e.schedule;
-            // var element = cal.getElement(schedule.id, schedule.calendarId);
+            let schedule = e.schedule;
+            // let element = cal.getElement(schedule.id, schedule.calendarId);
             // console.log('afterRenderSchedule', element);
         },
         'clickTimezonesCollapseBtn': function(timezonesCollapsed) {
@@ -105,10 +105,10 @@
      * @param {Event} e - click event
      */
     function onClickMenu(e) {
-        var target = $(e.target).closest('a[role="menuitem"]')[0];
-        var action = getDataAction(target);
-        var options = cal.getOptions();
-        var viewName = 'month';
+        let target = $(e.target).closest('a[role="menuitem"]')[0];
+        let action = getDataAction(target);
+        let options = cal.getOptions();
+        let viewName = 'month';
 
         console.log(target);
         console.log(action);
@@ -148,7 +148,7 @@
     }*/
 
     function onClickNavi(e) {
-        var action = getDataAction(e.target);
+        let action = getDataAction(e.target);
 
         switch (action) {
             case 'move-prev':
@@ -168,15 +168,15 @@
     }
 
     function onChangeNewScheduleCalendar(e) {
-        var target = $(e.target).closest('a[role="menuitem"]')[0];
-        var calendarId = getDataAction(target);
+        let target = $(e.target).closest('a[role="menuitem"]')[0];
+        let calendarId = getDataAction(target);
         changeNewScheduleCalendar(calendarId);
     }
 
     function changeNewScheduleCalendar(calendarId) {
-        var calendarNameElement = document.getElementById('calendarName');
-        var calendar = findCalendar(calendarId);
-        var html = [];
+        let calendarNameElement = document.getElementById('calendarName');
+        let calendar = findCalendar(calendarId);
+        let html = [];
 
         html.push('<span class="calendar-bar" style="background-color: ' + calendar.bgColor + '; border-color:' + calendar.borderColor + ';"></span>');
         html.push('<span class="calendar-name">' + calendar.name + '</span>');
@@ -187,17 +187,17 @@
     }
 
     function onChangeCalendars(e) {
-        var calendarId = e.target.value;
-        var checked = e.target.checked;
-        var viewAll = document.querySelector('.lnb-calendars-item input');
-        var calendarElements = Array.prototype.slice.call(document.querySelectorAll('#calendarList input'));
-        var allCheckedCalendars = true;
+        let calendarId = e.target.value;
+        let checked = e.target.checked;
+        let viewAll = document.querySelector('.lnb-calendars-item input');
+        let calendarElements = Array.prototype.slice.call(document.querySelectorAll('#calendarList input'));
+        let allCheckedCalendars = true;
         
         if (calendarId === 'all') {
             allCheckedCalendars = checked;
             
             calendarElements.forEach(function(input) {
-                var span = input.parentNode;
+                let span = input.parentNode;
                 input.checked = checked;
                 span.style.backgroundColor = checked ? span.style.borderColor : 'transparent';
             });
@@ -223,7 +223,7 @@
     }
 
     function refreshScheduleVisibility() {
-        var calendarElements = Array.prototype.slice.call(document.querySelectorAll('#calendarList input'));
+        let calendarElements = Array.prototype.slice.call(document.querySelectorAll('#calendarList input'));
 
         // CalendarList.forEach(function(calendar) {
         //     cal.toggleSchedules(calendar.id, !calendar.checked, false);
@@ -234,16 +234,16 @@
         cal.render(true);
 
         calendarElements.forEach(function(input) {
-            var span = input.nextElementSibling;
+            let span = input.nextElementSibling;
             span.style.backgroundColor = input.checked ? span.style.borderColor : 'transparent';
         });
     }
 
     function setDropdownCalendarType(action) {
-        var calendarTypeName = document.getElementById('calendarTypeName');
-        var calendarTypeIcon = document.getElementById('calendarTypeIcon');
-        var type = 'Monthly';
-        var iconClassName = 'calendar-icon ic_view_month';
+        let calendarTypeName = document.getElementById('calendarTypeName');
+        let calendarTypeIcon = document.getElementById('calendarTypeIcon');
+        let type = 'Monthly';
+        let iconClassName = 'calendar-icon ic_view_month';
 
         if (action === 'toggle-weekly') {
             type = 'Weekly';
@@ -255,17 +255,17 @@
     }
 
     function currentCalendarDate(format) {
-      var currentDate = moment([cal.getDate().getFullYear(), cal.getDate().getMonth(), cal.getDate().getDate()]);
+      let currentDate = moment([cal.getDate().getFullYear(), cal.getDate().getMonth(), cal.getDate().getDate()]);
 
       return currentDate.format(format);
     }
 
     function setRenderRangeText() {
-        var renderRange = document.getElementById('renderRange');
-        var options = cal.getOptions();
-        var viewName = cal.getViewName();
+        let renderRange = document.getElementById('renderRange');
+        let options = cal.getOptions();
+        let viewName = cal.getViewName();
 
-        var html = [];
+        let html = [];
         if (viewName === 'day') {
             html.push(currentCalendarDate('YYYY.MM.DD'));
         } else if (viewName === 'month' &&

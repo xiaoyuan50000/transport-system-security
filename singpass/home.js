@@ -16,7 +16,7 @@ const config = require('../lib/config')
 function index(_req, res) {
   let sysType = _req.query.sysType
   const authUrl = {}
-  var temp = ""
+  let temp = ""
   for (const [env, baseurl] of Object.entries(config.baseUrls)) {
 
     temp = `${baseurl}/v1/oauth/authorize?response_type=code&client_id=${clientId}&scope=${scopes}&redirect_uri=${redirectURL}/callback&nonce=randomnonce&state=${env}`
@@ -39,7 +39,7 @@ function index(_req, res) {
 module.exports = index
 
 module.exports.mobileSingpass =  async function (req, res) {
-  var temp = ""
+  let temp = ""
   for (const [env, baseurl] of Object.entries(config.baseUrls)) {
     temp = `${baseurl}/v1/oauth/authorize?response_type=code&client_id=${clientId}&scope=${scopes}&redirect_uri=${redirectURL}/mobile-callback&nonce=randomnonce&state=${env}`
   }

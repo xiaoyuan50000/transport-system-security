@@ -158,8 +158,6 @@ if (!fs.existsSync(invoicePath)) fs.mkdirSync(invoicePath);
 /**
  * Init ActiveMQ Client
  */
- setTimeout(function () {
-     ActiveMQ.initActiveMQ();
- },100);
+ActiveMQ.initActiveMQ();
  
 module.exports = app;

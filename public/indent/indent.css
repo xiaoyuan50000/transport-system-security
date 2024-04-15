@@ -1,6 +1,5 @@
 body,
 html {
-    /* height: 100%; */
     font-size: clamp(1rem, 0.84rem + 0.2vw, 1rem) !important;
 }
 
@@ -23,7 +22,6 @@ html {
     right: 0px;
     background-color: white;
     border-left: 1px solid #F3F3F3;
-    /* text-align: left; */
 }
 
 .auto-wrap {
@@ -39,11 +37,7 @@ html {
     min-height: calc(100% - 80px);
 }
 
-/* .new-indent-btn {
-    width: 180px;
-    height: 40px;
-    border-radius: 20px;
-} */
+
 
 .shadow {
     box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
@@ -145,7 +139,6 @@ html {
 
 .rsp-select,
 .status-select {
-    /* font-size: 14px; */
     width: auto;
 }
 
@@ -171,30 +164,13 @@ html {
     font-size: 14px !important;
 }
 
-/* .table>:not(:first-child) {
-    border-top: 0px solid currentColor;
-}
 
-table tbody {
-    display: block;
-    max-height: 676px;
-    overflow-y: scroll;
-}
-
-table thead,
-tbody tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-}
-
-table thead {
-    width: calc(100% - 1em)
-} */
 
 td.details-control {
     background: url('/images/indent/expand.svg') no-repeat center center;
     cursor: pointer;
+    width: 1% !important;
+
 }
 
 tr.shown td.details-control {
@@ -323,9 +299,7 @@ td.firstCol {
     text-align: center;
 }
 
-td.details-control {
-    width: 1% !important;
-}
+
 
 td.indentIdCol {
     width: 7% !important;

@@ -1,10 +1,10 @@
-var user = parent.user;
-var roleName = user.roleName;
-var table
-// var needInitDateEle = [];
-var lastOptTask = [];
-var mobiusSubUnits = [];
-var hubNodeList = []
+let user = parent.user;
+let roleName = user.roleName;
+let table
+// let needInitDateEle = [];
+let lastOptTask = [];
+let mobiusSubUnits = [];
+let hubNodeList = []
 
 $(function () {
     $("#execution-date").val(`${moment().format("DD/MM/YYYY")} ~ ${moment().add(5, 'd').format("DD/MM/YYYY")}`)
@@ -111,15 +111,14 @@ $(function () {
                             if (full.repeats == 'Period') {
                                 return `<div>Period</div>
                                     <div>${moment(full.startDate).format("DD/MM/YYYY HH:mm")}</div>`
+                            } else if (full.duration) {
+                                return `<div>Once(Duration ${full.duration}hr)</div>
+                                        <div>${moment(full.startDate).format("DD/MM/YYYY HH:mm")}</div>`
                             } else {
-                                if (full.duration) {
-                                    return `<div>Once(Duration ${full.duration}hr)</div>
+                                return `<div>Once(no duration)</div>
                                         <div>${moment(full.startDate).format("DD/MM/YYYY HH:mm")}</div>`
-                                } else {
-                                    return `<div>Once(no duration)</div>
-                                        <div>${moment(full.startDate).format("DD/MM/YYYY HH:mm")}</div>`
-                                }
                             }
+
                         } else {
                             return moment(data).format("DD/MM/YYYY HH:mm");
                         }
@@ -133,13 +132,12 @@ $(function () {
                 "render": function (data, type, full, meta) {
                     if (full.externalJobId) {
                         return data;
+                    } else if (full.tripStatus.indexOf('Pending') != -1) {
+                        return "Pending Approval";
                     } else {
-                        if (full.tripStatus.indexOf('Pending') != -1) {
-                            return "Pending Approval";
-                        } else {
-                            return full.tripStatus;
-                        }
+                        return full.tripStatus;
                     }
+
                 }
             },
             {
@@ -563,7 +561,6 @@ const CancelDriver = function (e) {
 }
 
 const EditDriver = function (e) {
-    let actionCell = $(e).data("cell");
     let row = table.row($(e).data("row")).data();
     let taskId = row.taskId
     let executionDate = moment(row.startDate).format("DD/MM/YYYY")
@@ -609,7 +606,8 @@ const EditDriver = function (e) {
         });
     }
 
-    const SaveEditDriver = async function (taskId, poc, pocMobileNumber, executionDate, executionTime, duration, newTsp, startDate, endDate) {
+    const SaveEditDriver = async function (data) {
+        let {taskId, poc, pocMobileNumber, executionDate, executionTime, duration, newTsp, startDate, endDate} = data
         await axios.post("/indent/editDriver", {
             taskId: taskId,
             poc: poc,
@@ -747,15 +745,18 @@ const EditDriver = function (e) {
                             return false;
                         }
                     }
-                    if(executionDate && !moment(executionDate, "YYYY-MM-DD", true).isValid()){
+                    if (executionDate && !moment(executionDate, "YYYY-MM-DD", true).isValid()) {
                         simplyAlert('Execution Date is invalid!');
                         return false
                     }
-                    if(executionTime && !moment(executionTime, "HH:mm", true).isValid()){
+                    if (executionTime && !moment(executionTime, "HH:mm", true).isValid()) {
                         simplyAlert('Execution Time is invalid!');
                         return false
                     }
-                    SaveEditDriver(taskId, poc, pocMobileNumber, executionDate, executionTime, duration, newTsp, null, null)
+                    let data = {
+                        taskId, poc, pocMobileNumber, executionDate, executionTime, duration, newTsp, startDate: null, endDate: null
+                    }
+                    SaveEditDriver(data)
                 }
             }
         )
@@ -834,7 +835,10 @@ const EditDriver = function (e) {
                         return false;
                     }
 
-                    SaveEditDriver(taskId, poc, pocMobileNumber, null, null, null, null, startDate, endDate)
+                    let data = {
+                        taskId, poc, pocMobileNumber, executionDate: null, executionTime: null, duration: null, newTsp: null, startDate, endDate
+                    }
+                    SaveEditDriver(data)
                 }
             }
         )
@@ -921,7 +925,6 @@ const updateTaskState = async function (taskId, optType, eleId, justification) {
             operationTime: optTime,
             optType: optType
         }).then(res => {
-            let data = res.data.data;
             if (res.data.code == 2) {
                 simplyAlert("The task has been canceled !", 'red');
             }

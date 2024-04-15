@@ -1,5 +1,5 @@
-var unitDatas;
-var occ = ["OCC Mgr"]
+let unitDatas;
+let occ = ["OCC Mgr"]
 
 $(async function () {
     let elemIds = ['#execution-date', '#created-date']

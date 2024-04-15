@@ -1,9 +1,9 @@
-var MaskUtil = function(){
-    var $mask;
-    var $maskMsg = 'Loading...';
+let MaskUtil = function(){
+    let $mask;
+    let $maskMsg = 'Loading...';
     function init(){
         if(!$mask){
-            var data = `<div class="modal fade" id="myWaitingModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+            let data = `<div class="modal fade" id="myWaitingModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
               <div class="modal-dialog modal-sm modal-dialog-centered w-25">
                 <div class="modal-content" style="background: none; border: none;">
                   <div class="modal-body">

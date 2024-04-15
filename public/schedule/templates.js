@@ -40,7 +40,7 @@ function getTimeTemplate(schedule, isAllDay) {
     // html.push('<label style="color: white">' + schedule.title + '</label> ');
     let body = schedule.body
     let number = body.length
-    for(var i = 0; i < number;i++){
+    for(let i = 0; i < number;i++){
         let state = body[i].state.toLowerCase();
         html.push(`<div style="float:left; background-color: ${Colors["status"][state]}; width: 15px; height: 15px; border-radius: 15px; margin-right: 3px;"></div>`);
     }
@@ -48,7 +48,7 @@ function getTimeTemplate(schedule, isAllDay) {
     return html.join('');
 }
 
-var templates = {
+let templates = {
     popupIsAllDay: function () {
         return 'All Day';
     },
@@ -131,7 +131,7 @@ var templates = {
     }
 };
 
-var COMMON_CUSTOM_THEME = {
+let COMMON_CUSTOM_THEME = {
     // 'common.border': '1px solid #e5e5e5',
     'common.backgroundColor': 'white',
     'common.holiday.color': '#333',
@@ -157,4 +157,4 @@ var COMMON_CUSTOM_THEME = {
     'month.schedule.marginRight': '2px',
 };
 
-var daynames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+let daynames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];

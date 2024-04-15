@@ -1,4 +1,4 @@
-var tableDetail = null;
+let tableDetail = null;
 $(function () {
     initTableListPage()
 });

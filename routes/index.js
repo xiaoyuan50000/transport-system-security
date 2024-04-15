@@ -273,6 +273,8 @@ router.post('/endorse/confirmEndorse', endorseService.Endorse);
 router.post('/endorse/submitComment', endorseService.SubmitComment);
 router.post('/endorse/getCommentByTaskId', endorseService.GetCommentByTaskId);
 
+router.post('/checkUCORestricted', indentService2.checkUCORestricted);
+
 // Arbitration
 router.post('/getAllArbitration', arbitrationService.GetAllArbitration);
 

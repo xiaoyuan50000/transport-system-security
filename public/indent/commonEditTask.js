@@ -1,4 +1,4 @@
-const editTaskTime = function(e) {
+const editTaskTime = function (e) {
     let actionCell = $(e).data("cell");
     let row = table.row($(e).data("row")).data();
     let taskId = row.taskId
@@ -55,37 +55,42 @@ const editTaskTime = function(e) {
             if (serviceModeValue != 'delivery' && serviceModeValue != 'ferry service') {
                 taskTimeList.endTime = parent.changeDateFormat($this.$content.find('input[name="endTime"]').val());
             }
-            
-            if(taskTimeList.arrivalTime && !moment(taskTimeList.arrivalTime, "YYYY-MM-DD HH:mm", true).isValid()){
-                simplyAlert('Arrive Time is invalid!');
-                return
-            }
-            if(taskTimeList.departTime && !moment(taskTimeList.departTime, "YYYY-MM-DD HH:mm", true).isValid()){
-                simplyAlert('Depart Time is invalid!');
-                return
-            }
-            if(taskTimeList.endTime && !moment(taskTimeList.endTime, "YYYY-MM-DD HH:mm", true).isValid()){
-                simplyAlert('End Time is invalid!');
-                return
-            }
-            if(taskTimeList.notifiedTime && !moment(taskTimeList.notifiedTime, "YYYY-MM-DD HH:mm", true).isValid()){
-                simplyAlert('TSP Notified Time is invalid!');
-                return
-            }
-            if(taskTimeList.amendmentTime && !moment(taskTimeList.amendmentTime, "YYYY-MM-DD HH:mm", true).isValid()){
-                simplyAlert('TSP Amendment Notified Time is invalid!');
-                return
-            }
-            if(taskTimeList.cancellationTime && !moment(taskTimeList.cancellationTime, "YYYY-MM-DD HH:mm", true).isValid()){
-                simplyAlert('TSP Cancellation Notified Time is invalid!');
+            if (!validEditTaskDate(taskTimeList)) {
                 return
             }
             SaveEditTaskTime(taskId, taskTimeList)
         })
 }
 
+const validEditTaskDate = function (taskTimeList) {
+    if (taskTimeList.arrivalTime && !moment(taskTimeList.arrivalTime, "YYYY-MM-DD HH:mm", true).isValid()) {
+        simplyAlert('Arrive Time is invalid!');
+        return false
+    }
+    if (taskTimeList.departTime && !moment(taskTimeList.departTime, "YYYY-MM-DD HH:mm", true).isValid()) {
+        simplyAlert('Depart Time is invalid!');
+        return false
+    }
+    if (taskTimeList.endTime && !moment(taskTimeList.endTime, "YYYY-MM-DD HH:mm", true).isValid()) {
+        simplyAlert('End Time is invalid!');
+        return false
+    }
+    if (taskTimeList.notifiedTime && !moment(taskTimeList.notifiedTime, "YYYY-MM-DD HH:mm", true).isValid()) {
+        simplyAlert('TSP Notified Time is invalid!');
+        return false
+    }
+    if (taskTimeList.amendmentTime && !moment(taskTimeList.amendmentTime, "YYYY-MM-DD HH:mm", true).isValid()) {
+        simplyAlert('TSP Amendment Notified Time is invalid!');
+        return false
+    }
+    if (taskTimeList.cancellationTime && !moment(taskTimeList.cancellationTime, "YYYY-MM-DD HH:mm", true).isValid()) {
+        simplyAlert('TSP Cancellation Notified Time is invalid!');
+        return false
+    }
+    return true
+}
 
-const initEditTaskTimePage = function($pageContent, task, actionCell) {
+const initEditTaskTimePage = function ($pageContent, task, actionCell) {
     let option = {
         elem: '',
         lang: 'en',
@@ -95,22 +100,22 @@ const initEditTaskTimePage = function($pageContent, task, actionCell) {
         // format: 'yyyy-MM-dd HH:mm',
         format: 'dd/MM/yyyy HH:mm',
         btns: ['clear', 'confirm'],
-        ready: () => {},
+        ready: () => { },
         done: function (value, date, endDate) {
         },
     };
     if ((roleName == "RF" || roleName == OCCMGR) && actionCell == 'tspTime') {
         $pageContent.find('.rf-time-div').show();
         layui.use(['laydate'], function () {
-            laydate = layui.laydate;
-            option.elem="#tspNotifiedTime";
-            option.value=task.notifiedTime ? new Date(moment(task.notifiedTime).format('YYYY-MM-DD HH:mm')) : '';
-            var notifiedDateLay = laydate.render(option);
-            option.elem="#tspAmendmentNotifiedTime";
-            option.value=task.tspChangeTime ? new Date(moment(task.tspChangeTime).format('YYYY-MM-DD HH:mm')) : '';
-            var tspChangeDateLay = laydate.render(option);
-            option.elem="#tspCancellationNotifiedTime";
-            option.value=task.cancellationTime ? new Date(moment(task.cancellationTime).format('YYYY-MM-DD HH:mm')) : '';
+            let laydate = layui.laydate;
+            option.elem = "#tspNotifiedTime";
+            option.value = task.notifiedTime ? new Date(moment(task.notifiedTime).format('YYYY-MM-DD HH:mm')) : '';
+            laydate.render(option);
+            option.elem = "#tspAmendmentNotifiedTime";
+            option.value = task.tspChangeTime ? new Date(moment(task.tspChangeTime).format('YYYY-MM-DD HH:mm')) : '';
+            laydate.render(option);
+            option.elem = "#tspCancellationNotifiedTime";
+            option.value = task.cancellationTime ? new Date(moment(task.cancellationTime).format('YYYY-MM-DD HH:mm')) : '';
             laydate.render(option);
         });
     }
@@ -121,19 +126,19 @@ const initEditTaskTimePage = function($pageContent, task, actionCell) {
     let serviceModeValue = task.serviceMode.toLowerCase()
     layui.use(['laydate'], function () {
         laydate = layui.laydate;
-        option.elem="#arriveTime";
-        option.value=task.arrivalTime ? new Date(moment(task.arrivalTime).format('YYYY-MM-DD HH:mm')) : '';
+        option.elem = "#arriveTime";
+        option.value = task.arrivalTime ? new Date(moment(task.arrivalTime).format('YYYY-MM-DD HH:mm')) : '';
         laydate.render(option);
         if (serviceModeValue != 'pickup' && serviceModeValue != 'ferry service') {
             $pageContent.find('.departTime-div').show();
-            option.elem="#departTime";
-            option.value=task.departTime ? new Date(moment(task.departTime).format('YYYY-MM-DD HH:mm')) : '';
+            option.elem = "#departTime";
+            option.value = task.departTime ? new Date(moment(task.departTime).format('YYYY-MM-DD HH:mm')) : '';
             laydate.render(option);
         }
         if (serviceModeValue != 'delivery' && serviceModeValue != 'ferry service') {
             $pageContent.find('.endTime-div').show();
-            option.elem="#endTime";
-            option.value= task.endTime ? new Date(moment(task.endTime).format('YYYY-MM-DD HH:mm')) : '';
+            option.elem = "#endTime";
+            option.value = task.endTime ? new Date(moment(task.endTime).format('YYYY-MM-DD HH:mm')) : '';
             laydate.render(option);
         }
     });

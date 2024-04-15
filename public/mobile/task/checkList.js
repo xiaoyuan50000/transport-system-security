@@ -4,7 +4,7 @@ let isEditCheckInfo = false;
 $(async function () {
 	currentTaskId = getParams('taskId');
 
-	var $tooneSignature = $("#tooneSignature");
+	let $tooneSignature = $("#tooneSignature");
 	$tooneSignature.jSignature({
 		"height": 'inherit',
 		"width": 'inherit',
@@ -15,7 +15,7 @@ $(async function () {
 		$tooneSignature.jSignature("clear");
 	});
 
-	var $tloneSignature = $("#tloneSignature");
+	let $tloneSignature = $("#tloneSignature");
 	$tloneSignature.jSignature({
 		"height": 'inherit',
 		"width": 'inherit',
@@ -27,7 +27,7 @@ $(async function () {
 	});
 
 
-	var $hoUnitSignature = $("#hoUnitSignature");
+	let $hoUnitSignature = $("#hoUnitSignature");
 	$hoUnitSignature.jSignature({
 		"height": 'inherit',
 		"width": 'inherit',
@@ -38,7 +38,7 @@ $(async function () {
 		$hoUnitSignature.jSignature("clear");
 	});
 
-	var $toTendererSignature = $("#toTendererSignature");
+	let $toTendererSignature = $("#toTendererSignature");
 	$toTendererSignature.jSignature({
 		"height": 'inherit',
 		"width": 'inherit',
@@ -49,7 +49,7 @@ $(async function () {
 		$toTendererSignature.jSignature("clear");
 	});
 
-	var $hoTendererSignature = $("#hoTendererSignature");
+	let $hoTendererSignature = $("#hoTendererSignature");
 	$hoTendererSignature.jSignature({
 		"height": 'inherit',
 		"width": 'inherit',
@@ -60,7 +60,7 @@ $(async function () {
 		$hoTendererSignature.jSignature("clear");
 	});
 
-	var $toUnitSignature = $("#toUnitSignature");
+	let $toUnitSignature = $("#toUnitSignature");
 	$toUnitSignature.jSignature({
 		"height": 'inherit',
 		"width": 'inherit',
@@ -80,13 +80,13 @@ $(async function () {
 				isEditCheckInfo = true;
 				if (pocCheckData.formOneData && pocCheckData.formTwoData) {
 					let formOneDataBytes = await pocCheckData.formOneData.data;
-					var formOneDataDataString = "";
-					for (var i = 0; i < formOneDataBytes.length; i++) {
+					let formOneDataDataString = "";
+					for (let i = 0; i < formOneDataBytes.length; i++) {
 						formOneDataDataString += String.fromCharCode(formOneDataBytes[i]);
 					}
 					let formTwoDataBytes = await pocCheckData.formTwoData.data;
-					var formTwoDataDataString = "";
-					for (var i = 0; i < formTwoDataBytes.length; i++) {
+					let formTwoDataDataString = "";
+					for (let i = 0; i < formTwoDataBytes.length; i++) {
 						formTwoDataDataString += String.fromCharCode(formTwoDataBytes[i]);
 					}
 
@@ -308,8 +308,8 @@ const serializeToJson = function (d) {
 	return s
 }
 const getParams = function (key) {
-	var reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
-	var r = window.location.search.substr(1).match(reg);
+	let reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
+	let r = window.location.search.substr(1).match(reg);
 	if (r != null) {
 		return unescape(r[2]);
 	}

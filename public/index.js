@@ -247,7 +247,6 @@ function navTargetPage(target) {
 }
 
 const getSingaporePublicHolidays = async function () {
-    let thisYear = moment().format("YYYY")
     let hols = []
     await axios.get(`/singapore_public_holidays`).then(res => {
         let datas = res.data.data
@@ -338,7 +337,6 @@ const showPreviewDialog = function () {
         type: 'preview',
         buttons: [],
         onContentReady: async function () {
-            var jc = this;
             this.$content.find('.btn-preview-close').on('click', function (e) {
                 previewDialog.close()
             });
@@ -398,7 +396,6 @@ const showEditAnnouncementDialog = function () {
         type: 'preview',
         buttons: [],
         onContentReady: async function () {
-            var jc = this;
             let content = await readAnnouncement();
             $("#text-announcement").val(content)
             $("#preview").html(content.replace(/\r?\n/g, "<br />"))
@@ -428,7 +425,6 @@ const showAnnouncementDialog = function () {
         type: 'preview',
         buttons: [],
         onContentReady: async function () {
-            var jc = this;
             this.$content.find('.btn-preview-close').on('click', function (e) {
                 localStorage.setItem("previewClick", true)
                 announcementDialog.close()

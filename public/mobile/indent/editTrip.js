@@ -1,15 +1,15 @@
-// var currentUser = JSON.parse(localStorage.user);
-var laydate;
-var currentServiceMode = '';
-var currentServiceModeId = '';
-var currentTripId = '';
-var page = 'indent';
-var tekongStr = "TEKONG";
-var allTSP = []
-// var roleName = currentUser.roleName;
-var currentUser = null;
-var roleName = null;
-var currentGroupServiceType = null;
+// let currentUser = JSON.parse(localStorage.user);
+let laydate;
+let currentServiceMode = '';
+let currentServiceModeId = '';
+let currentTripId = '';
+let page = 'indent';
+let tekongStr = "TEKONG";
+let allTSP = []
+// let roleName = currentUser.roleName;
+let currentUser = null;
+let roleName = null;
+let currentGroupServiceType = null;
 
 $(async function () {
     currentUser = await getDecodeAESCode(localStorage.user);
@@ -162,11 +162,8 @@ const initPageData = async function (callback) {
         }).then(async res => {
             let trip = res.data.data;
 
-            if (optType == 'Edit') {
-                $('.edit-trip-title-label').text(optType + " " + trip.tripNo);
-            } else if (optType == 'View') {
-                $('.edit-trip-title-label').text(optType + " " + trip.tripNo);
-            }
+            $('.edit-trip-title-label').text(optType + " " + trip.tripNo);
+            
 
             let groupId = trip.groupId
             let serviceModeId = trip.serviceModeId
@@ -275,32 +272,29 @@ const AddBtnListening = function () {
         duplicateTrip()
     })
 
-    $("#typeOfVehicle").on("change", function () {
-        let vehicle = $(this).val()
-        let dropoffDestination = $("#dropoffDestination").val()
-        let serviceModeId = $("#serviceMode").find("option:selected").val();
-        let executionTime = $("#executionTime").val();
-    });
+    // $("#typeOfVehicle").on("change", function () {
+    //     let vehicle = $(this).val()
+    //     let dropoffDestination = $("#dropoffDestination").val()
+    //     let serviceModeId = $("#serviceMode").find("option:selected").val();
+    //     let executionTime = $("#executionTime").val();
+    // });
     $("#pickupDestination").on("change", function () {
         let pickupDesName = $("#pickupDestination option:selected").text();
-        if (currentServiceMode == "pickup") {
-            $("#dropoffDestination").val($("#pickupDestination").val());
-            $("#dropoffDestination").attr("disabled", true)
-        } else if (currentServiceMode.toLowerCase() == "offshore" && pickupDesName && pickupDesName.toUpperCase() == tekongStr) {
+        if (currentServiceMode == "pickup" || currentServiceMode.toLowerCase() == "offshore" && pickupDesName && pickupDesName.toUpperCase() == tekongStr) {
             $("#dropoffDestination").val($("#pickupDestination").val());
             $("#dropoffDestination").attr("disabled", true)
         }
-        let vehicle = $("#typeOfVehicle").val()
-        let dropoffDestination = $("#dropoffDestination").val()
-        let serviceModeId = $("#serviceMode").find("option:selected").val();
-        let executionTime = $("#executionTime").val();
+        // let vehicle = $("#typeOfVehicle").val()
+        // let dropoffDestination = $("#dropoffDestination").val()
+        // let serviceModeId = $("#serviceMode").find("option:selected").val();
+        // let executionTime = $("#executionTime").val();
     })
-    $("#dropoffDestination").on("change", function () {
-        let vehicle = $("#typeOfVehicle").val()
-        let dropoffDestination = $("#dropoffDestination").val()
-        let serviceModeId = $("#serviceMode").find("option:selected").val();
-        let executionTime = $("#executionTime").val();
-    })
+    // $("#dropoffDestination").on("change", function () {
+    //     let vehicle = $("#typeOfVehicle").val()
+    //     let dropoffDestination = $("#dropoffDestination").val()
+    //     let serviceModeId = $("#serviceMode").find("option:selected").val();
+    //     let executionTime = $("#executionTime").val();
+    // })
 }
 
 const duplicateTrip = async function () {
@@ -690,7 +684,7 @@ const changeEndMinTime = async function () {
 }
 
 const SelectTimeListening = function () {
-    // var timeDom = $('.layui-laydate-footer').find("span[lay-type='datetime']")[0];
+    // let timeDom = $('.layui-laydate-footer').find("span[lay-type='datetime']")[0];
 
     // $(timeDom).on('click', function () {
     //     interval5Min()
@@ -842,7 +836,7 @@ const AddTrip = function () {
         data.noOfDriver = null
     }
     
-    var isOK = ValidTripForm(data)
+    let isOK = ValidTripForm(data)
     if (isOK) {
         $(".confirm-add-btn").attr("disabled", true)
         data.driver = driver
@@ -935,8 +929,7 @@ const ValidTripForm = function (data, isEdit) {
         executionTime: 'Execution Time', duration: 'Duration', endsOn: 'Ends On', repeatsOn: 'Repeat On',
         periodStartDate: 'Start Date', periodEndDate: 'End Date', driver: 'Driver', tripRemarks: 'TripRemarks'
     }
-    let currentCategory = $('input:radio[name="category"]:checked').val();
-    for (var key in data) {
+    for (let key in data) {
         if (key == 'pickupNotes' || key == 'dropoffNotes' || key == 'preParkDate') continue
 
         if (data[key] == "" && key != "driver") {
@@ -998,11 +991,11 @@ const GetWeekdays = function () {
 }
 
 const mergeJsonObject = function (jsonbject1, jsonbject2) {
-    var resultJsonObject = {};
-    for (var attr in jsonbject1) {
+    let resultJsonObject = {};
+    for (let attr in jsonbject1) {
         resultJsonObject[attr] = jsonbject1[attr];
     }
-    for (var attr in jsonbject2) {
+    for (let attr in jsonbject2) {
         resultJsonObject[attr] = jsonbject2[attr];
     }
     return resultJsonObject;
@@ -1066,7 +1059,7 @@ const EditTrip = async function () {
         data.noOfDriver = noOfDriver
     }
     
-    var isOK = ValidTripForm(data, true)
+    let isOK = ValidTripForm(data, true)
     if (isOK) {
         data.tripId = currentTripId
         data.pickupNotes = $("#pickupNotes").val()
@@ -1100,11 +1093,11 @@ const AddRemarksPopup = function (title, callback) {
 }
 
 const DisabledLayDate = function () {
-    // var elem = $(".layui-laydate-content");
+    // let elem = $(".layui-laydate-content");
     // layui.each(elem.find('tr'), function (trIndex, trElem) {
     //     layui.each($(trElem).find('td'), function (tdIndex, tdElem) {
 
-    //         var tdTemp = $(tdElem);
+    //         let tdTemp = $(tdElem);
     //         if (publidHolidays.indexOf(tdTemp.attr("lay-ymd")) > -1) {
     //             tdTemp.addClass('laydate-disabled');
     //         }
