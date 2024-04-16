@@ -80,13 +80,12 @@ const buildTaskHtml = function (taskArray) {
         task.startMonth = moment(task.date).month() + 1;
         if (moment(task.endTime).isBefore(moment())) {
             task.arriving = -1;
-        } else {
-            if (moment().add(30, 'm').isAfter(moment(task.date + " " + task.startTime))) {
-                task.arriving = 1;
-            } else if (moment().add(30, 'm').isBefore(moment(task.date + " " + task.startTime))) {
-                task.arriving = 0;
-            }
+        } else if (moment().add(30, 'm').isAfter(moment(task.date + " " + task.startTime))) {
+            task.arriving = 1;
+        } else if (moment().add(30, 'm').isBefore(moment(task.date + " " + task.startTime))) {
+            task.arriving = 0;
         }
+
 
         let showArriveOpt = false;
         let showNoShowOpt = false;
@@ -118,15 +117,14 @@ const buildTaskHtml = function (taskArray) {
                 if (!task.arrivalTime) {
                     showArriveOpt = true;
                 }
-            } else {
-                if (!task.arrivalTime && !task.departTime && !task.completeTime) {
-                    showArriveOpt = true;
-                } else if (!task.departTime && !task.completeTime) {
-                    showDepartOpt = true;
-                } else if (!task.completeTime) {
-                    showCompleteOpt = true;
-                }
+            } else if (!task.arrivalTime && !task.departTime && !task.completeTime) {
+                showArriveOpt = true;
+            } else if (!task.departTime && !task.completeTime) {
+                showDepartOpt = true;
+            } else if (!task.completeTime) {
+                showCompleteOpt = true;
             }
+
         }
         if (showArriveOpt) {
             showNoShowOpt = true;

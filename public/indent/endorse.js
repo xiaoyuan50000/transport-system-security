@@ -323,24 +323,15 @@ $(function () {
 })
 
 const haveArbitrateBtn = function (full) {
-    if (!full.noMoreArbitrate && full.endorse && roleName == 'TSP') {
-        return true
-    }
-    return false
+    return !full.noMoreArbitrate && full.endorse && roleName == 'TSP'
 }
 
 const getResetBtn = function (full) {
-    if (!full.noMoreArbitrate && full.endorse && roleName == 'RF' && full.taskStatus != "declined" && full.taskStatus != "cancelled by TSP") {
-        return true
-    }
-    return false
+    return !full.noMoreArbitrate && full.endorse && roleName == 'RF' && full.taskStatus != "declined" && full.taskStatus != "cancelled by TSP"
 }
 
 const getEndorseBtn = function (full) {
-    if (!full.noMoreArbitrate && !full.endorse && roleName == 'UCO' && full.tsp != null && TASK_STATUS.indexOf(full.taskStatus.toLowerCase()) != -1) {
-        return true
-    }
-    return false
+    return !full.noMoreArbitrate && !full.endorse && roleName == 'UCO' && full.tsp != null && TASK_STATUS.indexOf(full.taskStatus.toLowerCase()) != -1
 }
 
 const getTaskStatus = function (data) {

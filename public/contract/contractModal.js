@@ -239,7 +239,7 @@ const InitEndDateSelectorModal = function () {
 
 const InitExtensionDateSelectorModal = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let config = {
             elem: extensionDateElem,
             lang: 'en',

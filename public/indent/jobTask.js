@@ -606,7 +606,7 @@ const EditDriver = function (e) {
     }
 
     const SaveEditDriver = async function (data) {
-        let {taskId, poc, pocMobileNumber, executionDate, executionTime, duration, newTsp, startDate, endDate} = data
+        let { taskId, poc, pocMobileNumber, executionDate, executionTime, duration, newTsp, startDate, endDate } = data
         await axios.post("/indent/editDriver", {
             taskId: taskId,
             poc: poc,
@@ -653,7 +653,7 @@ const EditDriver = function (e) {
                 });
                 //InitStartTimeSelector()
                 layui.use(['laydate'], function () {
-                    laydate = layui.laydate;
+                    let laydate = layui.laydate;
                     laydate.render({
                         elem: '#executionTime',
                         lang: 'en',
@@ -666,7 +666,8 @@ const EditDriver = function (e) {
                         done: function (value, date, endDate) {
                             let executionDate = $this.$content.find('input[name="executionDate"]').val()
                             let executionTime = $this.$content.find('input[name="executionTime"]').val()
-                            doneEditTaskTime(serviceProviderId, vehicleType, serviceModeId, dropoffPoint, pickupPoint, executionDate, executionTime, function(needChangeTsp, data){
+                            let editData = { serviceProviderId, vehicleType, serviceModeId, dropoffPoint, pickupPoint, executionDate, executionTime }
+                            doneEditTaskTime(editData, function (needChangeTsp, data) {
                                 if (needChangeTsp === true) {
                                     $this.$content.find(".sp-div").show();
                                     $this.$content.find("#serviceProvider").empty()
@@ -825,7 +826,8 @@ const EditDriver = function (e) {
 
 }
 
-const doneEditTaskTime = function(serviceProviderId, vehicleType, serviceModeId, dropoffPoint, pickupPoint, executionDate, executionTime, callback){
+const doneEditTaskTime = function (editData, callback) {
+    let { serviceProviderId, vehicleType, serviceModeId, dropoffPoint, pickupPoint, executionDate, executionTime } = editData
     if (serviceProviderId) {
         axios.post("/getDriverCheckboxByVehicle", {
             vehicle: vehicleType,

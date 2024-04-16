@@ -1,9 +1,9 @@
 $("#execution-date").val(`${moment().format("DD/MM/YYYY")} ~ ${moment().add(7, 'd').format("DD/MM/YYYY")}`)
 let elemIds = ['#execution-date', '#created-date']
 layui.use(['laydate'], function () {
-    laydate = layui.laydate;
+    let laydate = layui.laydate;
     for (let elem of elemIds) {
-        let = laydate.render({
+        laydate.render({
             elem: elem,
             lang: 'en',
             type: 'date',

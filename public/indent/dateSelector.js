@@ -158,7 +158,7 @@ const InitStartDateSelector = function () {
 const InitStartTimeSelector = function (minHour) {
     $('#executionTime').parent().empty().append('<input class="form-control" id="executionTime" name="executionTime" autocomplete="off" lay-key="4" readonly>')
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let option = {
             elem: '#executionTime',
             lang: 'en',
@@ -179,7 +179,7 @@ const InitStartTimeSelector = function (minHour) {
 
 const InitPeriodStartDateSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let option = {
             elem: "#periodStartDate",
             lang: 'en',
@@ -235,7 +235,7 @@ const InitPeriodStartDateSelector = function () {
 
 const InitPeriodEndDateSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let option = {
             elem: "#periodEndDate",
             lang: 'en',
@@ -278,7 +278,7 @@ const InitPeriodEndDateSelector = function () {
 
 const InitPreParkDateSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let option = {
             elem: "#preParkDate",
             lang: 'en',
@@ -360,7 +360,7 @@ const changeEndMinTime = async function () {
 
 const InitFuelStartDateSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let option = {
             elem: "#fuelStartDate",
             lang: 'en',
@@ -401,7 +401,7 @@ const InitFuelStartDateSelector = function () {
 
 const InitFuelEndDateSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let option = {
             elem: "#fuelEndDate",
             lang: 'en',

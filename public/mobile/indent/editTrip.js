@@ -187,7 +187,6 @@ const initPageData = async function (callback) {
             await InitRepeats(trip.repeats)
             $("#repeats").attr("disabled", true)
             let tripStartExeDate = null;
-            let executionTime = "";
             if (trip.repeats == "Once") {
                 $("#executionDate").val(changeDateFormatDMY(trip.executionDate))
                 $("#executionTime").val(trip.executionTime)
@@ -197,7 +196,6 @@ const initPageData = async function (callback) {
                 $("#periodStartDate").val(changeDateFormatDMY(trip.periodStartDate))
                 $("#periodEndDate").val(changeDateFormatDMY(trip.periodEndDate))
                 $("#preParkDate").val(changeDateFormatDMY(trip.preParkDate))
-                executionTime = moment(trip.periodStartDate);
                 tripStartExeDate = trip.periodStartDate;
             } else if (trip.repeats == "Weekly") {
                 $("#executionDate").val(changeDateFormatDMY(trip.executionDate))

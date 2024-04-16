@@ -15,7 +15,6 @@ function singpassLoginCallback(singpassResCode, nric) {
             window.webkit.messageHandlers.logoutCallback.postMessage('');
         }
         simplyAlert('Invalid system account, Nric: ' + (nric || 'null'), 'red');
-        return;
     } else if (!nric) {
         if (isAndroid) {
             window.android.logoutCallback();

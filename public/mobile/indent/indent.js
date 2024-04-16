@@ -1097,7 +1097,7 @@ const sortByField = function(ele) {
 
 const InitChangeTspOptateTimeSelector = async function () {
     await layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         laydate.render({
             elem: '#operateTime',
             lang: 'en',

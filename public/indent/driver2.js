@@ -451,7 +451,8 @@ const EditDriver = function (e) {
                             
                             let executionDate = $this.$content.find('input[name="executionDate"]').val()
                             let executionTime = $this.$content.find('input[name="executionTime"]').val()
-                            doneEditTaskTime(serviceProviderId, vehicleType, serviceModeId, dropoffPoint, pickupPoint, executionDate, executionTime, function(needChangeTsp, data){
+                            let editData = {serviceProviderId, vehicleType, serviceModeId, dropoffPoint, pickupPoint, executionDate, executionTime}
+                            doneEditTaskTime(editData, function (needChangeTsp, data) {
                                 if (needChangeTsp === true) {
                                     $this.$content.find(".sp-div").show();
                                     $this.$content.find("#serviceProvider").empty()
@@ -522,7 +523,7 @@ const EditDriver = function (e) {
                 }
 
                 layui.use(['laydate'], function () {
-                    laydate = layui.laydate;
+                    let laydate = layui.laydate;
                     laydate.render({
                         elem: '#period-startDate',
                         lang: 'en',
@@ -533,7 +534,7 @@ const EditDriver = function (e) {
                     });
                 });
                 layui.use(['laydate'], function () {
-                    laydate = layui.laydate;
+                    let laydate = layui.laydate;
                     laydate.render({
                         elem: '#period-endDate',
                         lang: 'en',
