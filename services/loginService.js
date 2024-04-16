@@ -128,6 +128,27 @@ const loginServer = async function (req, res) {
 };
 module.exports.loginServer = loginServer;
 
+
+const lockOutUser = async function (user) {
+    if (user.getDataValue('status') == null) {
+        await addUserManagementReport(user.id, "Last login date passed 90 days", USER_ACTIVITY.LockOut)
+        await User.update({ status: USER_STATUS.LockOut }, { where: { id: user.id } })
+    } else if (user.getDataValue('status') != USER_STATUS.LockOut) {
+        await addUserManagementReport(user.id, "Account locked", USER_ACTIVITY.LockOut)
+    }
+}
+module.exports.lockOutUser = lockOutUser
+
+const deactivatedUser = async function (user) {
+    if (user.getDataValue('status') == null) {
+        await addUserManagementReport(user.id, "Last login date passed 180 days", USER_ACTIVITY.Deactivate)
+        await User.update({ status: USER_STATUS.Deactivated }, { where: { id: user.id } })
+    } else if (user.getDataValue('status') != USER_STATUS.Deactivated) {
+        await addUserManagementReport(user.id, "Account deactivated", USER_ACTIVITY.Deactivate)
+    }
+}
+module.exports.deactivatedUser = deactivatedUser
+
 const getUserExistByLoginName = async function (loginName) {
     let userBaseObj = await sequelizeDriverObj.query(
         `select id, cvApproveDate, cvApproveBy, cvRejectBy from user_base where cvRole is not null and loginName = ? limit 1`,

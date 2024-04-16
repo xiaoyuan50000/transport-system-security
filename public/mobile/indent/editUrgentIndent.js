@@ -165,16 +165,7 @@ const initLocation = async function (defaultVal) {
         $("#reportingLocation").val(location ? location.locationName : '-');
         $("#reportingLocation").attr('locationid', location ? location.id : '')
 
-        // if (datas != null && datas != undefined) {
-        //     $("#reportingLocation").empty();
-        //     let location = `<option value=""></option>`
-        //     for (let item of datas) {
-        //         location += `<option value="${item.locationName}" name="${item.locationName}" data-id="${item.id}" data-secured="${item.secured}">${item.locationName}</option>`
-        //     }
-        //     $("#reportingLocation").append(location);
-        // }
-
-        //return datas;
+        
     })
 };
 
@@ -276,7 +267,7 @@ const updateUrgentIndent = async function() {
                 backToIndentList()
             } else {
                 let msg = res.data.msg;
-                simplyAlert(msg ? msg : "Edit Urgent Indent fail.");
+                simplyAlert(msg || "Edit Urgent Indent fail.");
             }
         });
     } else if (optType == 'Create') {
@@ -287,18 +278,18 @@ const updateUrgentIndent = async function() {
                 backToIndentList()
             } else {
                 let msg = res.data.msg;
-                simplyAlert(msg ? msg : "Create Urgent Indent fail.");
+                simplyAlert(msg || "Create Urgent Indent fail.");
             }
         });
     }
     
 }
 
-const getParams = function(key) {
+const getParams = function (key) {
     let reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
-    let r = window.location.search.substr(1).match(reg);
+    let r = reg.exec(window.location.search.slice(1));
     if (r != null) {
-        return unescape(r[2]);
+        return decodeURIComponent(r[2]);
     }
     return null;
 };

@@ -50,7 +50,7 @@
                 $("#" + eleId).find('.multiple-select-item-checkbox').removeClass('active');
                 $("#" + eleId).find('.multiple-select-item-checkbox').each(function () {
                     let itemValue = $(this).attr("value");
-                    let selected = valuesArray.find(item => item == itemValue)
+                    let selected = findValueSelected(valuesArray, itemValue)
                     if (selected) {
                         $(this).addClass('active');
                         $(this).find('.selected-img').attr('src', '/javascripts/multiple-select/selected-white.svg')
@@ -76,6 +76,9 @@
         }
     }
 
+    function findValueSelected(valuesArray, itemValue) {
+        return valuesArray.find(item => item == itemValue)
+    }
     function buildSelectContent($ele, options, eleId) {
         let resultHtml = '<div tabindex="-1" class="multiple-select-content"  id="' + eleId + '" style="display: none;">';
         let datas = options.data;
@@ -126,29 +129,7 @@
         }
     }
 
-    function getElementLeft(element) {
-        let actualLeft = element.offsetLeft;
-        let current = element.offsetParent;
-
-        while (current !== null) {
-            actualLeft += current.offsetLeft;
-            current = current.offsetParent;
-        }
-
-        return actualLeft;
-    }
-
-    function getElementTop(element) {
-        let actualTop = element.offsetTop;
-        let current = element.offsetParent;
-
-        while (current !== null) {
-            actualTop += current.offsetTop;
-            current = current.offsetParent;
-        }
-
-        return actualTop;
-    }
+    
     function randomID() {
         return (Math.random().toString().substring(2) + Date.now()).toString(36);
     }

@@ -125,7 +125,7 @@ const initEditTaskTimePage = function ($pageContent, task, actionCell) {
     // Admin Dispatch，Offshore:arrival depart complete
     let serviceModeValue = task.serviceMode.toLowerCase()
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         option.elem = "#arriveTime";
         option.value = task.arrivalTime ? new Date(moment(task.arrivalTime).format('YYYY-MM-DD HH:mm')) : '';
         laydate.render(option);

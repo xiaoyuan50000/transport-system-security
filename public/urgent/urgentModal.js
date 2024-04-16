@@ -91,7 +91,6 @@ const showUrgentIndentModal = async function () {
         await axios.post("/validCreateUrgentIndentBtn").then(res => {
             if (res.data.code == 0) {
                 simplyAlert(res.data.msg, "red")
-                return
             } else {
                 $("#urgentModal").modal("show")
             }

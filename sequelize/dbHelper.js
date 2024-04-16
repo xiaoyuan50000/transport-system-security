@@ -92,7 +92,6 @@ try {
     // Driver.sync({ alter: true });
     // Vehicle.sync({ alter: true });
     // Role.sync({ alter: true });
-    // TODO: maybe init data into db here!
     // ...
     // AddTestData();
     // AddLocation()

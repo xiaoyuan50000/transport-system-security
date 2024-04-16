@@ -95,7 +95,7 @@ $(function () {
         },
         "columns": [
             {
-                "visible": roleName === 'UCO' ? true : false,
+                "visible": roleName === 'UCO',
                 "class": "firstCol",
                 "data": null, "title": "",
                 "render": function (data, type, full, meta) {
@@ -156,7 +156,7 @@ $(function () {
                         data = ""
                     }
                     if (full.noMoreArbitrate == 1 || data == "declined" || full.endorse) {
-                        return data == "Completed" ? "On-Time" : data
+                        return getTaskStatus(data)
                     }
                     if (roleName != "TSP" && occ.indexOf(roleName) == -1) {
                         let onchangeFunc = `onchange="StatusChange(this)"`
@@ -165,13 +165,13 @@ $(function () {
                         }
                         return `<select class="form-select status-select" ${onchangeFunc} data-row="${meta.row}">
                             <option value="-" ${TASK_STATUS.indexOf(data.toLowerCase()) == -1 ? "selected" : ""}>-</option>
-                            <option value="Completed" ${data == "Completed" ? "selected" : ""}>On-Time</option>
-                            <option value="Late Trip" ${data == "Late Trip" ? "selected" : ""}>Late Trip</option>
-                            <option value="No Show" ${data == "No Show" ? "selected" : ""}>No Show</option>
-                            <option value="Cancelled" ${(data.toLowerCase() == "cancelled" || data.toLowerCase() == "cancelled by TSP") ? "selected" : ""}>Cancelled</option>
+                            <option value="Completed" ${getIsSelect(data, "completed")}>On-Time</option>
+                            <option value="Late Trip" ${getIsSelect(data, "late trip")}>Late Trip</option>
+                            <option value="No Show" ${getIsSelect(data, "no show")}>No Show</option>
+                            <option value="Cancelled" ${getIsSelect(data, "cancelled")}>Cancelled</option>
                         </select>`
                     }
-                    return data == "Completed" ? "On-Time" : data
+                    return getTaskStatus(data)
                 }
             },
             {
@@ -199,7 +199,7 @@ $(function () {
                 }
             },
             {
-                "visible": occ.indexOf(roleName) == -1 ? true : false,
+                "visible": occ.indexOf(roleName) == -1,
                 "class": "auto-wrap",
                 "data": "poc", "title": "POC Details",
                 "render": function (data, type, full, meta) {
@@ -211,7 +211,7 @@ $(function () {
                 }
             },
             {
-                "visible": occ.indexOf(roleName) != -1 ? true : false,
+                "visible": occ.indexOf(roleName) != -1,
                 "class": "auto-wrap",
                 "data": "ucoDetail", "title": "UCO Details",
                 "render": function (data, type, full, meta) {
@@ -265,29 +265,18 @@ $(function () {
                 "class": "auto-wrap",
                 "data": "endTime", "title": "Notify TSP Time",
                 "render": function (data, type, full, meta) {
-                    if (roleName == 'RF' || occ.indexOf(roleName) != -1) {
-                        let baseHtml = ``
-                        if (full.notifiedTime) {
-                            baseHtml += `<div>Notified:${getNotifyTSPTime(full.notifiedTime)}</div>`;
-                        }
-                        if (full.tspChangeTime) {
-                            baseHtml += `<div >Amendment:${getNotifyTSPTime(full.tspChangeTime)}</div>`;
-                        }
-                        if (full.cancellationTime) {
-                            baseHtml += `<div >Cancellation:${getNotifyTSPTime(full.cancellationTime)}</div>`;
-                        }
-                        if (full.endorse != 1) {
-                            if (roleName == 'RF') {
-                                return `<div data-cell="tspTime" style="wdith: 100%;height: 100%;text-decoration:underline;" data-row="${meta.row}" onclick="editTaskTime(this)">${baseHtml}</div>`
-                            } else {
-                                return `<div data-cell="tspTime" style="wdith: 100%;height: 100%;">${baseHtml}</div>`
-
-                            }
-                        } else {
-                            return baseHtml
-                        }
-                    } else {
+                    if (roleName != 'RF' && occ.indexOf(roleName) == -1) {
                         return '-';
+                    }
+                    let baseHtml = getBaseHtml(full)
+                    if (full.endorse == 1) {
+                        return baseHtml
+                    }
+                    if (roleName == 'RF') {
+                        return `<div data-cell="tspTime" style="wdith: 100%;height: 100%;text-decoration:underline;" data-row="${meta.row}" onclick="editTaskTime(this)">${baseHtml}</div>`
+                    } else {
+                        return `<div data-cell="tspTime" style="wdith: 100%;height: 100%;">${baseHtml}</div>`
+
                     }
                 }
             },
@@ -309,27 +298,15 @@ $(function () {
                     }
                     let btn = action["View"]
                     console.log(`tripNo: ${tripNo}, noMoreArbitrate: ${full.noMoreArbitrate}, endorse: ${full.endorse}, taskStatus: ${full.taskStatus}, role: ${roleName}`)
-                    if (!full.noMoreArbitrate == 1) {
-                        if (full.endorse) {
-                            if (full.taskStatus == "declined" || full.taskStatus == "cancelled by TSP") {
-                                if (roleName == 'TSP') {
-                                    btn += action["Arbitrate"]
-                                }
-                            } else {
-                                if (roleName == 'TSP') {
-                                    btn += action["Arbitrate"]
-                                }
-                                if (roleName == "RF") {
-                                    btn += action["Reset"]
-                                }
-                            }
-                        } else if (!full.endorse && roleName == "UCO") {
-                            if (full.tsp != null && TASK_STATUS.indexOf(full.taskStatus.toLowerCase()) != -1) {
-                                btn += action["Endorse"]
-                            }
-                        }
 
-
+                    if (haveArbitrateBtn(full)) {
+                        btn += action["Arbitrate"]
+                    }
+                    if (getResetBtn(full)) {
+                        btn += action["Reset"]
+                    }
+                    if (getEndorseBtn(full)) {
+                        btn += action["Endorse"]
                     }
                     if (roleName == "RF" || roleName == "RA" || roleName == "OCC Mgr") {
                         if (full.comment) {
@@ -343,9 +320,54 @@ $(function () {
             },
         ]
     });
-
-
 })
+
+const haveArbitrateBtn = function (full) {
+    if (!full.noMoreArbitrate && full.endorse && roleName == 'TSP') {
+        return true
+    }
+    return false
+}
+
+const getResetBtn = function (full) {
+    if (!full.noMoreArbitrate && full.endorse && roleName == 'RF' && full.taskStatus != "declined" && full.taskStatus != "cancelled by TSP") {
+        return true
+    }
+    return false
+}
+
+const getEndorseBtn = function (full) {
+    if (!full.noMoreArbitrate && !full.endorse && roleName == 'UCO' && full.tsp != null && TASK_STATUS.indexOf(full.taskStatus.toLowerCase()) != -1) {
+        return true
+    }
+    return false
+}
+
+const getTaskStatus = function (data) {
+    return data == "Completed" ? "On-Time" : data
+}
+
+const getIsSelect = function (data, val) {
+    data = data.toLowerCase()
+    if (data == val || val == "cancelled" && data == "cancelled by tsp") {
+        return "selected"
+    }
+    return ""
+}
+
+const getBaseHtml = function (full) {
+    let baseHtml = ``
+    if (full.notifiedTime) {
+        baseHtml += `<div>Notified:${getNotifyTSPTime(full.notifiedTime)}</div>`;
+    }
+    if (full.tspChangeTime) {
+        baseHtml += `<div>Amendment:${getNotifyTSPTime(full.tspChangeTime)}</div>`;
+    }
+    if (full.cancellationTime) {
+        baseHtml += `<div>Cancellation:${getNotifyTSPTime(full.cancellationTime)}</div>`;
+    }
+    return baseHtml
+}
 const getNotifyTSPTime = function (date) {
     return date ? moment(date).format("DD/MM/YYYY HH:mm") : '-'
 }
@@ -416,7 +438,7 @@ const StatusChange = async function (e) {
                 });
 
                 layui.use(['laydate'], function () {
-                    laydate = layui.laydate;
+                    let laydate = layui.laydate;
                     laydate.render({
                         elem: '#new-arrivalTime',
                         lang: 'en',

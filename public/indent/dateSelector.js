@@ -120,7 +120,7 @@ const CheckExecutionDateWithin5days = function (executionDate) {
 const InitStartDateSelector = function () {
     let minHour = ''
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let option = {
             elem: '#executionDate',
             lang: 'en',

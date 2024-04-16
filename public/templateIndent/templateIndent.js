@@ -169,8 +169,7 @@ let table
                 if (templateResourceElem.val() == "-") {
                     return
                 }
-                let noOfVehicle = templateNoOfVehicleElem.val();
-                noOfVehicle = noOfVehicle ? noOfVehicle : 0;
+                let noOfVehicle = templateNoOfVehicleElem.val() || 0;
                 let driverNum = templateNoOfDriverElem.val();
                 if (parseInt(driverNum) > parseInt(noOfVehicle)) {
                     templateNoOfDriverElem.val(noOfVehicle);
@@ -178,8 +177,8 @@ let table
             })
 
             $("#editTemplateIndentModal #edit-btn").on('click', async function () {
-                await saveTemplateIndent()
-                $("#editTemplateIndentModal").modal('hide')
+                saveTemplateIndent()
+                
             })
         }
 
@@ -298,7 +297,7 @@ let table
         }
 
 
-        const saveTemplateIndent = async function () {
+        const saveTemplateIndent = function () {
             let category = $('#template-indent-category-radio input[type="radio"]:checked').val()
             let resourceTypeId = templateResourceTypeElem.val()
             let resourceType = templateResourceTypeElem.find("option:selected").text()
@@ -316,13 +315,14 @@ let table
             console.log(data);
             if (!ValidTemplateIndentForm(data)) return
 
-            await axios.post("/editTemplateIndentById", data).then(res => {
+            axios.post("/editTemplateIndentById", data).then(res => {
                 if (res.data.code == 0) {
                     simplyAlert('Edit Failed.')
                     return
                 }
                 simplyAlert('Edit Success.')
                 table.ajax.reload(null, false)
+                $("#editTemplateIndentModal").modal('hide')
             })
         }
 

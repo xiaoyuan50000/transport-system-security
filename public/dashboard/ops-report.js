@@ -925,9 +925,7 @@ let purposeColorList = ['#546FC6', '#73C0DE', '#EE6766', '#90A790']
                             formatter: function(value, index){
                                 if (value >= 1000) {
                                     value = value / 1000 + 'k';
-                                } else {
-                                    value = value
-                                }
+                                } 
                                 return '$'+value;
 
                             }
@@ -1008,9 +1006,7 @@ let purposeColorList = ['#546FC6', '#73C0DE', '#EE6766', '#90A790']
                                 formatter: function(value, index){
                                     if (value >= 1000) {
                                         value = value / 1000 + 'k';
-                                    } else {
-                                        value = value
-                                    }
+                                    } 
                                     return '$'+value;
                                 }
                             }

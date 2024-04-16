@@ -18,7 +18,7 @@ $(async function () {
         $(".common-nav").show();
         $(".poc-nav").hide();
     }
-    $("#task-statu-select").on('change', function() {
+    $("#task-statu-select").on('change', function () {
         initTaskData();
     });
 });
@@ -39,13 +39,12 @@ const initTaskData = async function () {
     })
 }
 
-const updateTaskState = async function(taskId, newState, optTime, justification) {
+const updateTaskState = async function (taskId, newState, optTime, justification) {
     if (newState === 'No Show') {
         axios.post('/mobile/task/noshow', {
             taskId: taskId,
             justification: ''
         }).then(res => {
-            let data = res.data.data;
             if (res.data.code == 2) {
                 simplyAlert("The task has been canceled !", 'red');
             }
@@ -53,26 +52,24 @@ const updateTaskState = async function(taskId, newState, optTime, justification)
         }).catch(function (error) {
             simplyAlert(error.message, 'red');
         });
+    } else if (!optTime) {
+        simplyAlert('Operation Time is empty!', 'red');
     } else {
-        if (!optTime) {
-            simplyAlert('Operation Time is empty!', 'red');
-        } else {
-            axios.post('/mobile/task/updateState', {
-                taskId: taskId,
-                operationTime: optTime,
-                justification: justification
-            }).then(res => {
-                let data = res.data.data;
-                if (res.data.code == 2) {
-                    simplyAlert("The task has been canceled !", 'red');
-                }
-        
-                initTaskData();
-            }).catch(function (error) {
-                simplyAlert(error.message, 'red');
-            });
-        }
+        axios.post('/mobile/task/updateState', {
+            taskId: taskId,
+            operationTime: optTime,
+            justification: justification
+        }).then(res => {
+            if (res.data.code == 2) {
+                simplyAlert("The task has been canceled !", 'red');
+            }
+
+            initTaskData();
+        }).catch(function (error) {
+            simplyAlert(error.message, 'red');
+        });
     }
+
 }
 
 const buildTaskHtml = function (taskArray) {
@@ -84,46 +81,40 @@ const buildTaskHtml = function (taskArray) {
         if (moment(task.endTime).isBefore(moment())) {
             task.arriving = -1;
         } else {
-            if (moment().add(30, 'm').isAfter(moment(task.date + " " + task.startTime))){
+            if (moment().add(30, 'm').isAfter(moment(task.date + " " + task.startTime))) {
                 task.arriving = 1;
             } else if (moment().add(30, 'm').isBefore(moment(task.date + " " + task.startTime))) {
                 task.arriving = 0;
             }
         }
 
-        let currentTime = moment();
-
-        let currentTaskState = task.state.toLowerCase();
         let showArriveOpt = false;
         let showNoShowOpt = false;
         let showDepartOpt = false;
         let showCompleteOpt = false;
         let showNoShowLabel = false;
         let showCompleteLabel = false;
-        
-        let borderColor = '#4EB981';
+
         if (task.driverStatus == 'Completed' || task.driverStatus == 'Late Trip') {
-            showCompleteLabel=true;
-            task.driverStatus == 'Completed' ? (borderColor = '#007c5c') : (borderColor = '#fd7624');
+            showCompleteLabel = true;
         } else if (task.driverStatus == 'No Show') {
             showNoShowLabel = true;
-            borderColor = '#ff80a5';
         } else if (task.driverMobileNumber != null && task.driverMobileNumber != '') {
             //has assign driver.
-            if (task.serviceMode == "delivery"){
+            if (task.serviceMode == "delivery") {
                 if (!task.arrivalTime) {
                     showArriveOpt = true;
                 } else if (!task.departTime) {
                     showDepartOpt = true;
                 }
-            } else if (task.serviceMode == "pickup"){
+            } else if (task.serviceMode == "pickup") {
                 if (!task.arrivalTime) {
                     showArriveOpt = true;
-                } else if (!task.completeTime){
+                } else if (!task.completeTime) {
                     showCompleteOpt = true;
                 }
-                
-            } else if (task.serviceMode == "ferry service"){
+
+            } else if (task.serviceMode == "ferry service") {
                 if (!task.arrivalTime) {
                     showArriveOpt = true;
                 }
@@ -132,9 +123,9 @@ const buildTaskHtml = function (taskArray) {
                     showArriveOpt = true;
                 } else if (!task.departTime && !task.completeTime) {
                     showDepartOpt = true;
-                } else if (!task.completeTime){
+                } else if (!task.completeTime) {
                     showCompleteOpt = true;
-                } 
+                }
             }
         }
         if (showArriveOpt) {
@@ -142,7 +133,7 @@ const buildTaskHtml = function (taskArray) {
         }
         let htmlOptBtn = ``;
         if (showNoShowLabel) {
-            htmlOptBtn += 
+            htmlOptBtn +=
                 `<div style="width: 90%;height: 30px;border-radius: 2px;margin-top: 5px;background-color: #918b8b;
                         display: flex;justify-content : center;align-items : center">
                     <span><font color="white" size="2">No Show</font></span>
@@ -150,7 +141,7 @@ const buildTaskHtml = function (taskArray) {
             `;
         }
         if (showCompleteLabel) {
-            htmlOptBtn += 
+            htmlOptBtn +=
                 `<div style="width: 90%;height: 30px;border-radius: 2px;margin-top: 5px;background-color: #918b8b;
                         display: flex;justify-content : center;align-items : center">
                     <span><font color="white" size="2">Completed</font></span>
@@ -158,7 +149,7 @@ const buildTaskHtml = function (taskArray) {
             `;
         }
         if (showNoShowOpt) {
-            htmlOptBtn += 
+            htmlOptBtn +=
                 `<div onclick="updateTaskState(${task.taskId}, 'No Show')" style="width: 90%;height: 30px;border-radius: 2px;margin-top: 5px;background-color: #ff80a5;
                         display: flex;justify-content : flex-start;align-items : center">
                     <img style="width: 18px;max-width: 20px;margin-left: 5px;" src="/images/task/No Show.svg">
@@ -166,47 +157,43 @@ const buildTaskHtml = function (taskArray) {
                 </div>
             `;
 
-            borderColor = '#ff80a5';
         }
         if (showArriveOpt) {
-            htmlOptBtn += 
-                `<div onclick="taskOptTime(${task.taskId}, 'Arrive', '${task.date +" "+task.startTime}')" style="width: 90%;height: 30px;border-radius: 2px;margin-top: 5px;background-color: #2bb982;
+            htmlOptBtn +=
+                `<div onclick="taskOptTime(${task.taskId}, 'Arrive', '${task.date + " " + task.startTime}')" style="width: 90%;height: 30px;border-radius: 2px;margin-top: 5px;background-color: #2bb982;
                         display: flex;justify-content : flex-start;align-items : center">
                     <img style="width: 18px;max-width: 20px;margin-left: 5px;" src="/images/task/Arrive.svg">
                     <span style="width: 80%;margin-left: 5px;"><font color="white" size="2">Arrive</font></span>
                 </div>
             `;
 
-            borderColor = '#4EB981';
         }
         if (showDepartOpt) {
-            htmlOptBtn += 
-                `<div onclick="taskOptTime(${task.taskId}, 'Depart', '${task.date +" "+task.startTime}')" style="width: 90%;height: 30px;border-radius: 2px;margin-top: 5px;background-color: #05a797;
+            htmlOptBtn +=
+                `<div onclick="taskOptTime(${task.taskId}, 'Depart', '${task.date + " " + task.startTime}')" style="width: 90%;height: 30px;border-radius: 2px;margin-top: 5px;background-color: #05a797;
                         display: flex;justify-content : flex-start;align-items : center">
                     <img style="width: 18px;max-width: 20px;margin-left: 5px;" src="/images/task/Depart.svg">
                     <span style="width: 80%;margin-left: 5px;"><font color="white" size="2">Depart</font></span>
                 </div>
             `;
 
-            borderColor = '#4EB981';
         }
 
         if (showCompleteOpt) {
-            htmlOptBtn += 
-                `<div onclick="taskOptTime(${task.taskId}, 'End', '${task.date +" "+task.startTime}')" style="width: 90%;height: 30px;border-radius: 2px;margin-top: 5px;background-color: #007c5c;
+            htmlOptBtn +=
+                `<div onclick="taskOptTime(${task.taskId}, 'End', '${task.date + " " + task.startTime}')" style="width: 90%;height: 30px;border-radius: 2px;margin-top: 5px;background-color: #007c5c;
                         display: flex;justify-content : flex-start;align-items : center">
                     <img style="width: 18px;max-width: 20px;margin-left: 5px;" src="/images/task/Complete.svg">
                     <span style="width: 80%;margin-left: 5px;"><font color="white" size="2">End</font></span>
                 </div>
             `;
 
-            borderColor = '#007c5c';
         }
         let driverInfoHtml = ``;
         let taskPinHtml = ``;
 
         if (task.vehicleNumber) {
-            taskPinHtml += 
+            taskPinHtml +=
                 `<div onclick="toCheckListPage('${task.taskId}', 'check')" 
                     style="width: 32px;height: 26px; display: flex;justify-content: center;align-items: center;margin-left: 10px;">
                     <img src="/images/pocCheck.svg">
@@ -237,7 +224,7 @@ const buildTaskHtml = function (taskArray) {
                     </div>
                 `;
             } else {
-                taskPinHtml += 
+                taskPinHtml +=
                     `<div onclick="getTaskPin('${task.taskId}')" 
                         style="width: 32px;height: 26px; display: flex;justify-content: center;align-items: center;">
                             <img src="/images/pinCode.svg">
@@ -246,7 +233,7 @@ const buildTaskHtml = function (taskArray) {
             }
         }
         let bgImg = `url('/images/task/speeding-${task.driverStatus}.svg')`
-        if (task.driverStatus && ['started','unassigned','arrived','assigned','completed','late trip','no show'].indexOf(task.driverStatus.toLowerCase()) == -1) {
+        if (task.driverStatus && ['started', 'unassigned', 'arrived', 'assigned', 'completed', 'late trip', 'no show'].indexOf(task.driverStatus.toLowerCase()) == -1) {
             bgImg = `url('/images/task/speeding-Default.svg')`
         }
 
@@ -333,7 +320,7 @@ const getMonthStr = function (monthNum) {
     }
 }
 
-const taskOptTime = function(taskId, title, taskStartDate) {
+const taskOptTime = function (taskId, title, taskStartDate) {
 
     $.confirm({
         title: '',
@@ -360,7 +347,7 @@ const taskOptTime = function(taskId, title, taskStartDate) {
                 },
             }
         },
-        onContentReady: function(){
+        onContentReady: function () {
             let taskStartDateStr = $("#taskOptDiv").attr("taskStartDate");
             if (moment(new Date()).isAfter(moment(taskStartDateStr))) {
                 $(".trip-justification-ele").show();
@@ -370,7 +357,7 @@ const taskOptTime = function(taskId, title, taskStartDate) {
     });
 }
 
-const confirmOperate = function($this, taskId) {
+const confirmOperate = function ($this, taskId) {
     let optTime = changeDateFormat($this.$content.find("#operateTime").val());
     let taskStartDateStr = $("#taskOptDiv").attr("taskStartDate");
     let justification = "";
@@ -383,7 +370,7 @@ const confirmOperate = function($this, taskId) {
 
 const InitOptateTimeSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         laydate.render({
             elem: '#operateTime',
             lang: 'en',
@@ -393,8 +380,8 @@ const InitOptateTimeSelector = function () {
             format: 'dd/MM/yyyy HH:mm',
             btns: ['clear', 'confirm'],
             value: new Date(),
-            ready: () => {onOptTimeSelectorReady()},
-            change: () => {},
+            ready: () => { onOptTimeSelectorReady() },
+            change: () => { },
             done: function () {
                 optTimeChange();
             }
@@ -402,15 +389,14 @@ const InitOptateTimeSelector = function () {
     });
 }
 
-const onOptTimeSelectorReady = function() {
+const onOptTimeSelectorReady = function () {
     let taskStartDateStr = $("#taskOptDiv").attr("taskStartDate");
     if (moment(new Date()).isAfter(moment(taskStartDateStr))) {
         $(".trip-justification-ele").show();
     }
 }
 
-const optTimeChange = function() {
-    let taskId = $("#taskOptDiv").attr("taskId");
+const optTimeChange = function () {
     let taskStartDateStr = $("#taskOptDiv").attr("taskStartDate");
     let operateTime = changeDateFormat($("#operateTime").val());
     if (operateTime) {
@@ -424,11 +410,11 @@ const optTimeChange = function() {
     }
 }
 
-const toCheckListPage = function(taskId) {
-    window.location.href="/mobilePOC/checkList?taskId=" + taskId;
+const toCheckListPage = function (taskId) {
+    window.location.href = "/mobilePOC/checkList?taskId=" + taskId;
 }
 
-const getTaskPin = async function(taskId) {
+const getTaskPin = async function (taskId) {
     await axios.post('/mobile/getTaskPin', {
         taskId: taskId
     }).then(function (res) {
@@ -450,6 +436,6 @@ const getTaskPin = async function(taskId) {
         } else {
             simplyAlert(res.data.msg, 'red');
         }
-        
+
     })
 }

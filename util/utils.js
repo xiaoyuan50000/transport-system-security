@@ -48,7 +48,7 @@ module.exports.generateTokenKey = generateTokenKey;
  * @constructor
  */
 function PrefixInteger(num, n) {
-    return (Array(n).join(0) + num).slice(-n);
+    return (Array(n).join('0') + num).slice(-n);
 }
 module.exports.PrefixInteger = PrefixInteger;
 
@@ -338,12 +338,12 @@ module.exports.FormatPrice = function (number) {
         minusSign = "-"
         number = Math.abs(parseFloat(number))
     }
-    number = parseFloat((number + "").replace(/[^\d\.-]/g, "")).toFixed(n) + "";
+    number = parseFloat((number + "").replace(/[^\d.-]/g, "")).toFixed(n) + "";
     let sub_val = number.split(".")[0].split("").reverse();
     let sub_xs = number.split(".")[1];
 
     let show_html = "";
-    for (i = 0; i < sub_val.length; i++) {
+    for (let i = 0; i < sub_val.length; i++) {
         show_html += sub_val[i] + ((i + 1) % 3 == 0 && (i + 1) != sub_val.length ? "," : "");
     }
 

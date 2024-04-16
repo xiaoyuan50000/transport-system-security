@@ -8,36 +8,7 @@
 function getTimeTemplate(schedule, isAllDay) {
     //console.log(schedule)
     let html = [];
-    // let start = moment(new Date(schedule.start));
-
-    // switch (Number.parseInt(schedule.id)) {
-    //     case 1:
-    //         html.push(' <img style="width: 18px;margin-top: -3px;margin-right: 5px;" src="../images/schedule/message-black.png">');
-    //         break;
-    //     case 2:
-    //         html.push(' <img style="width: 18px;margin-top: -3px;margin-right: 5px;" src="../images/schedule/submitted-black.png">');
-    //         break;
-    //     case 3:
-    //         html.push(' <img style="width: 18px;margin-top: -3px;margin-right: 5px;" src="../images/schedule/pending-black.png">');
-    //         break;
-    //     case 4:
-    //         html.push(' <img style="width: 18px;margin-top: -3px;margin-right: 5px;" src="../images/schedule/approved-black.png">');
-    //         break;
-    //     case 5:
-    //         html.push(' <img style="width: 18px;margin-top: -3px;margin-right: 5px;" src="../images/schedule/completed-black.png">');
-    //         break;
-    //     case 6:
-    //         html.push(' <img style="width: 18px;margin-top: -3px;margin-right: 5px;" src="../images/schedule/rejected-black.png">');
-    //         break;
-    //     default:
-    //         html.push(' ');
-    // }
-
-    // if (!isAllDay) {
-    //     html.push('<strong style="color: black">' + start.format('HH:mm') + '</strong> ');
-    // }
-
-    // html.push('<label style="color: white">' + schedule.title + '</label> ');
+    
     let body = schedule.body
     let number = body.length
     for(let i = 0; i < number;i++){

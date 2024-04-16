@@ -1,3 +1,5 @@
+let hubNodeList = []
+
 $(function () {
             
     // if($('#typeOfVehicle option:selected').val()){

@@ -13,12 +13,25 @@ const sgid = require('../lib/sgid')
 const config = require('../lib/config')
 const utils = require('../util/utils')
 
-const { USER_STATUS, USER_ACTIVITY } = require('../util/content');
+const { USER_STATUS } = require('../util/content');
 const loginService = require('../services/loginService');
 const log4js = require('../log4js/log.js');
 const log = log4js.logger('Singpass Callback');
 
 
+const getUserInfo = function (data) {
+  let nric = ""
+  let name = ""
+  for (const [key, value] of data) {
+    if (key == "NRIC NUMBER") {
+      nric = value
+    }
+    if (key == "NAME") {
+      name = value
+    }
+  }
+  return { nric, name }
+}
 /**
  * Main controller function to generate the callback page
  *
@@ -37,67 +50,51 @@ async function index(req, res) {
       privateKey
     )
 
-    let nric = ""
-    let name = ""
-    for (const [key, value] of data) {
-      if (key == "NRIC NUMBER") {
-        nric = value
-      }
-      if (key == "NAME") {
-        name = value
-      }
-    }
+    let { nric, name } = getUserInfo(data)
     let loginName = utils.GetLoginName(nric, name)
     log.info(`LoginName: ${loginName}, FullName: ${name}`)
+
     let userBase = await loginService.getUserExistByLoginName(loginName)
     if (userBase.code == 0) {
       return res.render('login', { title: 'Login', error: userBase.errorMsg })
     }
 
     let user = await User.findOne({ where: { loginName: loginName, username: name } });
-    if (user) {
-      if (user.status == USER_STATUS.LockOut) {
-        if (user.getDataValue('status') == null) {
-          await loginService.addUserManagementReport(user.id, "Last login date passed 90 days", USER_ACTIVITY.LockOut)
-          await User.update({ status: USER_STATUS.LockOut }, { where: { id: user.id } })
-        } else if (user.getDataValue('status') != USER_STATUS.LockOut) {
-          await loginService.addUserManagementReport(user.id, "Account locked", USER_ACTIVITY.LockOut)
-        }
-        let error = `Account [${loginName}] is locked, please contact administrator.`
-        log.error(error)
 
-        return res.render('login', { title: 'Login', error: error })
-      } else if (user.status == USER_STATUS.Deactivated) {
-        if (user.getDataValue('status') == null) {
-          await loginService.addUserManagementReport(user.id, "Last login date passed 180 days", USER_ACTIVITY.Deactivate)
-          await User.update({ status: USER_STATUS.Deactivated }, { where: { id: user.id } })
-        } else if (user.getDataValue('status') != USER_STATUS.Deactivated) {
-          await loginService.addUserManagementReport(user.id, "Account deactivated", USER_ACTIVITY.Deactivate)
-        }
-        let error = `Account [${loginName}] is deactivated, please contact administrator.`
-        log.error(error)
-
-        return res.render('login', { title: 'Login', error: error })
-      }
-      if (user.ORDExpired) {
-        let error = `Login Failed. Account [${loginName}] ORD Expired, please contact administrator.`
-        log.error(error)
-
-        return res.render('login', { title: 'Login', error: error })
-      }
-
-      user.sgid = sub
-      await user.save()
-      return res.render('callback', {
-        data: loginName + "@" + name,
-        sysType: 'window'
-      })
-    } else {
+    if (!user) {
       const error = "Login failed. User does not exist."
       console.log(error)
       log.error(error)
       return res.render('login', { title: 'Login', error: error })
     }
+
+    if (user.status == USER_STATUS.LockOut) {
+      await loginService.lockOutUser(user)
+      let error = `Account [${loginName}] is locked, please contact administrator.`
+      log.error(error)
+      return res.render('login', { title: 'Login', error: error })
+    } 
+    else if (user.status == USER_STATUS.Deactivated) {
+      await loginService.deactivatedUser(user)
+      let error = `Account [${loginName}] is deactivated, please contact administrator.`
+      log.error(error)
+      return res.render('login', { title: 'Login', error: error })
+    }
+
+    if (user.ORDExpired) {
+      let error = `Login Failed. Account [${loginName}] ORD Expired, please contact administrator.`
+      log.error(error)
+
+      return res.render('login', { title: 'Login', error: error })
+    }
+
+    user.sgid = sub
+    await user.save()
+    return res.render('callback', {
+      data: loginName + "@" + name,
+      sysType: 'window'
+    })
+
   } catch (error) {
     console.log(error)
     log.error(error)

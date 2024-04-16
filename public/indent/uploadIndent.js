@@ -20,7 +20,6 @@ function uploadFile(e) {
             simplyAlert('Upload Success.');
             // console.log(res.data.data)
             window.location.reload();
-            return
         } else if (res.data.code == 0) {
             simplyAlert(res.data.msg, 'red');
             return
@@ -32,8 +31,5 @@ function uploadFile(e) {
 
 function isExcel(filename) {
     let extension = filename.substring(filename.lastIndexOf('.') + 1);
-    if (extension !== 'xlsx') {
-        return false;
-    }
-    return true;
+    return extension === 'xlsx';
 }

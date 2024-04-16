@@ -1,3 +1,5 @@
+let hubNodeList = []
+
 $(function() {
     axios.post("/provider/getAllServiceProviderSummary", {}).then(async res => {
         let tsp = res.data.data;

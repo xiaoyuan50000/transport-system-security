@@ -14,7 +14,7 @@ const addBtnListening = function () {
 }
 
 const onCheckBox = function(ele) {
-    if(ele.checked == true){
+    if(ele.checked){
         $("#checkBoxContent")[0].style.color = "black";
 
         canClickSignUp();
@@ -40,12 +40,12 @@ const initGroupSelect = function() {
 
 const submitForm = async function() {
     let canSignUP = $(".register-btn-div").hasClass("active");
-    if (canSignUP === true) {
+    if (canSignUP) {
         let checkNumResult = await check(document.getElementById('user-mobileNumber'))
         let checkPwdResult = await check(document.getElementById('user-password'))
         let checkRePwdResult = await check(document.getElementById('user-confirmPassword'))
-        let checkBoxResult = ($("#checkBoxEle")[0].checked == true);
-        if (checkNumResult && checkPwdResult && checkRePwdResult && checkBoxResult === true) {
+        let checkBoxResult = $("#checkBoxEle")[0].checked;
+        if (checkNumResult && checkPwdResult && checkRePwdResult && checkBoxResult) {
             saveUser();
         }
     }
@@ -97,7 +97,7 @@ const canClickSignUp = function() {
             $(".register-btn-div").removeClass("active");
         }
     });
-    if ($("#checkBoxEle")[0].checked != true) {
+    if (!$("#checkBoxEle")[0].checked) {
         $(".register-btn-div").removeClass("active");
     }
 }

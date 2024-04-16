@@ -358,7 +358,7 @@ const DeleteMixRow = function (e) {
 
 const InitDailyTripTime = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         laydate.render({
             elem: '#dailyTripTime',
             lang: 'en',
@@ -406,13 +406,22 @@ const DeleteDailyTripRow = function (e) {
 }
 
 const ValidFormBeforeSubmit3 = function (data) {
-    if (data["chargeType"] == '1' && data["basePrice"] == "" && data["hourlyPrice"] != "" || data["basePrice"] != "" && data["hourlyPrice"] == "") {
-        return true
-    }
-    return false
+    return data["chargeType"] == '1' && data["basePrice"] == "" && data["hourlyPrice"] != "" || data["basePrice"] != "" && data["hourlyPrice"] == ""
 }
 
 const ValidFormBeforeSubmit2 = function (data) {
+    const validObjectData = function (data, key) {
+        for (let val of data[key]) {
+            if (val == "") {
+                let errorLabel = $(`#contractRate-modal-form input[name='${key}'],#contractRate-modal-form select[name='${key}']`).closest(".row").find("label").html()
+                errorLabel = errorLabel.replace(":", "")
+                simplyAlert(errorLabel + " is required.")
+                return false
+            }
+        }
+        return true
+    }
+
     if (!ValidFormBeforeSubmit3(data)) {
         for (let key in data) {
             if (data[key] == "" || data[key] == []) {
@@ -422,15 +431,10 @@ const ValidFormBeforeSubmit2 = function (data) {
                 return false
             } else if (typeof data[key] == 'object') {
                 console.log(typeof data[key]);
-                
-                for (let val of data[key]) {
-                    if (val == "") {
-                        let errorLabel = $(`#contractRate-modal-form input[name='${key}'],#contractRate-modal-form select[name='${key}']`).closest(".row").find("label").html()
-                        errorLabel = errorLabel.replace(":", "")
-                        simplyAlert(errorLabel + " is required.")
-                        return false
-                    }
+                if (!validObjectData(data, key)) {
+                    return false
                 }
+
             }
         }
     }

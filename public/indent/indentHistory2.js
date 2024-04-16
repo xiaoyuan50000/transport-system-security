@@ -139,12 +139,12 @@ $(function () {
                     </li>`
                 }
                 driverContent += `<tr>
-                    <td>${externalTaskId ? externalTaskId : "-"}</td>
+                    <td>${externalTaskId || "-"}</td>
                     <td>${poc}</td>
                     <td>${mobileNumber}</td>
-                    <td>${name ? name : "-"}</td>
-                    <td>${contactNumber ? contactNumber : "-"}</td>
-                    <td>${vehicleNumber ? vehicleNumber : "-"}</td>
+                    <td>${name || "-"}</td>
+                    <td>${contactNumber || "-"}</td>
+                    <td>${vehicleNumber || "-"}</td>
                     <td>
                         <ul class="custom-timeline">
                             ${statusFlow}

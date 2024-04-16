@@ -4,7 +4,8 @@ function singpassLoginCallback(singpassResCode, nric) {
     console.log('singpassLoginCallback: singpassResCode=' + singpassResCode + ', nric=' + nric);
     let platName = navigator.userAgent;
     let isAndroid = platName.indexOf("Android") > -1 || platName.indexOf('Lindex') > -1;
-    let isIos = !!platName.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+    let regex = /\(i[^;]+;( U;)? CPU.+Mac OS X/
+    let isIos = !!regex.exec(platName);
 
     if (singpassResCode == 0) {
         console.log('singpassLoginCallback: singpassResCode=' + singpassResCode + ', nric=' + nric);
@@ -13,7 +14,7 @@ function singpassLoginCallback(singpassResCode, nric) {
         } else if (isIos) {
             window.webkit.messageHandlers.logoutCallback.postMessage('');
         }
-        simplyAlert('Invalid system account, Nric: ' + (nric ? nric : 'null'), 'red');
+        simplyAlert('Invalid system account, Nric: ' + (nric || 'null'), 'red');
         return;
     } else if (!nric) {
         if (isAndroid) {
@@ -22,7 +23,6 @@ function singpassLoginCallback(singpassResCode, nric) {
             window.webkit.messageHandlers.logoutCallback.postMessage('');
         }
         simplyAlert("Singpass login fail, NIRC is null.", 'red');
-        return;
     } else {
         console.log('singpassLoginCallback autoLogin: singpassResCode=' + singpassResCode + ', nric=' + nric);
         axios.post('./loginUseSingpass', {

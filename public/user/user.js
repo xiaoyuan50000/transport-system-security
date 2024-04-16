@@ -113,14 +113,12 @@ const getServiceType = async function (groupId) {
         datas.forEach((data, index) => {
             let name = data.name
             let id = data.id
-            // if(data.category.toUpperCase() != 'MV') {
             checkBoxHtml += `<div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" data-value="${id}" id="service-type-${index}">
                             <label class="form-check-label checkbox-mt" for="service-type-${index}">
                                 ${name}
                             </label>
                         </div>`
-            // }
         });
         $("#platformType").append(`<label class="form-label">Platform Type</label><div class="service-type-checkbox">${checkBoxHtml}</div>`)
     })
@@ -170,10 +168,8 @@ const check = async function (input) {
             let validNricResult = loginNameReg.validNric(nric)
             if (!validNricResult.success) {
                 errorMsg = validNricResult.errorMsg
-            } else {
-                if (username != "" && !isEdit) {
-                    errorMsg = loginNameReg.valid(nric, username).errorMsg
-                }
+            } else if (username != "" && !isEdit) {
+                errorMsg = loginNameReg.valid(nric, username).errorMsg
             }
         } else if (name == "mobileNumber") {
             console.log(value)
@@ -399,7 +395,7 @@ $(function () {
 
 const initORD = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let option = {
             elem: '#user-ord',
             lang: 'en',

@@ -5,7 +5,8 @@ $(function() {
                 localStorage.clear()
                 let platName = navigator.userAgent;
                 let isAndroid = platName.indexOf("Android")>-1 || platName.indexOf('Lindex')>-1;
-                let isIos = !!platName.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+                let regex = /\(i[^;]+;( U;)? CPU.+Mac OS X/
+                let isIos = !!regex.exec(platName);
                 if (isAndroid) {
                     window.android.logoutCallback();
                 } else if (isIos) {

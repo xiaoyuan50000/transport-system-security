@@ -4,7 +4,6 @@ let table
 // let needInitDateEle = [];
 let lastOptTask = [];
 let mobiusSubUnits = [];
-let hubNodeList = []
 
 $(function () {
     $("#execution-date").val(`${moment().format("DD/MM/YYYY")} ~ ${moment().add(5, 'd').format("DD/MM/YYYY")}`)
@@ -189,7 +188,7 @@ $(function () {
                         return '-';
                     }
                     if (full.endorse) {
-                        return data ? data : "-"
+                        return data || "-"
                     }
 
                     if (full.fundingSelect && full.fundingSelect.length != 0) {
@@ -201,7 +200,7 @@ $(function () {
                                 ${option}
                             </select>`
                     } else {
-                        return data ? data : '-';
+                        return data || '-';
                     }
                 }
             },
@@ -215,7 +214,7 @@ $(function () {
                         return '-';
                     }
                     if (full.endorse) {
-                        return data ? data : "-"
+                        return data || "-"
                     }
 
                     if (full.serviceProviderId && full.funding && full.walletSelect && full.walletSelect.length != 0) {
@@ -227,7 +226,7 @@ $(function () {
                                 ${option}
                             </select>`
                     } else {
-                        return data ? data : '-';
+                        return data || '-';
                     }
                 }
             },
@@ -637,7 +636,7 @@ const EditDriver = function (e) {
 
                 //InitStartDateSelector()
                 layui.use(['laydate'], function () {
-                    laydate = layui.laydate;
+                    let laydate = layui.laydate;
                     laydate.render({
                         elem: '#executionDate',
                         lang: 'en',
@@ -665,35 +664,15 @@ const EditDriver = function (e) {
                         btns: ['clear', 'confirm'],
                         ready: () => { noSecond(); },
                         done: function (value, date, endDate) {
-                            if (serviceProviderId) {
-                                axios.post("/getDriverCheckboxByVehicle", {
-                                    vehicle: vehicleType,
-                                    serviceModeId: serviceModeId,
-                                    dropoffPoint: dropoffPoint,
-                                    pickupPoint: pickupPoint,
-                                    executionDate: parent.changeDateFormat($this.$content.find('input[name="executionDate"]').val()),
-                                    executionTime: $this.$content.find('input[name="executionTime"]').val()
-                                }).then(res => {
-                                    let datas = res.data.data
-                                    if (datas) {
-                                        let needChangeTsp = true;
-                                        let data = `<option value=""></option>`
-                                        for (let item of datas) {
-                                            if (item.id == serviceProviderId) {
-                                                data += `<option value="${item.id}" selected>${item.name}</option>`
-                                                needChangeTsp = false;
-                                            } else {
-                                                data += `<option value="${item.id}">${item.name}</option>`
-                                            }
-                                        }
-                                        if (needChangeTsp === true) {
-                                            $this.$content.find(".sp-div").show();
-                                            $this.$content.find("#serviceProvider").empty()
-                                            $this.$content.find("#serviceProvider").append(data)
-                                        }
-                                    }
-                                })
-                            }
+                            let executionDate = $this.$content.find('input[name="executionDate"]').val()
+                            let executionTime = $this.$content.find('input[name="executionTime"]').val()
+                            doneEditTaskTime(serviceProviderId, vehicleType, serviceModeId, dropoffPoint, pickupPoint, executionDate, executionTime, function(needChangeTsp, data){
+                                if (needChangeTsp === true) {
+                                    $this.$content.find(".sp-div").show();
+                                    $this.$content.find("#serviceProvider").empty()
+                                    $this.$content.find("#serviceProvider").append(data)
+                                }
+                            })
                         },
                     });
                 });
@@ -844,6 +823,34 @@ const EditDriver = function (e) {
         )
     }
 
+}
+
+const doneEditTaskTime = function(serviceProviderId, vehicleType, serviceModeId, dropoffPoint, pickupPoint, executionDate, executionTime, callback){
+    if (serviceProviderId) {
+        axios.post("/getDriverCheckboxByVehicle", {
+            vehicle: vehicleType,
+            serviceModeId: serviceModeId,
+            dropoffPoint: dropoffPoint,
+            pickupPoint: pickupPoint,
+            executionDate: parent.changeDateFormat(executionDate),
+            executionTime: executionTime
+        }).then(res => {
+            let datas = res.data.data
+            if (datas) {
+                let needChangeTsp = true;
+                let data = `<option value=""></option>`
+                for (let item of datas) {
+                    if (item.id == serviceProviderId) {
+                        data += `<option value="${item.id}" selected>${item.name}</option>`
+                        needChangeTsp = false;
+                    } else {
+                        data += `<option value="${item.id}">${item.name}</option>`
+                    }
+                }
+                callback(needChangeTsp, data)
+            }
+        })
+    }
 }
 
 const checkEditDriverFormInput = function (input) {
@@ -1024,7 +1031,7 @@ const showJobCount = async function () {
         let result = res.data
         let allCount = result.allCount
         let myCount = result.myCount
-        $("#pending-count").text(myCount ? myCount : 0);
-        $("#all-count").text(allCount ? allCount : 0);
+        $("#pending-count").text(myCount || 0);
+        $("#all-count").text(allCount || 0);
     })
 }

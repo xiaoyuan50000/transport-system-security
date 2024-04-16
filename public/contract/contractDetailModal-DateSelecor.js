@@ -52,7 +52,7 @@ let formatDate = 'DD/MM/YYYY'
     
     const InitEndDateSelectorModal = function () {
         layui.use(['laydate'], function () {
-            laydate = layui.laydate;
+            let laydate = layui.laydate;
             laydate.render({
                 elem: endDateElem,
                 lang: 'en',

@@ -64,7 +64,7 @@ async function index(req, res) {
       return res.render('callbackMobile', {
         code: 0,
         nric: loginName + "@" + name,
-        msg: 'Invalid system account, Nric: ' + (loginName ? loginName : 'None')
+        msg: 'Invalid system account, Nric: ' + (loginName || 'None')
       })
     }
   } catch (error) {

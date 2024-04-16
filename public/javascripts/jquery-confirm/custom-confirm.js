@@ -2,7 +2,7 @@ function simplyAlert(content, type) {
     $.alert({
         title: 'Alert',
         content: content,
-        type: type ? type : 'green',
+        type: type || 'green',
     });
 }
 

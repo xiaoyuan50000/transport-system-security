@@ -45,7 +45,7 @@ $(function () {
         ],
         "columns": [
             {
-                "visible": roleName === 'UCO' ? true : false,
+                "visible": roleName === 'UCO',
                 "class": "firstCol",
                 "data": null, "title": "",
                 "render": function (data, type, full, meta) {

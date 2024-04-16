@@ -10,6 +10,7 @@ let allTSP = []
 let currentUser = null;
 let roleName = null;
 let currentGroupServiceType = null;
+let optType1 = ""
 
 $(async function () {
     currentUser = await getDecodeAESCode(localStorage.user);
@@ -27,7 +28,7 @@ $(async function () {
         $(".info-div").hide();
         $(".trip-div").show();
     }
-    if (optType == 'Create') {
+    if (optType1 == 'Create') {
         $(".create-nav").hide();
         $(".to-add-btn").show();
         if (requestId) {
@@ -40,12 +41,12 @@ $(async function () {
             $("#noOfTripsDiv").hide()
         }
         $(".add-trip-btn").show();
-    } else if (optType == 'Edit') {
-        $('.edit-trip-title-label').text(optType);
+    } else if (optType1 == 'Edit') {
+        $('.edit-trip-title-label').text(optType1);
         $(".edit-trip-btn").show();
         $(".create-nav").show();
-    } else if (optType == 'View') {
-        $('.edit-trip-title-label').text(optType);
+    } else if (optType1 == 'View') {
+        $('.edit-trip-title-label').text(optType1);
         $(".duplicate-trip-btn").show();
         $(".create-nav").show();
     }
@@ -69,15 +70,14 @@ $(async function () {
     // }, 500)
 });
 
-const checkDriverNum = function() {
+const checkDriverNum = function () {
     if ($("#typeOfVehicle").val() == "-") {
         return
     }
 
-    let noOfVehicle = $('#noOfVehicle').val();
-    noOfVehicle = noOfVehicle ? noOfVehicle : 0;
+    let noOfVehicle = $('#noOfVehicle').val() || 0;
     let driverNum = $("#noOfDriver").val();
-    if(parseInt(driverNum) > parseInt(noOfVehicle)) {
+    if (parseInt(driverNum) > parseInt(noOfVehicle)) {
         $("#noOfDriver").val(noOfVehicle);
     }
 }
@@ -91,7 +91,7 @@ const changeTypeOfVehicle = async function (vehicle = null) {
         vehicle = $('#typeOfVehicle option:selected').val()
     }
     if (vehicle) {
-        if(vehicle != "-"){
+        if (vehicle != "-") {
             await axios.post("/checkVehicleDriver", { vehicle }).then(res => {
                 if (res.data.data == 1) {
                     $('#driver-row').css('display', 'block')
@@ -100,7 +100,7 @@ const changeTypeOfVehicle = async function (vehicle = null) {
                 }
                 OnCheckDriver(false)
             })
-        }else{
+        } else {
             $('#driver-row').css('display', 'block')
             $('#vehicle-row').css('display', 'none')
             $("#noOfVehicle").val(0);
@@ -115,7 +115,7 @@ const changeTypeOfVehicle = async function (vehicle = null) {
 const initPage = function () {
     let repeats = $("#repeats").val();
 
-    if (optType == 'Edit' && repeats == "Weekly") {
+    if (optType1 == 'Edit' && repeats == "Weekly") {
         $("#endsOn").hide();
         $("#endsOnLabel").hide();
         $("#repeatOnLabel").hide();
@@ -147,7 +147,7 @@ const initPage = function () {
         $("#pickupDestination").find("option").show();
     }
 
-    if (optType == 'View') {
+    if (optType1 == 'View') {
         $(".trip-info-form input").attr("disabled", true);
         $(".trip-info-form select").attr("disabled", true);
         $(".more-trip-info-form input").attr("disabled", true);
@@ -156,14 +156,14 @@ const initPage = function () {
     }
 }
 const initPageData = async function (callback) {
-    if ((optType == 'Edit' || optType == 'View') && currentTripId) {
+    if ((optType1 == 'Edit' || optType1 == 'View') && currentTripId) {
         await axios.post("/findTripById", {
             tripId: currentTripId
         }).then(async res => {
             let trip = res.data.data;
 
-            $('.edit-trip-title-label').text(optType + " " + trip.tripNo);
-            
+            $('.edit-trip-title-label').text(optType1 + " " + trip.tripNo);
+
 
             let groupId = trip.groupId
             let serviceModeId = trip.serviceModeId
@@ -187,7 +187,7 @@ const initPageData = async function (callback) {
             await InitRepeats(trip.repeats)
             $("#repeats").attr("disabled", true)
             let tripStartExeDate = null;
-            //let executionTime = trip.executionTime;
+            let executionTime = "";
             if (trip.repeats == "Once") {
                 $("#executionDate").val(changeDateFormatDMY(trip.executionDate))
                 $("#executionTime").val(trip.executionTime)
@@ -306,7 +306,7 @@ const duplicateTrip = async function () {
 
     $('.edit-trip-title-label').text("Duplicate");
     currentTripId = '';
-    optType = 'Create';
+    optType1 = 'Create';
     $(".create-nav").hide();
     $(".to-add-btn").show();
     $(".add-trip-btn").show();
@@ -347,7 +347,7 @@ const changeCategory = function () {
     let $currentCheckedEle = $('input:radio[name="category"]:checked');
     if ($currentCheckedEle) {
         let currentCategory = $currentCheckedEle.val();
-        
+
         $('#serviceType option').remove();
         $("#serviceType").val("");
 
@@ -413,7 +413,7 @@ const InitRecurring = async function (defaultVal) {
         if (defaultVal) {
             $("#repeats").val(defaultVal);
         }
-        if (optLength == 1 && optType == 'Create') {
+        if (optLength == 1 && optType1 == 'Create') {
             $("#repeats").val(datas[0].value);
             defaultVal = datas[0].value
             $("#repeats-div").hide();
@@ -503,7 +503,7 @@ const InitRepeats = async function (val) {
         }
     }
 
-    
+
 
     if (currentServiceMode == "delivery" || currentServiceMode == "Ferry Service") {
         $("#duration").attr("disabled", true)
@@ -580,12 +580,10 @@ const InitStartDateSelector = function () {
             done: function (value, date, endDate) {
                 value = changeDateFormat(value)
                 CheckExecutionDateWithin5days(value)
-
+                let minHour = ''
                 if (moment(value).isSame(moment(), 'day')) {
                     let m = (Math.floor(moment().minute() / 5) + 1) * 5;
                     minHour = moment().set('minute', m).format('HH:mm:ss')
-                } else {
-                    minHour = ''
                 }
                 InitStartTimeSelector(minHour)
             },
@@ -611,7 +609,7 @@ const InitStartTimeSelector = function (minHour) {
             min: 'today',
             format: 'HH:mm',
             btns: ['clear', 'confirm'],
-            ready: () => { noSecond();  DisabledLayDate() },
+            ready: () => { noSecond(); DisabledLayDate() },
             change: () => { DisabledLayDate() },
             done: () => {
             }
@@ -829,13 +827,16 @@ const AddTrip = function () {
         data.duration = null
     }
 
+    data.noOfDriver = null
     let driver = $("#driver").prop("checked")
     if (driver) {
         data.noOfDriver = $("#noOfDriver").val()
-    } else {
-        data.noOfDriver = null
     }
-    
+
+    submitAddTrip(data, requestId, currentPurposeType)
+}
+
+const submitAddTrip = function (data, requestId, currentPurposeType) {
     let isOK = ValidTripForm(data)
     if (isOK) {
         $(".confirm-add-btn").attr("disabled", true)
@@ -853,7 +854,7 @@ const AddTrip = function () {
                 } else {
                     simplyAlert(res.data.msg);
                 }
-            }).catch(error=>{
+            }).catch(error => {
                 $(".confirm-add-btn").attr("disabled", false)
             })
         } else {
@@ -874,7 +875,7 @@ const AddTrip = function () {
                 } else {
                     simplyAlert(res.data.msg);
                 }
-            }).catch(error=>{
+            }).catch(error => {
                 $(".confirm-add-btn").attr("disabled", false)
             })
         }
@@ -892,7 +893,7 @@ const showSuccessPage = function (createType, eleId) {
 }
 
 const addTripContinue = async function () {
-    optType = 'Create';
+    optType1 = 'Create';
     page = "trip";
     $(".content-div").show();
     $(".success-page-div").hide();
@@ -909,16 +910,14 @@ const ValidTripForm = function (data, isEdit) {
     data.endsOn = changeDateFormat(data.endsOn)
     data.preParkDate = changeDateFormat(data.preParkDate)
 
-    if (!requestId) {
-        //check indent info
-        if (roleName == 'RF' && !$("#groupSelectId").val()) {
-            simplyAlert("Unit is required.")
-            return false
-        }
-        if (!$("#purposeType").val()) {
-            simplyAlert("Purpose is required.")
-            return false
-        }
+    //check indent info
+    if (!requestId && roleName == 'RF' && !$("#groupSelectId").val()) {
+        simplyAlert("Unit is required.")
+        return false
+    }
+    if (!requestId && !$("#purposeType").val()) {
+        simplyAlert("Purpose is required.")
+        return false
     }
 
     let errorLabel = {
@@ -950,30 +949,30 @@ const ValidTripForm = function (data, isEdit) {
         simplyAlert(`The execution time must exceed ${serviceMode} hours.`)
         return false
     }
-    if (!isEdit && data.repeats == 'Weekly') {
-        let fmt = "YYYY-MM-DD"
-        let now = moment(data.executionDate).format(fmt)
-        let singaporePublicHolidays = publidHolidays;
-        let executionDateArray = []
-        while (true) {
-            if (moment(now).isAfter(moment(data.endsOn))) {
-                break;
-            }
-            if (singaporePublicHolidays.indexOf(now) != -1) {
-                now = moment(now).add(1, 'd').format(fmt);
-                continue;
-            }
-            let isoWeekday = moment(now).isoWeekday()
-            if (data.repeatsOn.indexOf(isoWeekday) != -1) {
-                executionDateArray.push(now)
-            }
-            now = moment(now).add(1, 'd').format(fmt);
-        }
-        if (executionDateArray.length == 0) {
-            simplyAlert("No trip will be create.")
-            return false
-        }
-    }
+    // if (!isEdit && data.repeats == 'Weekly') {
+    //     let fmt = "YYYY-MM-DD"
+    //     let now = moment(data.executionDate).format(fmt)
+    //     let singaporePublicHolidays = publidHolidays;
+    //     let executionDateArray = []
+    //     while (true) {
+    //         if (moment(now).isAfter(moment(data.endsOn))) {
+    //             break;
+    //         }
+    //         if (singaporePublicHolidays.indexOf(now) != -1) {
+    //             now = moment(now).add(1, 'd').format(fmt);
+    //             continue;
+    //         }
+    //         let isoWeekday = moment(now).isoWeekday()
+    //         if (data.repeatsOn.indexOf(isoWeekday) != -1) {
+    //             executionDateArray.push(now)
+    //         }
+    //         now = moment(now).add(1, 'd').format(fmt);
+    //     }
+    //     if (executionDateArray.length == 0) {
+    //         simplyAlert("No trip will be create.")
+    //         return false
+    //     }
+    // }
 
     return true
 }
@@ -1058,7 +1057,7 @@ const EditTrip = async function () {
     if (driver) {
         data.noOfDriver = noOfDriver
     }
-    
+
     let isOK = ValidTripForm(data, true)
     if (isOK) {
         data.tripId = currentTripId
@@ -1111,11 +1110,10 @@ const CheckExecutionDateWithin5days = function (executionDate) {
     //let day = moment(start).diff(moment(now), 'd')
     //next 5 working days(exclude publidHolidays)
     let currentDate = moment(now);
-    let index = 1; 
-    for(let index =1;index <6;) {
+    for (let index = 1; index < 6;) {
         currentDate = currentDate.add(1, "d");
         let weedDay = currentDate.day();
-        if(publidHolidays.indexOf(currentDate.format("YYYY-M-D")) == -1 && weedDay != 6 && weedDay != 0) {
+        if (publidHolidays.indexOf(currentDate.format("YYYY-M-D")) == -1 && weedDay != 6 && weedDay != 0) {
             index++;
         }
     }

@@ -6,11 +6,11 @@ $(function() {
     })
 });
 
-const getParams = function(key) {
+const getParams = function (key) {
     let reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
-    let r = window.location.search.substr(1).match(reg);
+    let r = reg.exec(window.location.search.slice(1));
     if (r != null) {
-        return unescape(r[2]);
+        return decodeURIComponent(r[2]);
     }
     return null;
 };
@@ -27,11 +27,7 @@ const initDriverData = async function() {
             if (!driverInfo.taskStatus) {
                 driverInfo.taskStatus = 'unassigned';
             }
-            let taskStatuColor = driverInfo.taskStatus == 'assigned' ? '#008aff' : driverInfo.taskStatus == 'unassigned' ? '#9d61fc' :
-                driverInfo.taskStatus == 'Arrived' ? '#10cbf8' : driverInfo.taskStatus == 'started' ? '#bcdb2c' : 
-                driverInfo.taskStatus == 'No Show' ? '#ff80a5' : driverInfo.taskStatus == 'Completed' ? '#1b7981' : 
-                driverInfo.taskStatus == 'cancelled' ? '#9d9d9d' : driverInfo.taskStatus == 'failed' ? '#701919' : 
-                driverInfo.taskStatus == 'Late Trip' ? '#fd7624' : driverInfo.taskStatus == 'Endorse' ? '#b622e7' : '#cbcbcb';
+            let taskStatuColor = getStatusColor(driverInfo.taskStatus);
             driverDetailHtml += `
                  <div class="info-nav ${sn == 1 ? 'active' : ''} ${sn == 1 ? 'up' : 'down'}">
                     <div class="row" style="margin-left: 10px;width: 100%; height: 35px;display: flex;justify-content: left;align-items: center;">

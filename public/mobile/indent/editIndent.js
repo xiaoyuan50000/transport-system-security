@@ -106,11 +106,11 @@ const initIndentData = async function() {
     });
 };
 
-const getParams = function(key) {
+const getParams = function (key) {
     let reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
-    let r = window.location.search.substr(1).match(reg);
+    let r = reg.exec(window.location.search.slice(1));
     if (r != null) {
-        return unescape(r[2]);
+        return decodeURIComponent(r[2]);
     }
     return null;
 };

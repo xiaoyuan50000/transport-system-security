@@ -1,13 +1,15 @@
-let indentFlowColors = {'New Indent': '#A8BBE5','New Trip': '#A8BBE5', 'Edit Trip': '#A8BBE5', 'Create': '#A8BBE5','Approve': '#4EB981', 
+let indentFlowColors = {
+    'New Indent': '#A8BBE5', 'New Trip': '#A8BBE5', 'Edit Trip': '#A8BBE5', 'Create': '#A8BBE5', 'Approve': '#4EB981',
     'Cancel': '#adadad', 'Reject': '#f6a7a6', 'Edit': '#8cc9fd',
-    'assigned': '#008aff', 'declined': '#eb3531', 'No Show': '#ff80a5', 
-    'Arrived': '#4EB981', 'Late Trip': '#fd7624','successful': '#007c5c'};
+    'assigned': '#008aff', 'declined': '#eb3531', 'No Show': '#ff80a5',
+    'Arrived': '#4EB981', 'Late Trip': '#fd7624', 'successful': '#007c5c'
+};
 
 let tripId;
 $(function () {
     tripId = getParams('tripId');
 
-    $(".create-info-item").on("click", function() {
+    $(".create-info-item").on("click", function () {
         $(".create-info-item").removeClass("active");
         if ($(this).hasClass("indent-flow-nav")) {
             $(".indent-flow-div").show();
@@ -21,7 +23,7 @@ $(function () {
 
     initActionHistory();
 
-    $("#back").on('click', function(){
+    $("#back").on('click', function () {
         history.back(-1);
     })
 });
@@ -42,14 +44,14 @@ const initActionHistory = async function () {
     })
 }
 
-const initIndentFlowPage = function(flowDataList) {
+const initIndentFlowPage = function (flowDataList) {
     let indentFlowHtml = `<table style="text-align: center;margin-top: 10px; margin-left: 10px;">`;
     let flowDataSize = flowDataList.length;
     let currentIndex = 0;
     for (let row of flowDataList) {
         currentIndex++;
         let indentFlowColor = '#9D9D9D';
-        if(indentFlowColors[row.action]){
+        if (indentFlowColors[row.action]) {
             indentFlowColor = indentFlowColors[row.action];
         }
 
@@ -57,8 +59,8 @@ const initIndentFlowPage = function(flowDataList) {
         let remark = row.remark ? `(${row.remark})` : ""
         let createdAt = moment(row.createdAt).format("DD/MM HH:mm:ss")
         let role = row.roleName
-        
-        indentFlowHtml +=`    
+
+        indentFlowHtml += `    
             <tr>
                 <td style="height: 50px;min-height: 50px;">
                     <label style="height: 24px; max-height: 50px;padding-top: 3px;width: 80px; border-radius: 15px;
@@ -70,7 +72,7 @@ const initIndentFlowPage = function(flowDataList) {
                             <span style="color: grey;font-size: 10px;">&nbsp${createdAt}</span>
                         </label>
                     </div>
-                    <div style="text-align: left;margin-left: 20px;font-size: 12px;font-weight: bolder"><label >${row.groupName+'('+row.contactNumber+')'}</label></div>
+                    <div style="text-align: left;margin-left: 20px;font-size: 12px;font-weight: bolder"><label >${row.groupName + '(' + row.contactNumber + ')'}</label></div>
                     ${remark ? `<div style="text-align: left;margin-left: 20px;"><label >${remark}</label></div>` : ''}
                 </td>
             </tr>
@@ -80,12 +82,15 @@ const initIndentFlowPage = function(flowDataList) {
             </tr>` : ''}
         `;
     }
-    indentFlowHtml +=`</table>`;
+    indentFlowHtml += `</table>`;
     $(".indent-flow-div").empty();
     $(".indent-flow-div").append(indentFlowHtml);
 };
 
-const initDriverFlowPage = function(flowDataList) {
+
+
+
+const initDriverFlowPage = function (flowDataList) {
     let sn = 1
     let driverDetailHtml = ``;
     $(".driver-flow-div").empty();
@@ -111,22 +116,15 @@ const initDriverFlowPage = function(flowDataList) {
             </div>
             <div class="driver-detail-div" ${sn == 1 ? '' : 'style="display: none;"'}>
                 <table style="text-align: center;margin-top: 10px; margin-left: 10px; width: 100%;">`;
-            
-            let driverFlowList = driverInfo.driverStatus;
-            let driverFlowLength = driverFlowList.length;
-            let currentIndex = 0;
-            for (let driverFlow of driverFlowList) {
-                currentIndex++;
-                let driverStatuColor = driverFlow.action == 'assigned' ? '#008aff' : 
-                    driverFlow.action == 'Arrived' ? '#10cbf8' : driverFlow.action == 'Started' ? '#bcdb2c' : 
-                    driverFlow.action == 'No Show' ? '#ff80a5' : driverFlow.action == 'Completed' ? '#1b7981' : 
-                    driverFlow.action == 'cancelled' ? '#9d9d9d' : driverFlow.action == 'failed' ? '#701919' : 
-                    driverFlow.action == 'Late Trip' ? '#fd7624' : driverFlow.action == 'Endorse' ? '#b622e7' : '#cbcbcb';
-                let driverStatuImg = driverFlow.action == 'assigned' ? '/radio-assigned.svg' : driverFlow.action == 'Started' ? '/radio-started.svg' : 
-                    driverFlow.action == 'Arrived' ? '/radio-arrived.svg' : driverFlow.action == 'Late Trip' ? '/radio-lateTrip.svg' : 
-                    driverFlow.action == 'No Show' ? '/radio-noshow.svg' : driverFlow.action == 'Completed' ? '/radio-complete.svg' : 
-                    driverFlow.action == 'cancelled' ? '/radio-cancel.svg': driverFlow.action == 'Endorse' ? '/radio-endorse.svg' : '/radio-create.svg';
-                driverDetailHtml += `
+
+        let driverFlowList = driverInfo.driverStatus;
+        let driverFlowLength = driverFlowList.length;
+        let currentIndex = 0;
+        for (let driverFlow of driverFlowList) {
+            currentIndex++;
+            let driverStatuColor = getStatusColor(driverFlow.action);
+            let driverStatuImg = getStatusImg(driverFlow.action)
+            driverDetailHtml += `
                     <tr>
                         <td style="width: 10%;">
                             <img src="/images/indent/action/${driverStatuImg}">
@@ -147,7 +145,7 @@ const initDriverFlowPage = function(flowDataList) {
                         <td></td>
                     </tr>` : ''}
                 `;
-            }
+        }
 
         driverDetailHtml += `</table>
             </div>
@@ -158,7 +156,7 @@ const initDriverFlowPage = function(flowDataList) {
 
     $(".driver-flow-div").append(driverDetailHtml);
 
-    $(".driver-flow-div").find(".info-nav").on('click', function() {
+    $(".driver-flow-div").find(".info-nav").on('click', function () {
         let isDown = $(this).hasClass("down");
         if (isDown) {
             $(this).removeClass("down");
@@ -189,11 +187,11 @@ const initDriverFlowPage = function(flowDataList) {
     });
 }
 
-const getParams = function(key) {
+const getParams = function (key) {
     let reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
-    let r = window.location.search.substr(1).match(reg);
+    let r = reg.exec(window.location.search.slice(1));
     if (r != null) {
-        return unescape(r[2]);
+        return decodeURIComponent(r[2]);
     }
     return null;
 };

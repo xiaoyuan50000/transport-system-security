@@ -5,7 +5,7 @@ let OCCMGR = "OCC Mgr"
 $(async function () {
     let elemIds = ['#execution-date', '#created-date']
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         laydate.render({
             elem: elemIds[0],
             lang: 'en',

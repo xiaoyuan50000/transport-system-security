@@ -26,7 +26,6 @@
 
 .iframe-container{
     width: 100%;
-    /* height: calc(100% - 82px); */
     height: -webkit-fill-available;
     position: fixed;
     border: none;

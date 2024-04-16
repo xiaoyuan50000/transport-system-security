@@ -1,3 +1,5 @@
+let lastOptTripIds = []
+
 const CheckAll = function (e) {
     let checkboxTrips = $(e).closest("tr").next().find("input[name='checkboxTrip']")
     checkboxTrips.prop('checked', $(e).prop('checked'))
@@ -37,8 +39,8 @@ const CheckIfJustificationRequired = function (dateArr) {
         }
     }
     let result = true
-    for (let a = 0; a < dateArr.length; a++) {
-        if (moment(dateArr[a]).isBefore(moment(now))) {
+    for(let date of dateArr){
+        if (moment(date).isBefore(moment(now))) {
             result = false
             break
         }

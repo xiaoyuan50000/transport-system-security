@@ -1,11 +1,11 @@
 $(function () {
-    document.documentElement.style.webkitUserSelect='none';
+    document.documentElement.style.userSelect='none';
     document.documentElement.style.webkitTouchCallout='none';
 
     let platName = navigator.userAgent;
     let isAndroid = platName.indexOf("Android")>-1 || platName.indexOf('Lindex')>-1;
-    let isIos = !!platName.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
-
+    let regex = /\(i[^;]+;( U;)? CPU.+Mac OS X/
+    let isIos = !!regex.exec(platName);
     autoLogin();
 
     $('.btn-login').on('click', function () {
@@ -16,7 +16,6 @@ $(function () {
         await axios.post('/mobileCV/mobileSingpass', {}).then(res => {
             if (res.data.code == 0) {
                 simplyAlert(res.data.msg, 'red');
-                return;
             } else if (isAndroid) {
                     window.android.singpassLogin(res.data.singpassUrl);
                 } else if (isIos) {

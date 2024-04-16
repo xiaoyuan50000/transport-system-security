@@ -100,7 +100,6 @@ $(function () {
 
         }
       }
-      let self = this;
       let year = dateObj.getDate().getFullYear();
       let month = dateObj.getDate().getMonth() + 1;
       let dateStr = returnDateStr(dateObj.getDate());
@@ -112,7 +111,6 @@ $(function () {
         let allDay = new Date(year, month - 1, i + 1 - firstDay.getDay());
         let allDay_str = returnDateStr(allDay);
 
-        // $(this).text(allDay.getDate()).attr('data', allDay_str);
         $(this).html(`<span class="calendar_day_i" style="">${allDay.getDate()}</span>`).attr('data', allDay_str);
 
         if (returnDateStr(new Date()) === allDay_str) {
@@ -146,9 +144,7 @@ $(function () {
                       '<li class="item">Fri</li>'+
                       '<li class="item">Sat</li>';
                       let _dateStr = '';
-                      let _dayStr = '<i class="triangle"></i>'+
-                    '<p class="date"></p>'+
-                    '<p class="week"></p>';
+                      
 
       for (let i = 0; i < 6; i++) {
         _dateStr += '<li class="item">26</li>'+
@@ -163,9 +159,7 @@ $(function () {
       this.$calendar_title.html(_titleStr);
       this.$calendar_week.html(_weekStr);
       this.$calendar_date.html(_dateStr);
-      // this.$calendar_today.html(_dayStr);
 
-      // this.$calendar.append(this.$calendar_title, this.$calendar_week, this.$calendar_date, this.$calendar_today);
       this.$calendar.append(this.$calendar_title, this.$calendar_week, this.$calendar_date);
       this.$calendar.show();
     },

@@ -45,8 +45,7 @@ $(function () {
         if (templateResourceElem.val() == "-") {
             return
         }
-        let noOfVehicle = templateNoOfVehicleElem.val();
-        noOfVehicle = noOfVehicle ? noOfVehicle : 0;
+        let noOfVehicle = templateNoOfVehicleElem.val() || 0;
         let driverNum = templateNoOfDriverElem.val();
         if (parseInt(driverNum) > parseInt(noOfVehicle)) {
             templateNoOfDriverElem.val(noOfVehicle);
@@ -200,7 +199,7 @@ const addTemplateIndent = function () {
     // let litres = templateLitresElem.val()
 
     let data = {
-        category, resourceTypeId, resourceType, serviceModeId, serviceMode, resource, noOfVehicle,  driver, noOfDriver
+        category, resourceTypeId, resourceType, serviceModeId, serviceMode, resource, noOfVehicle, driver, noOfDriver
     }
     console.log(data);
     if (!ValidTemplateIndentForm(data)) return
@@ -218,40 +217,25 @@ const ValidTemplateIndentForm = function (data) {
         noOfVehicle: 'No. Of Resource',
         noOfDriver: 'No. Of Driver',
     }
-    if (data.category == 'CV' || data.category == 'MV') {
-        let keyList = ['category', 'resourceTypeId', 'serviceModeId', 'resource']
-        for (let key in data) {
-            if (data[key] == "" && keyList.indexOf(key) != -1) {
-                simplyAlert(errorLabel[key] + " is required.")
-                return false
-            }
-            if (data[key] == "" && key == 'noOfVehicle' && data.resource != "-") {
-                simplyAlert(errorLabel[key] + " is required.")
-                return false
-            }
-            if (key == 'noOfDriver' && data.driver) {
-                if (data[key] == "") {
-                    simplyAlert(errorLabel[key] + " is required.")
-                    return false
-                } else if (data.noOfVehicle != '' && data.resource != "-" && (Number(data[key]) > Number(data.noOfVehicle))) {
-                    simplyAlert("No. Of Driver cannot exceed No. Of Vehicle.")
-                    return false
-                }
-            }
-        }
-    } 
-    // else if (data.category == 'Fuel') {
-    //     let keyList = ['category', 'resourceTypeId', 'resource', 'litres']
-    //     for (let key in data) {
-    //         if (data[key] == "" && keyList.indexOf(key) != -1) {
-    //             simplyAlert(errorLabel[key] + " is required.")
-    //             return false
-    //         }
-    //     }
-    // } 
-    else {
+    if (data.category != 'CV' && data.category != 'MV') {
         simplyAlert("Category is required.")
         return false
+    }
+
+    let keyList = ['category', 'resourceTypeId', 'serviceModeId', 'resource']
+    for (let key in data) {
+        if (data[key] == "" && keyList.indexOf(key) != -1
+            || data[key] == "" && key == 'noOfVehicle' && data.resource != "-"
+            || data[key] == "" && key == 'noOfDriver' && data.driver) {
+            simplyAlert(errorLabel[key] + " is required.")
+            return false
+        }
+
+        if (key == 'noOfDriver' && data.driver &&
+            data.noOfVehicle != '' && data.resource != "-" && (Number(data[key]) > Number(data.noOfVehicle))) {
+            simplyAlert("No. Of Driver cannot exceed No. Of Vehicle.")
+            return false
+        }
     }
     return true
 }
@@ -293,7 +277,6 @@ const createTemplateIndent = async function () {
     await axios.post("/createTemplateIndent", { templateList, name }).then(res => {
         if (res.data.code == 0) {
             simplyAlert(res.data.msg)
-            return
         } else {
             $("#templateIndentModal").modal('hide')
             simplyAlert('Create Template Indent Success.')

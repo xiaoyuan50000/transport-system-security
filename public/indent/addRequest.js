@@ -814,50 +814,51 @@ const AddTrip = function (indentId) {
 }
 
 const validateDate = function (data) {
-    if (data.executionDate) {
-        if (!moment(data.executionDate, "YYYY-MM-DD", true).isValid()) {
-            simplyAlert(`Execution Date ${data.executionDate} is invalid!`)
-            return false
-        }
+    if (data.executionDate && !moment(data.executionDate, "YYYY-MM-DD", true).isValid()) {
+        simplyAlert(`Execution Date ${data.executionDate} is invalid!`)
+        return false
     }
-    if (data.executionTime) {
-        if (!moment(data.executionTime, "HH:mm", true).isValid()) {
-            simplyAlert(`Execution Time ${data.executionTime} is invalid!`)
-            return false
-        }
+    if (data.executionTime && !moment(data.executionTime, "HH:mm", true).isValid()) {
+        simplyAlert(`Execution Time ${data.executionTime} is invalid!`)
+        return false
     }
-    if (data.preParkDate) {
-        if (!moment(data.preParkDate, "YYYY-MM-DD HH:mm", true).isValid()) {
-            simplyAlert(`Pre-Park Date ${data.preParkDate} is invalid!`)
-            return false
-        }
-        if (moment(data.preParkDate).isAfter(moment(data.periodStartDate))) {
-            simplyAlert(`Pre-Park Date should be earlier than Start Date!`)
-            return false
-        }
+    if (data.preParkDate && !moment(data.preParkDate, "YYYY-MM-DD HH:mm", true).isValid()) {
+        simplyAlert(`Pre-Park Date ${data.preParkDate} is invalid!`)
+        return false
     }
-    if (data.periodStartDate && data.periodEndDate) {
-        if (!moment(data.periodStartDate, "YYYY-MM-DD HH:mm", true).isValid()) {
-            simplyAlert(`Start Date ${data.periodStartDate} is invalid!`)
-            return false
-        }
-        if (!moment(data.periodEndDate, "YYYY-MM-DD HH:mm", true).isValid()) {
-            simplyAlert(`End Date ${data.periodEndDate} is invalid!`)
-            return false
-        }
-        if (moment(data.periodEndDate).isBefore(moment(data.periodStartDate))) {
-            simplyAlert(`End Date should be later than Start Date!`)
-            return false
-        }
-    }
-    if (data.executionDate && data.endsOn) {
-        if (moment(data.endsOn).isBefore(moment(data.executionDate))) {
-            simplyAlert(`Ends On should be later than Execution Date!`)
-            return false
-        }
+    if (data.preParkDate && moment(data.preParkDate).isAfter(moment(data.periodStartDate))) {
+        simplyAlert(`Pre-Park Date should be earlier than Start Date!`)
+        return false
     }
     return true
 }
+const validateDate2 = function (data) {
+    if (data.periodStartDate && !moment(data.periodStartDate, "YYYY-MM-DD HH:mm", true).isValid()) {
+        simplyAlert(`Start Date ${data.periodStartDate} is invalid!`)
+        return false
+    }
+    if (data.periodEndDate && !moment(data.periodEndDate, "YYYY-MM-DD HH:mm", true).isValid()) {
+        simplyAlert(`End Date ${data.periodEndDate} is invalid!`)
+        return false
+    }
+    if (data.periodStartDate && data.periodEndDate && moment(data.periodEndDate).isBefore(moment(data.periodStartDate))) {
+        simplyAlert(`End Date should be later than Start Date!`)
+        return false
+    }
+    if (data.executionDate && data.endsOn && moment(data.endsOn).isBefore(moment(data.executionDate))) {
+        simplyAlert(`Ends On should be later than Execution Date!`)
+        return false
+    }
+    return true
+}
+
+const isValidDate = (dateString, format) => {
+    return moment(dateString, format, true).isValid();
+};
+
+const checkDateRange = (startDate, endDate) => {
+    return moment(startDate).isBefore(moment(endDate));
+};
 
 const validateWeekly = function (isEdit, data) {
     if (!isEdit && data.repeats == 'Weekly') {
@@ -902,8 +903,8 @@ const validateRequiredField = (data, key) => {
     }
     return true
 };
-const ValidTripForm = function (data, isEdit) {
 
+const validateFormRequiredField = function (data) {
     for (let key in data) {
         if ($('#serviceProvider option:last').val() === null || $('#serviceProvider option:last').val() === '') {
             simplyAlert('There is no service provider at this time.');
@@ -915,7 +916,14 @@ const ValidTripForm = function (data, isEdit) {
             }
         }
     }
-    // vaild mobile
+    return true
+}
+const ValidTripForm = function (data, isEdit) {
+    if (!validateFormRequiredField(data)) {
+        return false
+    }
+
+    // valid mobile
     let contactNumber = data["contactNumber"]
     let mobileValid = mobileNumberReg.valid(contactNumber)
     if (!mobileValid.success) {
@@ -929,14 +937,11 @@ const ValidTripForm = function (data, isEdit) {
         return false
     }
 
-    if (!validateDate(data)) {
+    if (!(validateDate(data) && validateDate2(data))) {
         return false
     }
 
-    if (!validateWeekly(isEdit, data)) {
-        return false
-    }
-    return true
+    return validateWeekly(isEdit, data)
 }
 
 const ChangeRepeats = function (val) {
@@ -1229,8 +1234,7 @@ const checkDriverNum = function () {
     if ($("#typeOfVehicle").val() == "-") {
         return
     }
-    let noOfVehicle = $('#noOfVehicle').val();
-    noOfVehicle = noOfVehicle ? noOfVehicle : 0;
+    let noOfVehicle = $('#noOfVehicle').val() || 0;
     let driverNum = $("#noOfDriver").val();
     if (parseInt(driverNum) > parseInt(noOfVehicle)) {
         $("#noOfDriver").val(noOfVehicle);

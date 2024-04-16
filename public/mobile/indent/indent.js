@@ -707,7 +707,6 @@ const toAddUrgentIndentPage = async function() {
     }).then(res => {
         if (res.data.code == 0) {
             simplyAlert(res.data.msg);
-            return;
         } else {
             window.location.href="/mobileCV/editUrgentIndentPage?action=Create&page=indent";
         }
@@ -845,7 +844,7 @@ const initIndentStatus = function () {
 
 const InitExeDateSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let optStr = {
             elem: '#exe-date',
             lang: 'en',
@@ -864,7 +863,7 @@ const InitExeDateSelector = function () {
 
 const InitCreatedDateSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let optStr = {
             elem: '#create-date',
             lang: 'en',

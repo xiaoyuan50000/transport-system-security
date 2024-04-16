@@ -26,9 +26,7 @@ body {
     color: gray;
     font-weight: 500;
 }
-.btn-login {
-    border-radius: 20px;
-}
+
 .login-bg {
     background-image: url("../images/login/bg.png");
     background-size: 100% 100%;
@@ -37,9 +35,7 @@ body {
     image-rendering: -webkit-optimize-contrast;
 }
 .login-bg>div {
-    /* background-color: rgb(40, 40, 40);  */
     height: 100%; 
-    /* opacity: 0.8;  */
     border-bottom-right-radius: 20px; 
     border-top-right-radius: 20px;
     text-align: center;

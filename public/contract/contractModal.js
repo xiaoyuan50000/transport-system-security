@@ -195,7 +195,7 @@ const InitStartDateSelectorModal = function () {
 
 const InitEndDateSelectorModal = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         laydate.render({
             elem: endDateElem,
             lang: 'en',

@@ -61,21 +61,21 @@ let table;
                         {
                             "class": "poNumber",
                             "width": "12%",
-                            visible: (GetCurrentAction() == 1) ? false : true,
+                            visible: GetCurrentAction() != 1,
                             "data": "poNumber", "title": "NGTS PO",
                             "render": function (data, type, full, meta) {
                                 return `<input class="form-control" type="text" value="${data ?? ''}" readonly></div>`
                             }
                         },
                         {
-                            visible: (GetCurrentAction() == 1) ? false : true,
+                            visible: GetCurrentAction() != 1,
                             "data": "requestId", "title": "Indent ID",
                             "render": function (data, type, full, meta) {
                                 return data
                             }
                         },
                         {
-                            visible: (GetCurrentAction() == 2) ? false : true,
+                            visible: GetCurrentAction() != 2,
                             "class": "service-monthly",
                             "data": "monthly", "title": "Month",
                             "render": function (data, type, full, meta) {
@@ -113,7 +113,7 @@ let table;
                             "width": "10%",
                             "data": "id",
                             "title": "Action",
-                            visible: parent.user.roleName === 'TSP' ? true : false,
+                            visible: parent.user.roleName === 'TSP',
                             "render": function (data, type, full, meta) {
                                 let btnHtml = `
                                     <div class="float-start">

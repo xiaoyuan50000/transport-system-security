@@ -81,15 +81,15 @@ $(async function () {
 				if (pocCheckData.formOneData && pocCheckData.formTwoData) {
 					let formOneDataBytes = await pocCheckData.formOneData.data;
 					let formOneDataDataString = "";
-					for (let i = 0; i < formOneDataBytes.length; i++) {
-						formOneDataDataString += String.fromCharCode(formOneDataBytes[i]);
-					}
+					formOneDataBytes.forEach(val=>{
+						formOneDataDataString += String.fromCharCode(val);
+					})
+
 					let formTwoDataBytes = await pocCheckData.formTwoData.data;
 					let formTwoDataDataString = "";
-					for (let i = 0; i < formTwoDataBytes.length; i++) {
-						formTwoDataDataString += String.fromCharCode(formTwoDataBytes[i]);
-					}
-
+					formTwoDataBytes.forEach(val=>{
+						formTwoDataDataString += String.fromCharCode(val);
+					})
 					if (formOneDataDataString) {
 						let formOneData = JSON.parse(formOneDataDataString);
 						for (let key in formOneData) {
@@ -160,7 +160,7 @@ $(async function () {
 	$(".checkbox-no").on('click', function () {
 		$(this).prev().prop("checked", false);
 
-		if ($(this).prop("checked") == true) {
+		if ($(this).prop("checked")) {
 			$(this).parent().parent().find(".no-reason-div").show();
 		} else {
 			$(this).parent().parent().find(".no-reason-div").hide();
@@ -308,10 +308,10 @@ const serializeToJson = function (d) {
 	return s
 }
 const getParams = function (key) {
-	let reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
-	let r = window.location.search.substr(1).match(reg);
-	if (r != null) {
-		return unescape(r[2]);
-	}
-	return null;
+    let reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
+    let r = reg.exec(window.location.search.slice(1));
+    if (r != null) {
+        return decodeURIComponent(r[2]);
+    }
+    return null;
 };

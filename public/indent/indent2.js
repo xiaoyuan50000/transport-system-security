@@ -1,10 +1,8 @@
 let table
-let lastOptTripIds = []
 let approveBtn = `<div class="col-auto ps-0"><button class="btn btn-sm btn-white rounded-pill btn-action" onclick="ApproveBulkAction()"><img class="me-2" src="../images/indent/action/approve.svg">Approve</button></div>`
 let rejectBtn = `<div class="col-auto ps-0"><button class="btn btn-sm btn-white rounded-pill btn-action" onclick="RejectBulkAction()"><img class="me-2" src="../images/indent/action/reject.svg">Reject</button></div>`
 let cancelBtn = `<div class="col-auto ps-0"><button class="btn btn-sm btn-white rounded-pill btn-action" onclick="CancelBulkAction()"><img class="me-2" src="../images/indent/action/cancel.svg">Cancel</button></div>`
 let mobiusSubUnits = []
-let hubNodeList = []
 
 $(function () {
     $("#execution-date").val(`${moment().format("DD/MM/YYYY")} ~ ${moment().add(1, 'M').format("DD/MM/YYYY")}`)
@@ -246,7 +244,7 @@ const TableColumn = {
             }
             return `<select class="form-select rsp-select" onchange="RSPAvaliableChange(this, ${tripId}, ${isCategoryMV})">${data}</select>`
         }
-        return tspAvailable ? tspAvailable : "-"
+        return tspAvailable || "-"
     },
 
     GetTaskStatusColumn: function (data) {
@@ -279,90 +277,109 @@ const TableColumn = {
         <div class="color-dropoff-destination">${end}</div>`
     },
 
+    GetStatusHtml: function (full) {
+        let completedCount = full.completedCount
+        let lateCount = full.lateCount
+        let noshowCount = full.noshowCount
+        let otherCount = full.otherCount
+        let cancelledCount = full.cancelledCount
+        let html = ""
+        if (completedCount != 0) {
+            html += `<div><label class="taskStatusWidth">Completed:</label> <label>${completedCount}</label></div>`
+        }
+        if (lateCount != 0) {
+            html += `<div><label class="taskStatusWidth">Late Trip:</label> <label>${lateCount}</label></div>`
+        }
+        if (noshowCount != 0) {
+            html += `<div><label class="taskStatusWidth">No Show:</label> <label>${noshowCount}</label></div>`
+        }
+        if (cancelledCount != 0) {
+            html += `<div><label class="taskStatusWidth">Cancelled:</label> <label>${cancelledCount}</label></div>`
+        }
+        if (otherCount != 0) {
+            html += `<div><label class="taskStatusWidth">-:</label> <label>${otherCount}</label></div>`
+        }
+        return html
+    },
     GetStatusColors: function (data, full) {
         if (full.approve == 1 && full.isEndorse && !full.loaTagId) {
-            let completedCount = full.completedCount
-            let lateCount = full.lateCount
-            let noshowCount = full.noshowCount
-            let otherCount = full.otherCount
-            let cancelledCount = full.cancelledCount
-            let html = ""
-            if (completedCount != 0) {
-                html += `<div><label class="taskStatusWidth">Completed:</label> <label>${completedCount}</label></div>`
-            }
-            if (lateCount != 0) {
-                html += `<div><label class="taskStatusWidth">Late Trip:</label> <label>${lateCount}</label></div>`
-            }
-            if (noshowCount != 0) {
-                html += `<div><label class="taskStatusWidth">No Show:</label> <label>${noshowCount}</label></div>`
-            }
-            if (cancelledCount != 0) {
-                html += `<div><label class="taskStatusWidth">Cancelled:</label> <label>${cancelledCount}</label></div>`
-            }
-            if (otherCount != 0) {
-                html += `<div><label class="taskStatusWidth">-:</label> <label>${otherCount}</label></div>`
-            }
-            return html
+            return TableColumn.GetStatusHtml(full)
         }
 
         if (data == null || data == "") {
             return ""
         }
-        if (data.toLowerCase() == "pending for approval(uco)" || data.toLowerCase() == "pending for approval(rf)") {
-            return `<label class="color-waiting-approve">${data}</label>`
+        let html = ""
+        let status = data.toLowerCase()
+        switch (status) {
+            case "pending for approval(uco)":
+                html = `<label class="color-waiting-approve">${data}</label>`
+                break;
+            case "pending for approval(rf)":
+                html = `<label class="color-waiting-approve">${data}</label>`
+                break;
+            case "pending for cancellation(uco)":
+                html = `<label class="color-waiting-cancellation">${data}</label>`
+                break;
+            case "pending for cancellation(rf)":
+                html = `<label class="color-waiting-cancellation">${data}</label>`
+                break;
+            case "completed":
+                html = `<label class="color-completed">${data}</label>`
+                break;
+            case "approved":
+                html = `<label class="color-approved">${data}</label>`
+                break;
+            case "cancelled":
+                html = `<label class="color-cancelled">${data}</label>`
+                break;
+            case "rejected":
+                html = `<label class="color-rejected">${data}</label>`
+                break;
+            case "assigned":
+                html = `<label class="color-assigned">${data}</label>`
+                break;
+            case "late trip":
+                html = `<label class="color-late">${data}</label>`
+                break;
+            case "waiting for acknowledgement":
+                html = `<label class="color-waitingforack">${data}</label>`
+                break;
+            case "acknowledged":
+                html = `<label class="color-acknowledged">${data}</label>`
+                break;
+            case "started":
+                html = `<label class="color-started">${data}</label>`
+                break;
+            case "arrived":
+                html = `<label class="color-arrived">${data}</label>`
+                break;
+            case "no show":
+                html = `<label class="color-noshow">${data}</label>`
+                break;
+            case "no show (system)":
+                html = `<label class="color-noshow">${data}</label>`
+                break;
+            case "declined":
+                html = `<label class="color-declined">${data}</label>`
+                break;
+            case "pending":
+                html = `<label class="color-pending">${data}</label>`
+                break;
+            case "collected":
+                html = `<label class="color-collected">${data}</label>`
+                break;
+            case "allocated":
+                html = `<label class="color-allocated">${data}</label>`
+                break;
+            case "endorsed":
+                html = `<label class="color-endorsed">${data}</label>`
+                break;
+            default:
+                html = data
+                break;
         }
-        else if (data.toLowerCase() == "pending for cancellation(uco)" || data.toLowerCase() == "pending for cancellation(rf)") {
-            return `<label class="color-waiting-cancellation">${data}</label>`
-        }
-        else if (data.toLowerCase() == "completed") {
-            return `<label class="color-completed">${data}</label>`
-        }
-        else if (data.toLowerCase() == "approved") {
-            return `<label class="color-approved">${data}</label>`
-        }
-        else if (data.toLowerCase() == "cancelled") {
-            return `<label class="color-cancelled">${data}</label>`
-        }
-        else if (data.toLowerCase() == "rejected") {
-            return `<label class="color-rejected">${data}</label>`
-        }
-        else if (data.toLowerCase() == "assigned") {
-            return `<label class="color-assigned">${data}</label>`
-        }
-        else if (data.toLowerCase() == "late trip") {
-            return `<label class="color-late">${data}</label>`
-        }
-        else if (data.toLowerCase() == "waiting for acknowledgement") {
-            return `<label class="color-waitingforack">${data}</label>`
-        }
-        else if (data.toLowerCase() == "acknowledged") {
-            return `<label class="color-acknowledged">${data}</label>`
-        }
-        else if (data.toLowerCase() == "started") {
-            return `<label class="color-started">${data}</label>`
-        }
-        else if (data.toLowerCase() == "arrived") {
-            return `<label class="color-arrived">${data}</label>`
-        }
-        else if (data.toLowerCase() == "no show" || data.toLowerCase() == "no show (system)") {
-            return `<label class="color-noshow">${data}</label>`
-        }
-        else if (data.toLowerCase() == "declined") {
-            return `<label class="color-declined">${data}</label>`
-        }
-        else if (data.toLowerCase() == "pending") {
-            return `<label class="color-pending">${data}</label>`
-        }
-        else if (data.toLowerCase() == "collected") {
-            return `<label class="color-collected">${data}</label>`
-        }
-        else if (data.toLowerCase() == "allocated") {
-            return `<label class="color-allocated">${data}</label>`
-        }
-        else if (data.toLowerCase() == "endorsed") {
-            return `<label class="color-endorsed">${data}</label>`
-        }
-        return data
+        return html
     },
 
     GetActionBtns: function (full) {

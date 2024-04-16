@@ -3,7 +3,7 @@ let elemIds = ['#execution-date', '#created-date']
 layui.use(['laydate'], function () {
     laydate = layui.laydate;
     for (let elem of elemIds) {
-        laydate.render({
+        let = laydate.render({
             elem: elem,
             lang: 'en',
             type: 'date',

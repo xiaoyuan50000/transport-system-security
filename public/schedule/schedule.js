@@ -8,7 +8,6 @@
 
 (function(window, Calendar) {
     let cal, resizeThrottled;
-    let selectedCalendar;
     cal = new Calendar('#calendar', {
         defaultView: 'month',
         useCreationPopup: false,
@@ -76,11 +75,7 @@
             console.log('beforeDeleteSchedule', e);
             cal.deleteSchedule(e.schedule.id, e.schedule.calendarId);
         },
-        'afterRenderSchedule': function(e) {
-            let schedule = e.schedule;
-            // let element = cal.getElement(schedule.id, schedule.calendarId);
-            // console.log('afterRenderSchedule', element);
-        },
+        
         'clickTimezonesCollapseBtn': function(timezonesCollapsed) {
             console.log('timezonesCollapsed', timezonesCollapsed);
 
@@ -119,7 +114,6 @@
                 break;
             case 'toggle-monthly':
                 options.month.visibleWeeksCount = 0;
-                viewName = 'month';
                 break;
             default:
                 break;
@@ -130,23 +124,10 @@
 
         setDropdownCalendarType(action);
         setRenderRangeText();
-        //setCalendarHeight(action);
 
     }
 
-    /*function setCalendarHeight(action) {
-        switch (action) {
-            case 'toggle-weekly':
-                $('#calendar .tui-full-calendar-vlayout-container div').eq(1).addClass('tui-calendar-h');
-                break;
-            case 'toggle-monthly':
-                $('#calendar .tui-full-calendar-vlayout-container div').eq(1).removeClass('tui-calendar-h');
-                break;
-            default:
-                break;
-        }
-    }*/
-
+    
     function onClickNavi(e) {
         let action = getDataAction(e.target);
 
@@ -183,7 +164,6 @@
 
         calendarNameElement.innerHTML = html.join('');
 
-        selectedCalendar = calendar;
     }
 
     function onChangeCalendars(e) {
@@ -194,7 +174,6 @@
         let allCheckedCalendars = true;
         
         if (calendarId === 'all') {
-            allCheckedCalendars = checked;
             
             calendarElements.forEach(function(input) {
                 let span = input.parentNode;
@@ -206,7 +185,6 @@
                 calendar.checked = checked;
             });
         } else {
-            findCalendar(calendarId).checked = checked;
             
             allCheckedCalendars = calendarElements.every(function(input) {
                 return input.checked;
@@ -225,9 +203,7 @@
     function refreshScheduleVisibility() {
         let calendarElements = Array.prototype.slice.call(document.querySelectorAll('#calendarList input'));
 
-        // CalendarList.forEach(function(calendar) {
-        //     cal.toggleSchedules(calendar.id, !calendar.checked, false);
-        // });
+   
 
         cal.clear();
         FilterScheduleList();

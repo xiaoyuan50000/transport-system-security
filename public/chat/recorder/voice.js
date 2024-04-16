@@ -90,7 +90,7 @@ let RongIMLib;
             if (type) {
                 mimeType = { type: type };
             }
-            base64Data = base64Data.replace(/^(.*)[,]/, '');
+            base64Data = base64Data.replace(/^(.*)$$,/, '');
             let sliceSize = 1024;
             let byteCharacters = atob(base64Data);
             let bytesLength = byteCharacters.length;

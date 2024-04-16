@@ -33,7 +33,7 @@ const checkExportFormInput = function (input) {
 
 const InitDateSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         laydate.render({
             elem: "#date-range",
             lang: 'en',

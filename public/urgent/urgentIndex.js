@@ -1,3 +1,4 @@
+let hubNodeList;
 $(function () {
     axios.post("/getMobiusUnit").then(async res => {
         $("#hubSelect").empty();

@@ -8,7 +8,6 @@ $(function () {
     })
 });
 
-// TODO: Android will call this function
 const initSchedulePage = function (list) {
     list = JSON.parse(list);
     $('.item-div-list').empty();

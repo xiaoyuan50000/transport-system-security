@@ -22,7 +22,7 @@ module.exports.success = function(res, data, recordsTotal=null){
 
 module.exports.error = function(res, msg, code=null){
     return res.json({
-        "code": code? code: 0,
+        "code": code || 0,
         "msg": msg,
         "data": ""
     });

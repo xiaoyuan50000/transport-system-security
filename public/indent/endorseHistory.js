@@ -44,7 +44,7 @@ $(function () {
         ],
         "columns": [
             {
-                "visible": roleName === 'UCO' ? true : false,
+                "visible": roleName === 'UCO',
                 "class": "firstCol",
                 "data": null, "title": "",
                 "render": function (data, type, full, meta) {
@@ -122,7 +122,7 @@ $(function () {
                 }
             },
             {
-                "visible": occ.indexOf(roleName) == -1 ? true : false,
+                "visible": occ.indexOf(roleName) == -1,
                 "class": "auto-wrap",
                 "data": "poc", "title": "POC Details",
                 "render": function (data, type, full, meta) {
@@ -134,7 +134,7 @@ $(function () {
                 }
             },
             {
-                "visible": occ.indexOf(roleName) != -1 ? true : false,
+                "visible": occ.indexOf(roleName) != -1,
                 "class": "auto-wrap",
                 "data": "ucoDetail", "title": "UCO Details",
                 "render": function (data, type, full, meta) {

@@ -1,5 +1,5 @@
 let table;
-let hubNodeList;
+
 let urgentDriverModal = document.getElementById('urgentDriverModal');
 let selectTaskId;
 let isEdit = true;
@@ -92,7 +92,7 @@ $(function () {
             {
                 "data": "driverName", "title": "Driver Assigned",
                 render: function (data, type, full, meta) {
-                    return `${data ? data : '-'} <br/> (${full.contactNumber ? full.contactNumber : '-'})`
+                    return `${data || '-'} <br/> (${full.contactNumber ? full.contactNumber : '-'})`
                 }
             },
             {
@@ -141,7 +141,7 @@ $(function () {
                         return `
                         <div>
                             <span class="d-inline-block text-truncate" style="max-width: 250px; border-bottom: 1px solid gray; cursor: pointer;" data-row="${meta.row}" onclick="showJustification(this);">
-                                ${data ? data : '-'}
+                                ${data || '-'}
                             </span><br>
                             <label class="fw-bold">Amended by:</label> <label>${full.amendedByUsername ?? '-'}</label><br>
                             <label class="fw-bold">Date Time:</label> <label>${moment(full.cancelledDateTime).format('DD/MM/YYYY HH:mm:ss')}</label>

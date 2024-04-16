@@ -75,36 +75,7 @@ function jcalendar_week(options) {
 	}
 
 	let setdaydata = function (year, weeknum) {
-		const getMonth = function (monthNum) {
-			switch (monthNum) {
-				case 0:
-					return 'Jan';
-				case 1:
-					return 'Feb';
-				case 2:
-					return 'Mar';
-				case 3:
-					return 'Apr';
-				case 4:
-					return 'May';
-				case 5:
-					return 'Jun';
-				case 6:
-					return 'Jul';
-				case 7:
-					return 'Aug';
-				case 8:
-					return 'Sep';
-				case 9:
-					return 'Otc';
-				case 10:
-					return 'Nov';
-				case 11:
-					return 'Dec';
-
-			}
-		}
-		let m_days = [31, 28 + is_leap(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+		
 		let datastart = _this.weekfirstdate(year, weeknum);
 		let trueweeknum = _this.getweeknum(datastart[0], datastart[1], datastart[2]);
 		calendarid.attr({
@@ -115,7 +86,6 @@ function jcalendar_week(options) {
 		$("#setweek").val(trueweeknum[1]);
 		calendarid.find(".calendar_info").html(trueweeknum[0] + ' ' + trueweeknum[1] + 'Weeks');
 
-		// calendarid.find(".calendar_info").html(trueweeknum[0]+' ' + getMonth(datastart[1] + 1));
 
 		let week_day = "";
 		let isdayaddclass = false;

@@ -39,8 +39,7 @@ function uploadFile(e, url) {
     axios.post(url, param, config).then(function (res) {
         if (res.data.code == 1) {
             alert("success");
-            //window.location.reload();
-            return
+            
         } else if (res.data.code == 0) {
             alert(res.data.msg);
             return
@@ -52,8 +51,5 @@ function uploadFile(e, url) {
 }
 function isExcel(filename) {
     let extension = filename.substring(filename.lastIndexOf('.') + 1);
-    if (extension !== 'xlsx') {
-        return false;
-    }
-    return true;
+    return extension === 'xlsx';
 }

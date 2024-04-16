@@ -81,13 +81,16 @@ function setUserName() {
             }
         })
     }
+    if (user == null) {
+        top.location.href = "/login";
+        return
+    }
 
-    if (user != null) {
-        $("#username").html(user.username + ` (${user.roleName})`);
-        let phone24hBtn = `<li class="phone24h btn-phone24h">
+    $("#username").html(user.username + ` (${user.roleName})`);
+    let phone24hBtn = `<li class="phone24h btn-phone24h">
             <a class="dropdown-item" href="#" data-target="-1"><img src="../images/phone24h.svg">Announcement</a>
             </li>`
-        let settingDropdown = `<div class="dropdown dropstart">
+    let settingDropdown = `<div class="dropdown dropstart">
                 <a class="btn  dropdown-toggle p-0" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                     <img src="../images/setting.svg"><br>
                 </a>
@@ -98,58 +101,58 @@ function setUserName() {
                     ${phone24hBtn}
                 </ul>
             </div>`
-        let manageUserBtn = '<li><a class="dropdown-item" href="#" data-target="MANAGEUSER">Manage User</a></li>'
-        let manageGroupBtn = '<li><a class="dropdown-item" href="#" data-target="MANAGEGROUP">Manage Group</a></li>'
-        let manageAnnouncementBtn = '<li><a class="dropdown-item" href="#" data-target="Announcement">Manage Announcement</a></li>'
-        let noticeHtml = `<li class="text-center position-relative">
+    let manageUserBtn = '<li><a class="dropdown-item" href="#" data-target="MANAGEUSER">Manage User</a></li>'
+    let manageGroupBtn = '<li><a class="dropdown-item" href="#" data-target="MANAGEGROUP">Manage Group</a></li>'
+    let manageAnnouncementBtn = '<li><a class="dropdown-item" href="#" data-target="Announcement">Manage Announcement</a></li>'
+    let noticeHtml = `<li class="text-center position-relative">
                 <a class="btn p-0 btn-spending-notice" href="#" role="button" onclick="showSpendingAlert()">
                     <img src="../images/notice.svg">
                     <div class="tab-top-right-count" id="notification-count" style="opacity: 1; z-index: auto; top: 0; right: 8px; display: none"></div>
                 </a>
             </li>`
-        if (user.roleName == "RF") {
-            $(".setting").after(noticeHtml)
-            $(".setting").append(settingDropdown.replace("{{item}}", manageUserBtn + manageGroupBtn + manageAnnouncementBtn))
-            removeNoPermissionMenu(["FUEL", "TEMPLATE"])
-        } else if (user.roleName == "UCO") {
-            $(".setting").append(settingDropdown.replace("{{item}}", manageUserBtn))
-            removeNoPermissionMenu(["INVOICE", "HISTORY", "CONTRACT", "DASHBOARD", "OPERATIONDASHBOARD", "REPORT", "URGENTTASK"])
-        } else if (user.roleName == "RQ") {
-            removeNoPermissionMenu(["OPEN", "INVOICE", "ARBITRATION", "HISTORY", "CONTRACT", "BUDGET", "MOBIUSTASK", "DASHBOARD", "OPERATIONDASHBOARD", "REPORT", "TEMPLATE", "URGENTTASK"])
-        } else if (user.roleName == "TSP") {
-            removeNoPermissionMenu(["TASK", "JOB", "HISTORY", "CONTRACT", "FUEL", "BUDGET", "MOBIUSTASK", "DASHBOARD", "OPERATIONDASHBOARD", "REPORT", "URGENTTASK", "TEMPLATE"])
-        } else if (occ.indexOf(user.roleName) != -1) {
-            if (user.roleName == occ[0]) {
-                $(".setting").append(settingDropdown.replace("{{item}}", manageUserBtn + manageAnnouncementBtn))
-            }
-            removeNoPermissionMenu(["INITIALPO", "CONTRACT", "FUEL", "BUDGET", "DASHBOARD", "OPERATIONDASHBOARD", "REPORT", "URGENTTASK", "TEMPLATE"])
-        } else if (user.roleName == "RA") {
-            $(".setting").after(noticeHtml)
-            $(".setting").append(settingDropdown.replace("{{item}}", manageUserBtn + manageGroupBtn + manageAnnouncementBtn))
-            removeNoPermissionMenu(["TASK", "JOB", "INITIALPO", "INVOICE", "ARBITRATION", "HISTORY", "FUEL", "BUDGET", "MOBIUSTASK", "DASHBOARD", "OPERATIONDASHBOARD", "REPORT", "URGENTTASK", "TEMPLATE"])
-        } else if (user.roleName == "CM") {
-            $(".setting").after(noticeHtml)
-            $(".setting").append(settingDropdown.replace("{{item}}", manageUserBtn))
-            removeNoPermissionMenu(["TASK", "JOB", "INITIALPO", "INVOICE", "OPEN", "ARBITRATION", "HISTORY", "FUEL", "BUDGET", "MOBIUSTASK", "DASHBOARD", "OPERATIONDASHBOARD", "REPORT", "URGENTTASK", "TEMPLATE"])
+    if (user.roleName == "RF") {
+        $(".setting").after(noticeHtml)
+        $(".setting").append(settingDropdown.replace("{{item}}", manageUserBtn + manageGroupBtn + manageAnnouncementBtn))
+        removeNoPermissionMenu(["FUEL", "TEMPLATE"])
+    } else if (user.roleName == "UCO") {
+        $(".setting").append(settingDropdown.replace("{{item}}", manageUserBtn))
+        removeNoPermissionMenu(["INVOICE", "HISTORY", "CONTRACT", "DASHBOARD", "OPERATIONDASHBOARD", "REPORT", "URGENTTASK"])
+    } else if (user.roleName == "RQ") {
+        removeNoPermissionMenu(["OPEN", "INVOICE", "ARBITRATION", "HISTORY", "CONTRACT", "BUDGET", "MOBIUSTASK", "DASHBOARD", "OPERATIONDASHBOARD", "REPORT", "TEMPLATE", "URGENTTASK"])
+    } else if (user.roleName == "TSP") {
+        removeNoPermissionMenu(["TASK", "JOB", "HISTORY", "CONTRACT", "FUEL", "BUDGET", "MOBIUSTASK", "DASHBOARD", "OPERATIONDASHBOARD", "REPORT", "URGENTTASK", "TEMPLATE"])
+    } else if (occ.indexOf(user.roleName) != -1) {
+        if (user.roleName == occ[0]) {
+            $(".setting").append(settingDropdown.replace("{{item}}", manageUserBtn + manageAnnouncementBtn))
         }
-
-        $(".navbar-nav li").eq(1).addClass("active");
-        if (user.roleName == "TSP") {
-            $(".iframe-container").attr("src", "./initialPO");
-        }
-        else if (user.roleName == "RA" || user.roleName == "CM") {
-            $(".iframe-container").attr("src", "./contract");
-            $(".navbar-nav li").removeClass("active");
-            $("#target-contract").addClass("active");
-        }
-        else {
-            $(".iframe-container").attr("src", "./task/0");
-        }
-    } else {
-        top.location.href = "/login";
+        removeNoPermissionMenu(["INITIALPO", "CONTRACT", "FUEL", "BUDGET", "DASHBOARD", "OPERATIONDASHBOARD", "REPORT", "URGENTTASK", "TEMPLATE"])
+    } else if (user.roleName == "RA") {
+        $(".setting").after(noticeHtml)
+        $(".setting").append(settingDropdown.replace("{{item}}", manageUserBtn + manageGroupBtn + manageAnnouncementBtn))
+        removeNoPermissionMenu(["TASK", "JOB", "INITIALPO", "INVOICE", "ARBITRATION", "HISTORY", "FUEL", "BUDGET", "MOBIUSTASK", "DASHBOARD", "OPERATIONDASHBOARD", "REPORT", "URGENTTASK", "TEMPLATE"])
+    } else if (user.roleName == "CM") {
+        $(".setting").after(noticeHtml)
+        $(".setting").append(settingDropdown.replace("{{item}}", manageUserBtn))
+        removeNoPermissionMenu(["TASK", "JOB", "INITIALPO", "INVOICE", "OPEN", "ARBITRATION", "HISTORY", "FUEL", "BUDGET", "MOBIUSTASK", "DASHBOARD", "OPERATIONDASHBOARD", "REPORT", "URGENTTASK", "TEMPLATE"])
     }
+
+    $(".navbar-nav li").eq(1).addClass("active");
+    loadIframeByRole(user)
 }
 
+const loadIframeByRole = function (user) {
+    if (user.roleName == "TSP") {
+        $(".iframe-container").attr("src", "./initialPO");
+    }
+    else if (user.roleName == "RA" || user.roleName == "CM") {
+        $(".iframe-container").attr("src", "./contract");
+        $(".navbar-nav li").removeClass("active");
+        $("#target-contract").addClass("active");
+    }
+    else {
+        $(".iframe-container").attr("src", "./task/0");
+    }
+}
 
 function navTargetPage(target) {
     if (target == -1) {
@@ -275,14 +278,14 @@ const ShowChangePasswordDialog = function () {
                     if (form.checkValidity() === false) {
                         return false
                     } else {
-                        var password = this.$content.find('form').find("input[name='password']").val();
+                        let password = this.$content.find('form').find("input[name='password']").val();
                         confirmChangePassword(password)
                     }
                 }
             },
         },
         onContentReady: function () {
-            var jc = this;
+            let jc = this;
             this.$content.find('form').on('submit', function (e) {
                 jc.$confirm.trigger('click'); // reference the button and click it
             });
@@ -376,7 +379,7 @@ const showEditAnnouncementDialog = function () {
     }
 
     const validAnnouncementError = function () {
-        var content = $("#text-announcement").val()
+        let content = $("#text-announcement").val()
         if (content.length == 0) {
             $("#text-announcement-error").removeClass("hidden")
             return true
@@ -506,7 +509,29 @@ if (user.roleName == "RA" || user.roleName == "CM" || user.roleName == "RF") {
     })
 }
 
+const switchToMV = function () {
+    simplyConfirm("Are you sure to switch to MV?", function () {
+        axios.post('/reDirectToMobiusServer').then(res => {
+            //localStorage.clear()
+            const url = res.data.data
+            top.location.href = url
+        })
+    })
+}
+const registerMVAccount = function () {
+    simplyConfirm("Are you sure to register MV account?", function () {
+        axios.post('/reDirectToRegisterMV').then(res => {
+            let data = res.data.data
+            const url = data.mobius_server_url + encodeURI("/user/registerUser?registerFrom=" + data.str)
+            //console.log(url)
+            top.location.href = url;
+        })
+    })
+}
 const getMobiusUserExist = async function () {
+
+
+
     await axios.post("/getMobiusUserExist").then(res => {
         if (res.data.code == 0) {
             return
@@ -532,22 +557,9 @@ const getMobiusUserExist = async function () {
                     return
                 }
                 if (res.data.data == 1) {
-                    simplyConfirm("Are you sure to switch to MV?", function () {
-                        axios.post('/reDirectToMobiusServer').then(res => {
-                            //localStorage.clear()
-                            let url = res.data.data
-                            top.location.href = url
-                        })
-                    })
+                    switchToMV()
                 } else if (res.data.data == 0) {
-                    simplyConfirm("Are you sure to register MV account?", function () {
-                        axios.post('/reDirectToRegisterMV').then(res => {
-                            let data = res.data.data
-                            const url = data.mobius_server_url + encodeURI("/user/registerUser?registerFrom=" + data.str)
-                            //console.log(url)
-                            top.location.href = url;
-                        })
-                    })
+                    registerMVAccount()
                 } else {
                     simplyAlert("Under approval, please operate later.")
                 }
@@ -580,14 +592,14 @@ const ShowEmailDialog = function () {
                     if (form.checkValidity() === false) {
                         return false
                     } else {
-                        var email = this.$content.find('form').find("input[name='email']").val();
+                        let email = this.$content.find('form').find("input[name='email']").val();
                         confirmEmail(email)
                     }
                 }
             },
         },
         onContentReady: function () {
-            var jc = this;
+            let jc = this;
             this.$content.find('form').on('submit', function (e) {
                 jc.$confirm.trigger('click'); // reference the button and click it
             });
