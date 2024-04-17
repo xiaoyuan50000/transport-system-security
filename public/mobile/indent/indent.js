@@ -9,21 +9,25 @@ let currentPage = 1;
 let pageSize = 10;
 let totalPage = 1;
 let lastOptTripIds = [];
-let indentNavBgColors = {"Pending for approval(UCO)":"#1abfc0",
-     "Pending for approval(RF)":"#1abfc0",
-     "Pending for cancellation(UCO)":"#f8e814",
-     "Pending for cancellation(RF)":"#f8e814",
-     "Approved":"#2bb982",
-     "Rejected":"#d400f8",
-     "Cancelled":"#9d9d9d",
-     "Completed":"#1b7981",
-     "Late Trip":"#fd7624",
-     "declined":"#eb3531",
-     "No Show": "#ff80a5"};
-let urgentIndentNavBgColors = {"pending":"#1abfc0",
-     "cancelled":"#9d9d9d",
-     "completed":"#1b7981",
-     "ready":"#CF6161"};
+let indentNavBgColors = {
+    "Pending for approval(UCO)": "#1abfc0",
+    "Pending for approval(RF)": "#1abfc0",
+    "Pending for cancellation(UCO)": "#f8e814",
+    "Pending for cancellation(RF)": "#f8e814",
+    "Approved": "#2bb982",
+    "Rejected": "#d400f8",
+    "Cancelled": "#9d9d9d",
+    "Completed": "#1b7981",
+    "Late Trip": "#fd7624",
+    "declined": "#eb3531",
+    "No Show": "#ff80a5"
+};
+let urgentIndentNavBgColors = {
+    "pending": "#1abfc0",
+    "cancelled": "#9d9d9d",
+    "completed": "#1b7981",
+    "ready": "#CF6161"
+};
 $(async function () {
     currentUser = await getDecodeAESCode(localStorage.user);
     roleName = currentUser.roleName;
@@ -31,7 +35,7 @@ $(async function () {
     InitExeDateSelector();
     InitCreatedDateSelector();
     initGroupSelector();
-    
+
     if (roleName == "RF" || roleName == "RQ" || roleName == 'UCO') {
         $(".new-btn").show();
     }
@@ -58,10 +62,10 @@ $(async function () {
     if (roleName === 'POC') {
         $(".common-nav").hide();
         $(".poc-nav").show();
-        window.location.href = '/'+loginPagePath+'/task/';
+        window.location.href = '/' + loginPagePath + '/task/';
     }
 
-    $(".nav-indent").on('click', function() {
+    $(".nav-indent").on('click', function () {
         $('.nav-tab-label').removeClass('native');
         $(this).find(".nav-tab-label").addClass('native');
 
@@ -87,13 +91,13 @@ $(async function () {
         pageRefresh();
     });
 
-    $(".condition-btn").on('click', function() {
+    $(".condition-btn").on('click', function () {
         $(".condition-btn").removeClass('active');
 
         $(this).addClass('active');
         let indentAction = $(this).data("indent-action");
         $(".bulk-opt-btn").hide();
-        if(indentAction == "1" || indentAction == "4") {
+        if (indentAction == "1" || indentAction == "4") {
             $(".bulk-cancel").show();
         } else if (indentAction == "2") {
             $(".bulk-approve").show();
@@ -104,16 +108,16 @@ $(async function () {
     });
     $(".bulk-cancel").show();
 
-    $(".condition-select").on('change', function() {
+    $(".condition-select").on('change', function () {
         reloadIndents();
     });
-    $(".refresh-page-div").on('click', function() {
+    $(".refresh-page-div").on('click', function () {
         reloadIndents();
     });
 
     reloadIndents();
 
-    $(".item-div-list").on("scroll", function() {
+    $(".item-div-list").on("scroll", function () {
         if ($(this)[0].scrollHeight - $(this)[0].scrollTop - $(this)[0].offsetHeight < 5) {
             //has scroll to bottom and has more data, then start load more data
             if (totalPage > currentPage) {
@@ -123,12 +127,12 @@ $(async function () {
     });
 });
 
-const pageRefresh = async function() {
+const pageRefresh = async function () {
     await reloadIndents();
     refreshPageEle();
 }
 
-const refreshPageEle = function() {
+const refreshPageEle = function () {
     if (currentNav == 'past') {
         $(".page-title-label").text("History");
         //$(".indent-action-div").hide();
@@ -150,7 +154,7 @@ const refreshPageEle = function() {
     }
 }
 
-const reloadIndents = async function() {
+const reloadIndents = async function () {
     currentPage = 1;
     let pageStartIndex = (currentPage - 1) * pageSize;
 
@@ -163,7 +167,7 @@ const reloadIndents = async function() {
     if (currentAction == 4) {
         params.action = currentAction;
     }
-    
+
     params.start = pageStartIndex
     params.length = pageSize
     params.sortParams = sortParams
@@ -180,13 +184,13 @@ const reloadIndents = async function() {
     });
 };
 
-const loadNextPageIndents = async function() {
+const loadNextPageIndents = async function () {
     currentPage += 1;
     let pageStartIndex = (currentPage - 1) * pageSize;
 
     let params = GetFilerParameters();
     params.roleName = roleName;
-    
+
     let currentAction = $(".condition-btn.active").data("indent-action");
     if (currentAction == 4) {
         params.action = currentAction;
@@ -207,231 +211,264 @@ const loadNextPageIndents = async function() {
     refreshPageEle();
 };
 
-const buildIndentsPage = function(indentList) {
+const buildIndentsPage = function (indentList) {
     if (indentList === undefined || indentList == null || indentList.length == 0) {
         return;
     }
-
     let currentIndex = 1;
+
     for (let indent of indentList) {
-        let indentNavBgColor = "#2bb982";
-        let tripHtml = ``;
-        let tripIndex = 1;
-        for (let tripItem of indent.trips) {
-            let tempServiceproviderHtml = ``;
-            //Once indent is cancelled remove service provider to prevent confusion
-            let workFlowStatus = tripItem.status.toLowerCase();
-            if (workFlowStatus == "cancelled") {
-                tempServiceproviderHtml  = tripItem.tspAvailable ? tripItem.tspAvailable : "";
-            } else if (roleName == "RF" && tripItem.tspAvailableSelect && tripItem.tspAvailableSelect.length > 1) {
-                let isCategoryMV = 0
-                if (tripItem.category.toUpperCase() == "MV") {
-                    isCategoryMV = 1
-                }
+        let tripHtml = buildIndentsTripPage(indent)
 
-                tempServiceproviderHtml = `<select onchange="RSPAvaliableChange(this, ${tripItem.tripId}, ${isCategoryMV})" name="sp-select" class="form-control" style="width: 100%;text-align: center; font-size: 10px;">`;
-                tempServiceproviderHtml += `<option value="" data-no=""></option>`;
-                let serviceProviderData = tripItem.tspAvailableSelect;
-                for (let spData of serviceProviderData) {
-                    tempServiceproviderHtml += `<option data-no="${spData.contractPartNo}" value="${spData.id}" ${spData.id == tripItem.serviceProviderId ? 'selected' : ''}>${spData.name}</option>`;
-                }
-                tempServiceproviderHtml += `</select>`;
-            } else {
-                tempServiceproviderHtml = tripItem.tspAvailable ? tripItem.tspAvailable : "";
-            }
-
-            let taskAction = {
-                Edit: `<div onclick="toEditTripPage('${indent.id}', '${tripItem.tripId}')" class="edit-btn-div" style="width: 90px;padding-right: 3px;">
-                    <div class="action-btn">
-                        <img src="/images/indent/action/edit.svg">
-                        <label>Edit</label>
-                    </div>
-                </div>`,
-                EditSimple: `<div onclick="toEditTripPage('${indent.id}', '${tripItem.tripId}')" class="edit-btn-div" style="width: 50px;text-align: center;">
-                    <img src="/images/indent/action/edit.svg">
-                </div>`,
-                View: `<div onclick="toIndentFlowPage('${tripItem.tripId}')" style="width: 90px;padding-right: 5px;">
-                    <div class="action-btn">
-                        <img style="margin-left: 3px;" src="/images/indent/action/view-workflow.svg">
-                        <label style="margin-left: 3px;">History</label>
-                    </div>
-                </div>`,
-                ViewSimple:`<div onclick="toIndentFlowPage('${tripItem.tripId}')" class="col-2 col-sm-2" style="text-align: center;">
-                    <img src="/images/indent/action/view-workflow.svg">
-                </div>`,
-            }
-
-
-            let canCancel = false;
-            let actionBtnHtml = ``;
-            //let actionSimpleBtnHtml = ``;
-            for (let d of tripItem.btns) {
-                //let btnSimpleName = d + 'Simple';
-                actionBtnHtml += (taskAction[d] ? taskAction[d] : '');
-                //actionSimpleBtnHtml += (taskAction[btnSimpleName] ? taskAction[btnSimpleName] : '');
-                if (d == 'Cancel')  {
-                    canCancel = true;
-                }
-            }
-            let action = $(".condition-btn.active").data("indent-action");
-            let needShowCheckBox = true;
-            if (action == "1" && canCancel === false) {
-                needShowCheckBox = false;
-            }
-
-            let tripStatusBgColor = indentNavBgColors[tripItem.status] ? indentNavBgColors[tripItem.status] :"#2bb982";
-            let tripStatusStr = tripItem.status ? tripItem.status[0].toUpperCase() + tripItem.status.substr(1) : '';
-
-            tripItem.startDay = moment(tripItem.executionDate).date();
-            tripItem.startMonth = moment(tripItem.executionDate).month() + 1;
-            tripItem.startYear = moment(tripItem.executionDate).year();
-            let currentOptTrip = isCurrentOptTrip(tripItem.tripId);
-            tripHtml += `
-                <div class="task-info-div" ${currentOptTrip == 1 ? "style='background-color:#eee9e9;border-radius:5px;border: 1px solid #eee9e9;'" : ""}>
-                    <div class="row" style="text-align: left;">
-                        <div class="col-6" style="display: flex;justify-content : flex-start;align-items : center">`
-                            if (needShowCheckBox) {
-                                tripHtml += `
-                                    <div class="trip-selector unactive" tripId="${tripItem.tripId}" onclick="selectOrCancelTrip(this);"  
-                                        style="border-radius:16px;width: 16px;height: 16px; border: 1px solid #a3a3a3;
-                                        margin-right: 10px;margin-left: 5px;padding:0px;">
-                                    </div>
-                                `
-                            }
-                            
-                        tripHtml += `<label style="color: #a3a3a3; margin-left: 5px;">#${tripItem.tripNo}</label>
-                        </div>
-                        <div class="col-6" style="text-align: right;font-weight: bolder;">
-                            <label class="nav-statu-label" style="color:${tripStatusBgColor}">${tripStatusStr}</label>
-                        </div>
-                    </div>
-                    <div class="row" style="text-align: left;">
-                        <div class="col-6" style="text-align: left; margin-top: 5px;">
-                            <span class="trip-exedate-label" style="margin-left: 5px;">${tripItem.startDay} ${getMonthStr(tripItem.startMonth - 1)} ${tripItem.startYear} ${tripItem.executionTime}</span><div></div>
-                        </div>
-                        <div class="col-6 service-provider-div" style="height: 30px; text-align: right; margin-top: 5px;">
-                            ${tempServiceproviderHtml}
-                        </div>
-                    </div>
-                    <div class="row" style="padding: 10px">
-                        <div class="col-6 item-route" style="padding-left: 0;">
-                            <table style="text-align: center;">
-                                <tr>`;
-                                if (tripItem.serviceModeValue && tripItem.serviceModeValue.toLowerCase() != 'pickup') {
-                                    tripHtml += `  
-                                    <td><img style="width: 25px;padding: 0 5px;" src="/images/logout/circle-start.png"></td>
-                                    <td><label>${tripItem.pickupDestination}</label></td>`
-                                } else {
-                                    tripHtml += `  
-                                    <td><img style="width: 25px;padding: 0 5px;" src="/images/logout/circle-end.png"></td>
-                                    <td><label>${tripItem.pickupDestination}</label></td>`
-                                }
-                            tripHtml += `
-                                </tr>
-                                <tr>`;
-                                if (tripItem.serviceModeValue && tripItem.serviceModeValue.toLowerCase() != 'pickup' || !tripItem.duration) {
-                                    tripHtml += `
-                                        <td><img style="height: 20px;padding: 0 5px;" src="/images/logout/xu-line.png"></td>
-                                        <td></td>
-                                    `;
-                                }
-                            tripHtml += `  
-                                </tr>
-                                <tr>
-                                `
-                                if (tripItem.serviceModeValue && tripItem.serviceModeValue.toLowerCase() == 'pickup' && tripItem.duration) {
-                                    tripHtml += `
-                                        <td colspan="2" style="padding-top: 20px;text-align: center;">${tripItem.duration}hr for Disposal</td>
-                                    `;
-                                } else {
-                                    tripHtml += `
-                                        <td><img style="width: 25px;padding: 0 5px;" src="/images/logout/circle-end.png"></td>
-                                        <td><label>${tripItem.dropoffDestination}</label></td>
-                                    `;
-                                }
-                                    
-                                tripHtml += `</tr>
-                            </table>
-                        </div>
-                        <div class="col-6 item-route" style="padding-left: 0;margin-top: -6px">
-                            <div class="col-12" style="height: 30px; display: flex;justify-content: flex-end; align-items: center;">
-                                ${tripItem.vehicleType}
-                            </div>
-                            <br>
-                            <div class="driver-info-div" style="text-align: right;margin-top: -6px;">
-                                <!-- img style="width: 16px;margin-right: 3px;margin-bottom:2px;" src="/images/indent/mobileRsp/Driver-1.svg" -->
-                                <label onclick="toDriverDetailPage(${tripItem.tripId})" style="color: #4bc395;">Qty(${tripItem.assignedDriver}/${tripItem.noOfVehicle=="0"?tripItem.noOfDriver:tripItem.noOfVehicle})</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="action-btn-div row">
-                        <div class="col-10" style="display: flex;">
-                            ${actionBtnHtml}
-                        </div>
-                        <div class="col-2" style="display: flex;">
-                            <img onclick="toViewTripPage('${indent.id}', '${tripItem.tripId}')" style="width: 24px;margin-right: 3px;margin-bottom:2px;" src="/images/indent/right-black.svg">
-                        </div>
-                    </div>
-                </div>
-            `;
-            if (tripIndex < indent.trips.length) {
-                tripHtml +=`<hr style="margin: 0 1rem 0 1rem;background-color: #dcdcdc;height: 1px;border: none !important;">`;
-            }
-            tripIndex++;
-        }
-        
-        let indentStatusStr = '';
-        let htmlAll = `
-        <div class="info-nav row ${(currentIndex === 1 && currentPage == 1) ? 'up active' : 'down'}" 
-            style="background-color:${(currentIndex === 1 && currentPage == 1) ?  indentNavBgColor: ''}">
-            <div style="width: 100%;display: flex;justify-content : flex-start;align-items : center;">
-                <div class="col-6 info-nav-left" style="display: flex;justify-content : flex-start;align-items : center;">
-                    <div class="bulk-trip-selector" onclick="selectOrCancelTrip(this, true);"  
-                        style="margin-right: 10px;border-radius:16px;width: 16px;height: 16px; border: 1px solid #a3a3a3;padding:0px;"></div>
-                    <!--div class="" style="border-radius:2px;width: 5px;max-width:5px;height: 22px;
-                    margin-right: 10px;padding:0px;background-color: ${indentNavBgColor}"></div-->
-                    <label onclick="toViewIndentPage('${indent.id}');" style="min-width: 115px;width: 115px;font-size: 14px; padding-right: 0px;text-decoration: underline;">
-                        #${indent.id}
-                    </label>
-                </div>
-                <div class="col-4" style="height: 100%;" onclick="indentNavShow(this, '${indentNavBgColor}');">
-                    <div class="row">${indent.purposeType && indent.purposeType.length > 11 ? 
-                        (indent.purposeType.substr(0, 11) +'...') : indent.purposeType}</div>
-                </div>`
-                if(roleName != "UCO"){
-                    htmlAll+=`<div class="col-2 info-nav-right">
-                        <label class="col-5 col-sm-5 nav-statu-label" style="color:${(currentIndex === 1 && currentPage == 1) ? 'black' : indentNavBgColor}">${indentStatusStr}</label>
-                        <img class="nav-add-trip" onclick="addNewTrip(this, '${indent.id}');" 
-                            src="/images/${currentIndex === 1 ? 'add-white.svg' : 'add-green.svg'}">
-                    </div>`
-                }
-            htmlAll+=`</div>
-            <div style="margin-top: -10px;width: 100%;display: flex;justify-content : flex-start;align-items : center;" onclick="indentNavShow(this, '${indentNavBgColor}');">
-                ${indent.additionalRemarks && indent.additionalRemarks.length > 32 ? 
-                    (indent.additionalRemarks.substr(0, 30) +'...') : indent.additionalRemarks}
-            </div>
-        </div>
-        <div class="indent-content row" style="${(currentIndex === 1 && currentPage == 1) ? '' : 'display: none;'}">
-            <div class="task-info-list-div">
-                ${tripHtml}
-            </div>
-        </div>`;
-
+        let htmlAll = buidIndentHtmlAll(indent, tripHtml, currentIndex)
         $('.item-div-list').append(htmlAll);
 
         currentIndex++;
     }
 };
-const getActionBtnHtml = function(action, taskAction){
-    if(taskAction['Edit']){
+
+const buidIndentHtmlAll = function (indent, tripHtml, currentIndex) {
+    let indentNavBgColor = "#2bb982";
+    let indentStatusStr = '';
+    let htmlAll = `<div class="info-nav row ${(currentIndex === 1 && currentPage == 1) ? 'up active' : 'down'}" 
+        style="background-color:${(currentIndex === 1 && currentPage == 1) ? indentNavBgColor : ''}">
+        <div style="width: 100%;display: flex;justify-content : flex-start;align-items : center;">
+            <div class="col-6 info-nav-left" style="display: flex;justify-content : flex-start;align-items : center;">
+                <div class="bulk-trip-selector" onclick="selectOrCancelTrip(this, true);"  
+                    style="margin-right: 10px;border-radius:16px;width: 16px;height: 16px; border: 1px solid #a3a3a3;padding:0px;"></div>
+                <!--div class="" style="border-radius:2px;width: 5px;max-width:5px;height: 22px;
+                margin-right: 10px;padding:0px;background-color: ${indentNavBgColor}"></div-->
+                <label onclick="toViewIndentPage('${indent.id}');" style="min-width: 115px;width: 115px;font-size: 14px; padding-right: 0px;text-decoration: underline;">
+                    #${indent.id}
+                </label>
+            </div>
+            <div class="col-4" style="height: 100%;" onclick="indentNavShow(this, '${indentNavBgColor}');">
+                <div class="row">${indent.purposeType && indent.purposeType.length > 11 ?
+            (indent.purposeType.substr(0, 11) + '...') : indent.purposeType}</div>
+            </div>`
+    if (roleName != "UCO") {
+        htmlAll += `<div class="col-2 info-nav-right">
+                    <label class="col-5 col-sm-5 nav-statu-label" style="color:${(currentIndex === 1 && currentPage == 1) ? 'black' : indentNavBgColor}">${indentStatusStr}</label>
+                    <img class="nav-add-trip" onclick="addNewTrip(this, '${indent.id}');" 
+                        src="/images/${currentIndex === 1 ? 'add-white.svg' : 'add-green.svg'}">
+                </div>`
+    }
+    htmlAll += `</div>
+        <div style="margin-top: -10px;width: 100%;display: flex;justify-content : flex-start;align-items : center;" onclick="indentNavShow(this, '${indentNavBgColor}');">
+            ${indent.additionalRemarks && indent.additionalRemarks.length > 32 ?
+            (indent.additionalRemarks.substr(0, 30) + '...') : indent.additionalRemarks}
+        </div>
+    </div>
+    <div class="indent-content row" style="${(currentIndex === 1 && currentPage == 1) ? '' : 'display: none;'}">
+        <div class="task-info-list-div">
+            ${tripHtml}
+        </div>
+    </div>`;
+    return htmlAll
+}
+
+const buildIndentsTripPage = function (indent) {
+
+    const getTempServiceProviderOption = function (tripItem) {
+        let tempServiceproviderHtml = ""
+        for (let spData of tripItem.tspAvailableSelect) {
+            tempServiceproviderHtml += `<option data-no="${spData.contractPartNo}" value="${spData.id}" ${spData.id == tripItem.serviceProviderId ? 'selected' : ''}>${spData.name}</option>`;
+        }
+        return tempServiceproviderHtml
+    }
+
+    const getTempServiceProviderHtml = function (tripItem) {
+        //Once indent is cancelled remove service provider to prevent confusion
+        let workFlowStatus = tripItem.status.toLowerCase();
+        if (workFlowStatus == "cancelled") {
+            return tripItem.tspAvailable ? tripItem.tspAvailable : "";
+        }
+
+        if (roleName == "RF" && tripItem.tspAvailableSelect && tripItem.tspAvailableSelect.length > 1) {
+            let tempServiceproviderHtml = ``;
+            let isCategoryMV = 0
+            if (tripItem.category.toUpperCase() == "MV") {
+                isCategoryMV = 1
+            }
+
+            tempServiceproviderHtml = `<select onchange="RSPAvaliableChange(this, ${tripItem.tripId}, ${isCategoryMV})" name="sp-select" class="form-control" style="width: 100%;text-align: center; font-size: 10px;">`;
+            tempServiceproviderHtml += `<option value="" data-no=""></option>`;
+            tempServiceproviderHtml += getTempServiceProviderOption(tripItem)
+            tempServiceproviderHtml += `</select>`;
+            return tempServiceproviderHtml
+        }
+
+        return tripItem.tspAvailable ? tripItem.tspAvailable : "";
+    }
+
+    const getBtnHtml = function (indent, tripItem) {
+        let taskAction = {
+            Edit: `<div onclick="toEditTripPage('${indent.id}', '${tripItem.tripId}')" class="edit-btn-div" style="width: 90px;padding-right: 3px;">
+                <div class="action-btn">
+                    <img src="/images/indent/action/edit.svg">
+                    <label>Edit</label>
+                </div>
+            </div>`,
+            EditSimple: `<div onclick="toEditTripPage('${indent.id}', '${tripItem.tripId}')" class="edit-btn-div" style="width: 50px;text-align: center;">
+                <img src="/images/indent/action/edit.svg">
+            </div>`,
+            View: `<div onclick="toIndentFlowPage('${tripItem.tripId}')" style="width: 90px;padding-right: 5px;">
+                <div class="action-btn">
+                    <img style="margin-left: 3px;" src="/images/indent/action/view-workflow.svg">
+                    <label style="margin-left: 3px;">History</label>
+                </div>
+            </div>`,
+            ViewSimple: `<div onclick="toIndentFlowPage('${tripItem.tripId}')" class="col-2 col-sm-2" style="text-align: center;">
+                <img src="/images/indent/action/view-workflow.svg">
+            </div>`,
+        }
+        let canCancel = false;
+        let actionBtnHtml = ``;
+        for (let d of tripItem.btns) {
+            actionBtnHtml += (taskAction[d] ? taskAction[d] : '');
+            if (d == 'Cancel') {
+                canCancel = true;
+            }
+        }
+        return { canCancel, actionBtnHtml }
+    }
+
+
+
+    const getTripPickupDestinationHtml = function (tripItem) {
+        if (tripItem.serviceModeValue && tripItem.serviceModeValue.toLowerCase() != 'pickup') {
+            return `<td><img style="width: 25px;padding: 0 5px;" src="/images/logout/circle-start.png"></td>
+                                <td><label>${tripItem.pickupDestination}</label></td>`
+        }
+        return `<td><img style="width: 25px;padding: 0 5px;" src="/images/logout/circle-end.png"></td>
+                                <td><label>${tripItem.pickupDestination}</label></td>`
+    }
+
+    const getLineHtml = function (tripItem) {
+        if (tripItem.serviceModeValue && tripItem.serviceModeValue.toLowerCase() != 'pickup' || !tripItem.duration) {
+            return `<td><img style="height: 20px;padding: 0 5px;" src="/images/logout/xu-line.png"></td><td></td>`;
+        }
+        return ''
+    }
+    const getTripDropoffDestination = function (tripItem) {
+        if (tripItem.serviceModeValue && tripItem.serviceModeValue.toLowerCase() == 'pickup' && tripItem.duration) {
+            return `<td colspan="2" style="padding-top: 20px;text-align: center;">${tripItem.duration}hr for Disposal</td>`;
+        }
+        return `<td><img style="width: 25px;padding: 0 5px;" src="/images/logout/circle-end.png"></td>
+                                    <td><label>${tripItem.dropoffDestination}</label></td>`;
+
+    }
+
+    let tripHtml = ``;
+    let tripIndex = 1;
+    for (let tripItem of indent.trips) {
+        let tempServiceproviderHtml = getTempServiceProviderHtml(tripItem);
+        let { canCancel, actionBtnHtml } = getBtnHtml(indent, tripItem)
+
+        let action = $(".condition-btn.active").data("indent-action");
+        let needShowCheckBox = true;
+        if (action == "1" && canCancel === false) {
+            needShowCheckBox = false;
+        }
+
+        let tripStatusBgColor = getTripStatusBgColor(indentNavBgColors, tripItem.status)
+        let tripStatusStr = getTripStatusStr(tripItem.status)
+
+        tripItem.startDay = moment(tripItem.executionDate).date();
+        tripItem.startMonth = moment(tripItem.executionDate).month() + 1;
+        tripItem.startYear = moment(tripItem.executionDate).year();
+        let currentOptTrip = isCurrentOptTrip(tripItem.tripId);
+        tripHtml += `
+            <div class="task-info-div" ${currentOptTrip == 1 ? "style='background-color:#eee9e9;border-radius:5px;border: 1px solid #eee9e9;'" : ""}>
+                <div class="row" style="text-align: left;">
+                    <div class="col-6" style="display: flex;justify-content : flex-start;align-items : center">`
+        if (needShowCheckBox) {
+            tripHtml += `<div class="trip-selector unactive" tripId="${tripItem.tripId}" onclick="selectOrCancelTrip(this);"  
+                                    style="border-radius:16px;width: 16px;height: 16px; border: 1px solid #a3a3a3;
+                                    margin-right: 10px;margin-left: 5px;padding:0px;">
+                                </div>`
+        }
+
+        tripHtml += `<label style="color: #a3a3a3; margin-left: 5px;">#${tripItem.tripNo}</label>
+                    </div>
+                    <div class="col-6" style="text-align: right;font-weight: bolder;">
+                        <label class="nav-statu-label" style="color:${tripStatusBgColor}">${tripStatusStr}</label>
+                    </div>
+                </div>
+                <div class="row" style="text-align: left;">
+                    <div class="col-6" style="text-align: left; margin-top: 5px;">
+                        <span class="trip-exedate-label" style="margin-left: 5px;">${tripItem.startDay} ${getMonthStr(tripItem.startMonth - 1)} ${tripItem.startYear} ${tripItem.executionTime}</span><div></div>
+                    </div>
+                    <div class="col-6 service-provider-div" style="height: 30px; text-align: right; margin-top: 5px;">
+                        ${tempServiceproviderHtml}
+                    </div>
+                </div>
+                <div class="row" style="padding: 10px">
+                    <div class="col-6 item-route" style="padding-left: 0;">
+                        <table style="text-align: center;">
+                            <tr>`;
+
+        tripHtml += getTripPickupDestinationHtml(tripItem)
+        tripHtml += `</tr><tr>`;
+
+        tripHtml += getLineHtml(tripItem)
+        tripHtml += `</tr><tr>`
+
+        tripHtml += getTripDropoffDestination(tripItem)
+
+        tripHtml += `</tr>
+                        </table>
+                    </div>
+                    <div class="col-6 item-route" style="padding-left: 0;margin-top: -6px">
+                        <div class="col-12" style="height: 30px; display: flex;justify-content: flex-end; align-items: center;">
+                            ${tripItem.vehicleType}
+                        </div>
+                        <br>
+                        <div class="driver-info-div" style="text-align: right;margin-top: -6px;">
+                            <!-- img style="width: 16px;margin-right: 3px;margin-bottom:2px;" src="/images/indent/mobileRsp/Driver-1.svg" -->
+                            <label onclick="toDriverDetailPage(${tripItem.tripId})" style="color: #4bc395;">Qty(${tripItem.assignedDriver}/${tripItem.noOfVehicle == "0" ? tripItem.noOfDriver : tripItem.noOfVehicle})</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-btn-div row">
+                    <div class="col-10" style="display: flex;">
+                        ${actionBtnHtml}
+                    </div>
+                    <div class="col-2" style="display: flex;">
+                        <img onclick="toViewTripPage('${indent.id}', '${tripItem.tripId}')" style="width: 24px;margin-right: 3px;margin-bottom:2px;" src="/images/indent/right-black.svg">
+                    </div>
+                </div>
+            </div>
+        `;
+        if (tripIndex < indent.trips.length) {
+            tripHtml += `<hr style="margin: 0 1rem 0 1rem;background-color: #dcdcdc;height: 1px;border: none !important;">`;
+        }
+        tripIndex++;
+    }
+    return tripHtml
+}
+const getTripStatusBgColor = function (indentNavBgColors, status) {
+    return indentNavBgColors[status] ? indentNavBgColors[status] : "#2bb982";
+}
+
+const getTripStatusStr = function (status) {
+    return status ? status[0].toUpperCase() + status.slice(1) : '';
+}
+
+const getActionBtnHtml = function (action, taskAction) {
+    if (taskAction['Edit']) {
         return taskAction['Edit']
     }
-    if(action){
+    if (action) {
         return action
     }
     return ''
 }
-const buildUrgentIndnetsPage = function(urgentIndentList) {
+
+const setNullValue = function (value) {
+    return value || "-"
+}
+const buildUrgentIndnetsPage = function (urgentIndentList) {
     if (urgentIndentList === undefined || urgentIndentList == null || urgentIndentList.length == 0) {
         return;
     }
@@ -454,23 +491,14 @@ const buildUrgentIndnetsPage = function(urgentIndentList) {
             EditSimple: `<div onclick="toEditUrgentIndentPage('${indent.taskId}')" class="edit-btn-div" style="width: 50px;text-align: center;">
                 <img src="/images/indent/action/edit.svg">
             </div>`,
-            // View: `<div onclick="toIndentFlowPage('${tripItem.tripId}')" style="width: 90px;padding-right: 5px;">
-            //     <div class="action-btn">
-            //         <img style="margin-left: 3px;" src="/images/indent/action/view-workflow.svg">
-            //         <label style="margin-left: 3px;">History</label>
-            //     </div>
-            // </div>`,
-            // ViewSimple:`<div onclick="toIndentFlowPage('${tripItem.tripId}')" class="col-2 col-sm-2" style="text-align: center;">
-            //     <img src="/images/indent/action/view-workflow.svg">
-            // </div>`,
         }
 
         let action = indent.action;
         let actionBtnHtml = getActionBtnHtml(action, taskAction)
 
-  
-        let tripStatusBgColor = urgentIndentNavBgColors[taskStatus] ? urgentIndentNavBgColors[taskStatus] :"#2bb982";
-        let tripStatusStr = taskStatus ? taskStatus[0].toUpperCase() + taskStatus.substr(1) : '';
+
+        let tripStatusBgColor = getTripStatusBgColor(taskStatus)
+        let tripStatusStr = getTripStatusStr(taskStatus)
 
         indent.startDay = moment(indent.startDate).date();
         indent.startMonth = moment(indent.startDate).month() + 1;
@@ -480,16 +508,14 @@ const buildUrgentIndnetsPage = function(urgentIndentList) {
             <div class="task-info-div" ${currentOptTrip == 1 ? "style='background-color:#eee9e9;border-radius:5px;border: 1px solid #eee9e9;'" : ""}>
                 <div class="row" style="text-align: left;">
                     <div class="col-8" style="display: flex;justify-content : flex-start;align-items : center">`
-                        if (action) {
-                            tripHtml += `
-                                <div class="urgent-indent-selector unactive" taskId="${indent.taskId}" onclick="selectOrCancelUrgentTask(this);"  
+        if (action) {
+            tripHtml += `<div class="urgent-indent-selector unactive" taskId="${indent.taskId}" onclick="selectOrCancelUrgentTask(this);"  
                                     style="border-radius:16px;width: 16px;height: 16px; border: 1px solid #a3a3a3;
                                     margin-right: 10px;margin-left: 5px;padding:0px;">
-                                </div>
-                            `
-                        }
-                        
-                    tripHtml += `<label style="color: #a3a3a3; margin-left: 5px;">#${indent.requestId}-${indent.taskId}</label>
+                                </div>`
+        }
+
+        tripHtml += `<label style="color: #a3a3a3; margin-left: 5px;">#${indent.requestId}-${indent.taskId}</label>
                     </div>
                     <div class="col-4" style="text-align: right;font-weight: bolder;">
                         <label class="nav-statu-label" style="color:${tripStatusBgColor}">${tripStatusStr}</label>
@@ -521,18 +547,18 @@ const buildUrgentIndnetsPage = function(urgentIndentList) {
                                 <td><label>${indent.vehicleType}</label></td>
                             </tr>
                             <tr>
-                                <td><label style="height: 20px; padding-top: 10px;">(${indent.vehicleNumber ? indent.vehicleNumber : "-"})</label></td> 
+                                <td><label style="height: 20px; padding-top: 10px;">(${setNullValue(indent.vehicleNumber)})</label></td> 
                             </tr>
                         </table>
                     </div>
                     <div class="row" style="margin-top: 10px; color: #a3a3a3; font-size: 16px;">
                         <div class="col-6 item-route" style="padding-left: 8px;">
                             <div>Driver Name</div>
-                            <div style="color: black;">${indent.driverName ? indent.driverName : '-'}</div>
+                            <div style="color: black;">${setNullValue(indent.driverName)}</div>
                         </div>
                         <div class="col-6 item-route" style="padding: 0;">
                             <div style="display: flex; justify-content: flex-end;"><label>Contact Number</label></div>
-                            <div style="display: flex; justify-content: flex-end; color: black;">${indent.contactNumber ? indent.contactNumber : '-'}</div>
+                            <div style="display: flex; justify-content: flex-end; color: black;">${setNullValue(indent.contactNumber)}</div>
                         </div>
                     </div>
                 </div>
@@ -547,11 +573,11 @@ const buildUrgentIndnetsPage = function(urgentIndentList) {
             </div>
         `;
         if (indentIndex < urgentIndentList.length) {
-            tripHtml +=`<hr style="margin: 0 1rem 0 1rem;background-color: #dcdcdc;height: 1px;border: none !important;">`;
+            tripHtml += `<hr style="margin: 0 1rem 0 1rem;background-color: #dcdcdc;height: 1px;border: none !important;">`;
         }
         indentIndex++;
     }
-    
+
     let htmlAll = `
         <div class="indent-content row" style="margin-top: 10px;">
             <div class="task-info-list-div">
@@ -563,7 +589,7 @@ const buildUrgentIndnetsPage = function(urgentIndentList) {
     $('.item-div-list').append(htmlAll);
 };
 
-const indentNavShow = function(ele, activeBgColor) {
+const indentNavShow = function (ele, activeBgColor) {
     let $infoNav = $(ele).closest(".info-nav");
     let isDown = $infoNav.hasClass("down");
     if (isDown) {
@@ -573,7 +599,7 @@ const indentNavShow = function(ele, activeBgColor) {
         $infoNav.addClass("active");
 
         $infoNav.find(".nav-statu-label").attr("style", "color: black");
-        $infoNav.attr('style', 'background-color: '+activeBgColor);
+        $infoNav.attr('style', 'background-color: ' + activeBgColor);
         $infoNav.find(".nav-add-trip").attr("src", "/images/add-white.svg");
 
         $infoNav.next().show();
@@ -590,11 +616,11 @@ const indentNavShow = function(ele, activeBgColor) {
     }
 };
 
-const selectOrCancelTrip = function(ele, isAll) {
+const selectOrCancelTrip = function (ele, isAll) {
     let isSelectd = $(ele).hasClass("active");
     if (isSelectd) {
         $(ele).removeClass("active");
-        if(!$(ele).hasClass("unactive")){
+        if (!$(ele).hasClass("unactive")) {
             $(ele).addClass("unactive")
         }
         if (isAll) {
@@ -604,14 +630,14 @@ const selectOrCancelTrip = function(ele, isAll) {
         }
     } else {
         $(ele).removeClass("unactive");
-        if(!$(ele).hasClass("active")){
+        if (!$(ele).hasClass("active")) {
             $(ele).addClass("active")
         }
         if (isAll) {
             $(ele).parent().parent().parent().next().find(".trip-selector").addClass("active");
-        }  else {
+        } else {
             let unselectedNum = $(ele).parent().parent().parent().parent().find(".trip-selector.unactive").length;
-            
+
             if (unselectedNum == 0) {
                 $(ele).parent().parent().parent().parent().parent().prev().find(".bulk-trip-selector").addClass("active");
             }
@@ -619,7 +645,7 @@ const selectOrCancelTrip = function(ele, isAll) {
     }
 }
 
-const selectOrCancelUrgentTask = function(ele) {
+const selectOrCancelUrgentTask = function (ele) {
     let isSelectd = $(ele).hasClass("active");
     if (isSelectd) {
         $(ele).removeClass("active");
@@ -629,9 +655,9 @@ const selectOrCancelUrgentTask = function(ele) {
     }
 }
 
-const actionStyleChange = function(ele) {
+const actionStyleChange = function (ele) {
     let isDetail = $(ele).hasClass("detail");
-        
+
     if (isDetail) {
         $(ele).removeClass("detail");
         $(ele).removeClass("simple");
@@ -657,7 +683,7 @@ const RSPAvaliableChange = async function (e, tripId, isCategoryMV) {
     let serviceProviderId = $(e).val()
     popupTspNotifiedTime(tripId, serviceProviderId, isCategoryMV);
 }
-const popupTspNotifiedTime = async function(tripId, serviceProviderId, isCategoryMV) {
+const popupTspNotifiedTime = async function (tripId, serviceProviderId, isCategoryMV) {
     $.confirm({
         title: 'Are you sure to choose TSP?',
         content: `<div class="row md-2" style="width: 380px;" id="changeTspOptDiv">
@@ -692,15 +718,15 @@ const popupTspNotifiedTime = async function(tripId, serviceProviderId, isCategor
     });
 }
 
-const toViewIndentPage = function(requestId) {
-    window.location.href="/mobileCV/editIndentPage?action=View&requestId=" + requestId;
+const toViewIndentPage = function (requestId) {
+    window.location.href = "/mobileCV/editIndentPage?action=View&requestId=" + requestId;
 }
 
-const toAddIndentPage = function() {
-    window.location.href="/mobileCV/editTripPage?action=Create&page=indent";
+const toAddIndentPage = function () {
+    window.location.href = "/mobileCV/editTripPage?action=Create&page=indent";
 };
 
-const toAddUrgentIndentPage = async function() {
+const toAddUrgentIndentPage = async function () {
     //check can add urgent indent
     await axios.post('/ValidCreateUrgentIndentBtn', {
         createdBy: currentUser.userId
@@ -708,37 +734,37 @@ const toAddUrgentIndentPage = async function() {
         if (res.data.code == 0) {
             simplyAlert(res.data.msg);
         } else {
-            window.location.href="/mobileCV/editUrgentIndentPage?action=Create&page=indent";
+            window.location.href = "/mobileCV/editUrgentIndentPage?action=Create&page=indent";
         }
     })
 };
 
-const toEditUrgentIndentPage = function(taskId) {
-    window.location.href="/mobileCV/editUrgentIndentPage?action=Edit&taskId=" + taskId;
+const toEditUrgentIndentPage = function (taskId) {
+    window.location.href = "/mobileCV/editUrgentIndentPage?action=Edit&taskId=" + taskId;
 };
 
-const toViewUrgentIndentPage = function(taskId) {
-    window.location.href="/mobileCV/editUrgentIndentPage?action=View&taskId=" + taskId;
+const toViewUrgentIndentPage = function (taskId) {
+    window.location.href = "/mobileCV/editUrgentIndentPage?action=View&taskId=" + taskId;
 };
 
-const addNewTrip = function(ele, requestId) {
-    window.location.href="/mobileCV/editTripPage?requestId=" + requestId +"&action=Create&page=trip";
+const addNewTrip = function (ele, requestId) {
+    window.location.href = "/mobileCV/editTripPage?requestId=" + requestId + "&action=Create&page=trip";
 }
 
-const toEditTripPage = function(requestId, tripId) {
-    window.location.href="/mobileCV/editTripPage?requestId=" + requestId + "&tripId="+tripId+"&action=Edit&page=trip";
+const toEditTripPage = function (requestId, tripId) {
+    window.location.href = "/mobileCV/editTripPage?requestId=" + requestId + "&tripId=" + tripId + "&action=Edit&page=trip";
 }
 
-const toViewTripPage = function(requestId, tripId) {
-    window.location.href="/mobileCV/editTripPage?requestId=" + requestId + "&tripId="+tripId+"&action=View&page=trip";
+const toViewTripPage = function (requestId, tripId) {
+    window.location.href = "/mobileCV/editTripPage?requestId=" + requestId + "&tripId=" + tripId + "&action=View&page=trip";
 }
 
-const toDriverDetailPage = function(tripId) {
-    window.location.href="/mobileCV/driverDetail?tripId=" + tripId;
+const toDriverDetailPage = function (tripId) {
+    window.location.href = "/mobileCV/driverDetail?tripId=" + tripId;
 };
 
-const toIndentFlowPage = function(tripId) {
-    window.location.href="/mobileCV/indentFlowHistory?tripId=" + tripId;
+const toIndentFlowPage = function (tripId) {
+    window.location.href = "/mobileCV/indentFlowHistory?tripId=" + tripId;
 }
 
 const IndentEndorse = async function (jobId, requestId) {
@@ -763,9 +789,9 @@ const GetFilerParameters = function () {
     if (currentNav == 'upcomming') {
         action = $(".condition-btn.active").data("indent-action");
     }
-    
+
     let group = $("select[name='group']").val()
-    
+
     let status = $("select[name='indent-status']").val()
     let exeDate = changeDateFormat($("#exe-date").val())
     let createdDate = changeDateFormat($("#create-date").val())
@@ -787,10 +813,10 @@ const GetFilerParameters = function () {
     }
 };
 const GetSortParameters = function () {
-    let sortParams = {exeSort: '', createdSort: ''};
+    let sortParams = { exeSort: '', createdSort: '' };
     let exeSort = $(".exeDateSordDiv .sortele").attr("data-sort");
     let createdSort = $(".createDateSordDiv .sortele").attr("data-sort");
-    
+
     if (exeSort != 'none') {
         sortParams.exeSort = exeSort;
     }
@@ -880,12 +906,12 @@ const InitCreatedDateSelector = function () {
     });
 }
 
-const initGroupSelector = function() {
+const initGroupSelector = function () {
     axios.post("/findAllGroup", {}).then((res) => {
         if (res.data.data) {
             let groups = res.data.data;
 
-            groups = groups.filter(function(value) {
+            groups = groups.filter(function (value) {
                 return roleName == "RF" || value.id == currentUser.group;
             });
             groups = groups.sort(function (group1, group2) {
@@ -899,7 +925,7 @@ const initGroupSelector = function() {
                     return 0;
                 }
             });
-        
+
             $("#group").empty();
             let groupOptsHtml = `<option value="">All</option>`;
             for (let item of groups) {
@@ -910,7 +936,7 @@ const initGroupSelector = function() {
     })
 }
 
-const approve = async function() {
+const approve = async function () {
     let tripIds = getCheckedTripIds();
     if (tripIds.length == 0) {
         simplyAlert("Please select at least one Trip!");
@@ -920,7 +946,7 @@ const approve = async function() {
     confirmOpt("Approve");
 }
 
-const confirmOpt = function(optType) {
+const confirmOpt = function (optType) {
     let currentAction = $(".condition-btn.active").data("indent-action");
     if (currentAction == 4 && optType == 'Cancel') {
         confirmCancelUrgentIndent();
@@ -952,19 +978,19 @@ const confirmOpt = function(optType) {
         },
         async function ($this) {
             let remarks = $this.$content.find("textarea").val();
-            if(optType == 'Cancel'){
+            if (optType == 'Cancel') {
                 confirmCancel(remarks)
-            } else if(optType == 'Reject'){
+            } else if (optType == 'Reject') {
                 confirmReject(remarks)
-            }else if(optType == 'Approve'){
+            } else if (optType == 'Approve') {
                 confirmApprove(remarks)
             }
         }
     );
 }
-const confirmApprove = async function(remarks) {
+const confirmApprove = async function (remarks) {
     let tripIds = getCheckedTripIds();
-    await axios.post("/indent/bulkApprove",{
+    await axios.post("/indent/bulkApprove", {
         tripIds: tripIds,
         remark: remarks,
         roleName: roleName,
@@ -979,9 +1005,9 @@ const confirmApprove = async function(remarks) {
     })
 }
 
-const confirmCancel = async function(remarks) {
+const confirmCancel = async function (remarks) {
     let tripIds = getCheckedTripIds();
-    await axios.post("/indent/bulkCancel",{
+    await axios.post("/indent/bulkCancel", {
         tripIds: tripIds,
         remark: remarks,
         roleName: roleName,
@@ -997,7 +1023,7 @@ const confirmCancel = async function(remarks) {
     })
 }
 
-const confirmReject = async function(remarks) {
+const confirmReject = async function (remarks) {
     let tripIds = getCheckedTripIds();
     await axios.post("/indent/bulkReject", {
         tripIds: tripIds,
@@ -1014,7 +1040,7 @@ const confirmReject = async function(remarks) {
     })
 }
 
-const confirmCancelUrgentIndent = async function() {
+const confirmCancelUrgentIndent = async function () {
     let selectedTaskIds = [];
     $(".urgent-indent-selector.active").each(function () {
         selectedTaskIds.push($(this).attr("taskId"));
@@ -1040,7 +1066,7 @@ const confirmCancelUrgentIndent = async function() {
         async function ($this) {
             //let remarks = $this.$content.find("textarea").val();
             // optType == 'Cancel' ? confirmCancel(remarks) : optType == 'Reject' ? confirmReject(remarks) : optType == 'Approve' ? confirmApprove(remarks) : '';
-            await axios.post("/cancelUrgentIndent", {taskIdList: selectedTaskIds}).then(res => {
+            await axios.post("/cancelUrgentIndent", { taskIdList: selectedTaskIds }).then(res => {
                 let respCode = res.data.code;
                 let msg = res.data.msg;
                 if (respCode == 1) {
@@ -1072,8 +1098,8 @@ const isCurrentOptTrip = function (tripId) {
     return result;
 }
 
-const sortByField = function(ele) {
-    $(ele).find(".sortele").each(function(index, sortele) {
+const sortByField = function (ele) {
+    $(ele).find(".sortele").each(function (index, sortele) {
         if ($(sortele).hasClass("desc")) {
             $(sortele).removeClass("desc");
             $(sortele).addClass("asc");
@@ -1107,10 +1133,6 @@ const InitChangeTspOptateTimeSelector = async function () {
             // format: 'yyyy-MM-dd HH:mm',
             btns: ['clear', 'confirm'],
             value: new Date(),
-            ready: () => { },
-            change: () => { },
-            done: function () {
-            }
         });
     });
 }

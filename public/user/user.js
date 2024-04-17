@@ -345,6 +345,14 @@ const initUserTable = function () {
     });
 }
 
+const haveServiceTypePermission = function (roleName) {
+    return roleName && (roleName == "RF" || roleName == "RA" || roleName == "CM" || occ.indexOf(roleName.toUpperCase()) != -1)
+}
+
+const disabledRoleSelect = function (roleName) {
+    return roleName == "POC" || (roleName == "RF" && top.user.roleName == "RF") || (roleName == "CM" && top.user.roleName == "CM") || (roleName == "RA" && top.user.roleName == "RA")
+}
+
 const edit = async function (e) {
     isEdit = true
     let row = table.row($(e).data("row")).data();
@@ -362,7 +370,7 @@ const edit = async function (e) {
     // usernameInput.attr("disabled", true)
     let roleName = row.roleName
     await roleSelectChange(roleName)
-    if (roleName && (roleName == "RF" || roleName == "RA" || roleName == "CM" || occ.indexOf(roleName.toUpperCase()) != -1)) {
+    if (haveServiceTypePermission(roleName)) {
         let serviceTypeId = row.serviceTypeId
         if (serviceTypeId) {
             let ids = serviceTypeId.split(',')
@@ -371,7 +379,7 @@ const edit = async function (e) {
             });
         }
     }
-    if (roleName == "POC" || (roleName == "RF" && top.user.roleName == "RF") || (roleName == "CM" && top.user.roleName == "CM") || (roleName == "RA" && top.user.roleName == "RA")) {
+    if (disabledRoleSelect(roleName)) {
         roleSelect.attr("disabled", true)
     } else if (roleName == "TSP") {
         if (row.serviceProviderId) {

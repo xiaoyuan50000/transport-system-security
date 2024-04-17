@@ -7,10 +7,9 @@ let page = 'indent';
 let tekongStr = "TEKONG";
 let allTSP = []
 // let roleName = currentUser.roleName;
-let currentUser = null;
-let roleName = null;
+// let currentUser = null;
+// let roleName = null;
 let currentGroupServiceType = null;
-let optType1 = ""
 
 $(async function () {
     currentUser = await getDecodeAESCode(localStorage.user);
@@ -28,7 +27,7 @@ $(async function () {
         $(".info-div").hide();
         $(".trip-div").show();
     }
-    if (optType1 == 'Create') {
+    if (optType == 'Create') {
         $(".create-nav").hide();
         $(".to-add-btn").show();
         if (requestId) {
@@ -41,12 +40,12 @@ $(async function () {
             $("#noOfTripsDiv").hide()
         }
         $(".add-trip-btn").show();
-    } else if (optType1 == 'Edit') {
-        $('.edit-trip-title-label').text(optType1);
+    } else if (optType == 'Edit') {
+        $('.edit-trip-title-label').text(optType);
         $(".edit-trip-btn").show();
         $(".create-nav").show();
-    } else if (optType1 == 'View') {
-        $('.edit-trip-title-label').text(optType1);
+    } else if (optType == 'View') {
+        $('.edit-trip-title-label').text(optType);
         $(".duplicate-trip-btn").show();
         $(".create-nav").show();
     }
@@ -115,7 +114,7 @@ const changeTypeOfVehicle = async function (vehicle = null) {
 const initPage = function () {
     let repeats = $("#repeats").val();
 
-    if (optType1 == 'Edit' && repeats == "Weekly") {
+    if (optType == 'Edit' && repeats == "Weekly") {
         $("#endsOn").hide();
         $("#endsOnLabel").hide();
         $("#repeatOnLabel").hide();
@@ -147,7 +146,7 @@ const initPage = function () {
         $("#pickupDestination").find("option").show();
     }
 
-    if (optType1 == 'View') {
+    if (optType == 'View') {
         $(".trip-info-form input").attr("disabled", true);
         $(".trip-info-form select").attr("disabled", true);
         $(".more-trip-info-form input").attr("disabled", true);
@@ -156,13 +155,13 @@ const initPage = function () {
     }
 }
 const initPageData = async function (callback) {
-    if ((optType1 == 'Edit' || optType1 == 'View') && currentTripId) {
+    if ((optType == 'Edit' || optType == 'View') && currentTripId) {
         await axios.post("/findTripById", {
             tripId: currentTripId
         }).then(async res => {
             let trip = res.data.data;
 
-            $('.edit-trip-title-label').text(optType1 + " " + trip.tripNo);
+            $('.edit-trip-title-label').text(optType + " " + trip.tripNo);
 
 
             let groupId = trip.groupId
@@ -304,7 +303,7 @@ const duplicateTrip = async function () {
 
     $('.edit-trip-title-label').text("Duplicate");
     currentTripId = '';
-    optType1 = 'Create';
+    optType = 'Create';
     $(".create-nav").hide();
     $(".to-add-btn").show();
     $(".add-trip-btn").show();
@@ -411,7 +410,7 @@ const InitRecurring = async function (defaultVal) {
         if (defaultVal) {
             $("#repeats").val(defaultVal);
         }
-        if (optLength == 1 && optType1 == 'Create') {
+        if (optLength == 1 && optType == 'Create') {
             $("#repeats").val(datas[0].value);
             defaultVal = datas[0].value
             $("#repeats-div").hide();
@@ -543,7 +542,7 @@ const WeekdayUnSelect = function ($this) {
 
 const InitDateEndsOnSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let optStr = {
             elem: '#endsOn',
             lang: 'en',
@@ -565,7 +564,7 @@ const InitDateEndsOnSelector = function () {
 
 const InitStartDateSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let optStr = {
             elem: '#executionDate',
             lang: 'en',
@@ -598,7 +597,7 @@ const InitStartDateSelector = function () {
 const InitStartTimeSelector = function (minHour) {
     $('#executionTime').parent().empty().append('<input class="form-control" id="executionTime" name="executionTime" autocomplete="off" lay-key="4">')
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let optStr = {
             elem: '#executionTime',
             lang: 'en',
@@ -621,7 +620,7 @@ const InitStartTimeSelector = function (minHour) {
 
 const InitPeriodStartDateSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         let option = {
             elem: "#periodStartDate",
             lang: 'en',
@@ -679,17 +678,9 @@ const changeEndMinTime = async function () {
     }
 }
 
-const SelectTimeListening = function () {
-    // let timeDom = $('.layui-laydate-footer').find("span[lay-type='datetime']")[0];
-
-    // $(timeDom).on('click', function () {
-    //     interval5Min()
-    // });
-}
-
 const InitPeriodEndDateSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         laydate.render({
             elem: "#periodEndDate",
             lang: 'en',
@@ -721,7 +712,7 @@ const InitPeriodEndDateSelector = function () {
 
 const InitPreParkDateSelector = function () {
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         laydate.render({
             elem: "#preParkDate",
             lang: 'en',
@@ -755,13 +746,6 @@ const noSecond = function () {
     $(".layui-laydate-list>li").css("width", "50%")
 }
 
-const interval5Min = function () {
-    // $(".layui-laydate-list>li:nth-child(2)").find("ol>li").each(function (index, value) {
-    //     if (index % 5 != 0) {
-    //         $(value).addClass("hidden")
-    //     }
-    // })
-}
 
 const AddTrip = function () {
     let data = {
@@ -831,10 +815,10 @@ const AddTrip = function () {
         data.noOfDriver = $("#noOfDriver").val()
     }
 
-    submitAddTrip(data, requestId, currentPurposeType)
+    submitAddTrip(data, requestId, currentPurposeType, driver)
 }
 
-const submitAddTrip = function (data, requestId, currentPurposeType) {
+const submitAddTrip = function (data, requestId, currentPurposeType, driver) {
     let isOK = ValidTripForm(data)
     if (isOK) {
         $(".confirm-add-btn").attr("disabled", true)
@@ -891,7 +875,7 @@ const showSuccessPage = function (createType, eleId) {
 }
 
 const addTripContinue = async function () {
-    optType1 = 'Create';
+    optType = 'Create';
     page = "trip";
     $(".content-div").show();
     $(".success-page-div").hide();

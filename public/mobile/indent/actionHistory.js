@@ -88,7 +88,28 @@ const initIndentFlowPage = function (flowDataList) {
 };
 
 
-
+const getDriverDetailHtml = function (sn, driverInfo) {
+    return `
+    <div class="info-nav ${sn == 1 ? 'active' : ''} ${sn == 1 ? 'up' : 'down'}">
+        <div class="row" style="margin-left: 10px;width: 100%; height: 35px;display: flex;justify-content: left;align-items: center;">
+            <label class="col-4 info-nav-label" style="font-weight:bolder;font-size: small;">Task#${driverInfo.externalTaskId ? driverInfo.externalTaskId : '-'}</label>
+            <div class="col-6" style="display: flex; padding: 0px;">
+                <img class="col-2 col-sm-2 car-img" style="width: 18px; height: 18px;padding: 0px;" src="/images/indent/mobileRsp/${sn == 1 ? 'Vehicle-No.svg' : 'Vehicle-No-1.svg'}">
+                <label class="col-10 info-nav-label" style="font-weight:bolder;font-size: small; margin-left: 2px;margin-top: 4px;">${driverInfo.vehicleNumber ? driverInfo.vehicleNumber : '-'}</label>
+            </div>
+            <img class="nav-img" src="/images/indent/mobileRsp/${sn == 1 ? 'up-white.svg' : 'down-grey.svg'}">
+        </div>
+        <div class="row" style="margin-left: 10px;width: 100%; height: 25px;display: flex;justify-content: left;align-items: center;">
+            <label class="col-4 info-nav-label" style="font-weight:bolder;font-size: small;">${driverInfo.name ? driverInfo.name : '-'}</label>
+            <div class="col-6" style="display: flex; padding: 0px;">
+                <img class="col-2 phone-img" style="width: 18px; height: 18px;padding: 0px;" src="/images/indent/mobileRsp/${sn == 1 ? 'phone.svg' : 'phone-1.svg'}">
+                <label class="col-10 info-nav-label" style="font-size: small;margin-left: 2px;margin-top: 4px;">${driverInfo.contactNumber ? driverInfo.contactNumber : '-'}</label>
+            </div>
+        </div>
+    </div>
+    <div class="driver-detail-div" ${sn == 1 ? '' : 'style="display: none;"'}>
+        <table style="text-align: center;margin-top: 10px; margin-left: 10px; width: 100%;">`;
+}
 
 const initDriverFlowPage = function (flowDataList) {
     let sn = 1
@@ -96,26 +117,7 @@ const initDriverFlowPage = function (flowDataList) {
     $(".driver-flow-div").empty();
     for (let driverInfo of flowDataList) {
         let fmt = "HH:mm:ss";
-        driverDetailHtml += `
-            <div class="info-nav ${sn == 1 ? 'active' : ''} ${sn == 1 ? 'up' : 'down'}">
-                <div class="row" style="margin-left: 10px;width: 100%; height: 35px;display: flex;justify-content: left;align-items: center;">
-                    <label class="col-4 info-nav-label" style="font-weight:bolder;font-size: small;">Task#${driverInfo.externalTaskId ? driverInfo.externalTaskId : '-'}</label>
-                    <div class="col-6" style="display: flex; padding: 0px;">
-                        <img class="col-2 col-sm-2 car-img" style="width: 18px; height: 18px;padding: 0px;" src="/images/indent/mobileRsp/${sn == 1 ? 'Vehicle-No.svg' : 'Vehicle-No-1.svg'}">
-                        <label class="col-10 info-nav-label" style="font-weight:bolder;font-size: small; margin-left: 2px;margin-top: 4px;">${driverInfo.vehicleNumber ? driverInfo.vehicleNumber : '-'}</label>
-                    </div>
-                    <img class="nav-img" src="/images/indent/mobileRsp/${sn == 1 ? 'up-white.svg' : 'down-grey.svg'}">
-                </div>
-                <div class="row" style="margin-left: 10px;width: 100%; height: 25px;display: flex;justify-content: left;align-items: center;">
-                    <label class="col-4 info-nav-label" style="font-weight:bolder;font-size: small;">${driverInfo.name ? driverInfo.name : '-'}</label>
-                    <div class="col-6" style="display: flex; padding: 0px;">
-                        <img class="col-2 phone-img" style="width: 18px; height: 18px;padding: 0px;" src="/images/indent/mobileRsp/${sn == 1 ? 'phone.svg' : 'phone-1.svg'}">
-                        <label class="col-10 info-nav-label" style="font-size: small;margin-left: 2px;margin-top: 4px;">${driverInfo.contactNumber ? driverInfo.contactNumber : '-'}</label>
-                    </div>
-                </div>
-            </div>
-            <div class="driver-detail-div" ${sn == 1 ? '' : 'style="display: none;"'}>
-                <table style="text-align: center;margin-top: 10px; margin-left: 10px; width: 100%;">`;
+        driverDetailHtml += getDriverDetailHtml(sn, driverInfo)
 
         let driverFlowList = driverInfo.driverStatus;
         let driverFlowLength = driverFlowList.length;

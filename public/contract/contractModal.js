@@ -651,7 +651,7 @@ const InitAnnualEndDate = function (id, len) {
     let max = top.changeDateFormat($(extensionDateElem).val()) ? top.changeDateFormat($(extensionDateElem).val()) : top.changeDateFormat($(endDateElem).val())
     console.log(max);
     layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         laydate.render({
             elem: `#${id}`,
             lang: 'en',

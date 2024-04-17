@@ -145,32 +145,16 @@ $(function () {
                     if (full.mobiusSubUnits) {
                         mobiusSubUnits = full.mobiusSubUnits;
                     }
-                    if (full.endorse) {
-                        return full.tsp ? full.tsp : "-"
+
+                    if (full.endorse || full.taskStatus && full.taskStatus.toLowerCase() == "cancelled") {
+                        return getTSP(full)
                     }
 
-                    if (full.taskStatus && full.taskStatus.toLowerCase() == "cancelled") {
-                        return full.tsp ? full.tsp : "-"
-                    }
                     if (roleName == "RF" || roleName == OCCMGR) {
-                        if (full.category && full.category.toLowerCase() == 'mv' && mobiusSubUnits) {
-                            let option = `<option value=""></option>`
-                            for (let item of mobiusSubUnits) {
-                                option += `<option value="${item.id}" ${full.mobiusUnit == item.id ? "selected" : ""}>${item.name}</option>`
-                            }
-                            return `<select style="${full.isRandomUnit == 1 && !full.notifiedTime ? 'border-color: #D88817;' : ''}" class="form-select w-auto select_${full.taskId}" category="${full.category}" data-row="${meta.row}" 
-                                    ${full.taskStatus == 'Assigned' ? "disabled" : 'onchange="ChangeTsp(this)"'} >
-                                    ${option}
-                                </select>`
-                        } else if (full.tspSelect != null && full.tspSelect.length != 0) {
-                            let option = `<option value=""></option>`
-                            for (let item of full.tspSelect) {
-                                option += `<option value="${item.id}" ${full.serviceProviderId == item.id ? "selected" : ""}>${item.name}</option>`
-                            }
-                            return `<select style="" class="form-select w-auto select_${full.taskId}" data-row="${meta.row}" 
-                                    ${full.tspDisable == 1 ? "disabled" : 'onchange="ChangeTsp(this)"'} >
-                                    ${option}
-                                </select>`
+
+                        let html = getTSPHtml(full, mobiusSubUnits, meta)
+                        if (html != "") {
+                            return html
                         }
                     } else if (full.category && full.category.toLowerCase() == 'mv' && mobiusSubUnits) {
                         let currentUnit = mobiusSubUnits.find(item => item.id == full.mobiusUnit);
@@ -178,7 +162,8 @@ $(function () {
                             return currentUnit.name;
                         }
                     }
-                    return full.tsp ? full.tsp : "-"
+
+                    return getTSP(full)
                 }
             },
             {
@@ -302,16 +287,7 @@ $(function () {
                 "data": "endTime", "title": "Notify TSP Time",
                 "render": function (data, type, full, meta) {
                     if (roleName == 'RF' || roleName == OCCMGR) {
-                        let baseHtml = ``
-                        if (full.notifiedTime) {
-                            baseHtml += `<div>Notified:${full.notifiedTime ? moment(full.notifiedTime).format("DD/MM/YYYY HH:mm") : '-'}</div>`;
-                        }
-                        if (full.tspChangeTime) {
-                            baseHtml += `<div >Amendment:${full.tspChangeTime ? moment(full.tspChangeTime).format("DD/MM/YYYY HH:mm") : '-'}</div>`;
-                        }
-                        if (full.cancellationTime) {
-                            baseHtml += `<div >Cancellation:${full.cancellationTime ? moment(full.cancellationTime).format("DD/MM/YYYY HH:mm") : '-'}</div>`;
-                        }
+                        let baseHtml = getBaseTimeHtml(full)
                         if (full.endorse != 1) {
                             return `<div data-cell="tspTime" style="wdith: 100%;height: 100%;text-decoration:underline;" data-row="${meta.row}" onclick="editTaskTime(this)">${baseHtml}</div>`
                         } else {
@@ -404,6 +380,58 @@ $(function () {
         reloadJobList()
     })
 })
+
+const getBaseTimeHtml = function (full) {
+    let baseHtml = ``
+    if (full.notifiedTime) {
+        baseHtml += `<div>Notified:${full.notifiedTime ? moment(full.notifiedTime).format("DD/MM/YYYY HH:mm") : '-'}</div>`;
+    }
+    if (full.tspChangeTime) {
+        baseHtml += `<div >Amendment:${full.tspChangeTime ? moment(full.tspChangeTime).format("DD/MM/YYYY HH:mm") : '-'}</div>`;
+    }
+    if (full.cancellationTime) {
+        baseHtml += `<div >Cancellation:${full.cancellationTime ? moment(full.cancellationTime).format("DD/MM/YYYY HH:mm") : '-'}</div>`;
+    }
+    return baseHtml
+}
+
+const getTSP = function (full) {
+    return full.tsp ? full.tsp : ""
+}
+
+const getTSPHtml = function (full, mobiusSubUnits, meta) {
+    const getMVUnitOption = function (full, mobiusSubUnits) {
+        let option = `<option value=""></option>`
+        for (let item of mobiusSubUnits) {
+            option += `<option value="${item.id}" ${full.mobiusUnit == item.id ? "selected" : ""}>${item.name}</option>`
+        }
+        return option
+    }
+
+    const getTSPOption = function (full) {
+        let option = `<option value=""></option>`
+        for (let item of full.tspSelect) {
+            option += `<option value="${item.id}" ${full.serviceProviderId == item.id ? "selected" : ""}>${item.name}</option>`
+        }
+        return option
+    }
+
+
+    if (full.category && full.category.toLowerCase() == 'mv' && mobiusSubUnits) {
+        let option = getMVUnitOption(full, mobiusSubUnits)
+        return `<select style="${full.isRandomUnit == 1 && !full.notifiedTime ? 'border-color: #D88817;' : ''}" class="form-select w-auto select_${full.taskId}" category="${full.category}" data-row="${meta.row}" 
+                ${full.taskStatus == 'Assigned' ? "disabled" : 'onchange="ChangeTsp(this)"'} >
+                ${option}
+            </select>`
+    } else if (full.tspSelect != null && full.tspSelect.length != 0) {
+        let option = getTSPOption(full)
+        return `<select style="" class="form-select w-auto select_${full.taskId}" data-row="${meta.row}" 
+                ${full.tspDisable == 1 ? "disabled" : 'onchange="ChangeTsp(this)"'} >
+                ${option}
+            </select>`
+    }
+    return ""
+}
 
 const reloadJobList = function () {
     table.ajax.reload(null, true);
@@ -667,13 +695,7 @@ const EditDriver = function (e) {
                             let executionDate = $this.$content.find('input[name="executionDate"]').val()
                             let executionTime = $this.$content.find('input[name="executionTime"]').val()
                             let editData = { serviceProviderId, vehicleType, serviceModeId, dropoffPoint, pickupPoint, executionDate, executionTime }
-                            doneEditTaskTime(editData, function (needChangeTsp, data) {
-                                if (needChangeTsp === true) {
-                                    $this.$content.find(".sp-div").show();
-                                    $this.$content.find("#serviceProvider").empty()
-                                    $this.$content.find("#serviceProvider").append(data)
-                                }
-                            })
+                            doneEditTaskTime(editData, $this.$content)
                         },
                     });
                 });
@@ -750,7 +772,7 @@ const EditDriver = function (e) {
                 }
 
                 layui.use(['laydate'], function () {
-                    laydate = layui.laydate;
+                    let laydate = layui.laydate;
                     laydate.render({
                         elem: '#period-startDate',
                         lang: 'en',
@@ -761,7 +783,7 @@ const EditDriver = function (e) {
                     });
                 });
                 layui.use(['laydate'], function () {
-                    laydate = layui.laydate;
+                    let laydate = layui.laydate;
                     laydate.render({
                         elem: '#period-endDate',
                         lang: 'en',
@@ -826,7 +848,7 @@ const EditDriver = function (e) {
 
 }
 
-const doneEditTaskTime = function (editData, callback) {
+const doneEditTaskTime = function (editData, elem) {
     let { serviceProviderId, vehicleType, serviceModeId, dropoffPoint, pickupPoint, executionDate, executionTime } = editData
     if (serviceProviderId) {
         axios.post("/getDriverCheckboxByVehicle", {
@@ -849,7 +871,11 @@ const doneEditTaskTime = function (editData, callback) {
                         data += `<option value="${item.id}">${item.name}</option>`
                     }
                 }
-                callback(needChangeTsp, data)
+                if (needChangeTsp === true) {
+                    elem.find(".sp-div").show();
+                    elem.find("#serviceProvider").empty()
+                    elem.find("#serviceProvider").append(data)
+                }
             }
         })
     }
@@ -884,7 +910,7 @@ const checkEditDriverFormInput = function (input) {
 
 const InitOptateTimeSelector = async function (taskId, eleId, timeType, defaultVal) {
     await layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         laydate.render({
             elem: '#' + eleId,
             lang: 'en',
@@ -905,7 +931,7 @@ const InitOptateTimeSelector = async function (taskId, eleId, timeType, defaultV
 
 const InitChangeTspOptateTimeSelector = async function () {
     await layui.use(['laydate'], function () {
-        laydate = layui.laydate;
+        let laydate = layui.laydate;
         laydate.render({
             elem: '#operateTime',
             lang: 'en',

@@ -9,6 +9,27 @@ const queryActionHistory = async function (params, callback) {
         })
 }
 let historyTaskId = ""
+
+const getRemarks = function (row) {
+    return row.remark ? `(${row.remark})` : ""
+}
+
+const getChangeHistoryHtml = function (jobHistoryId) {
+    if (jobHistoryId) {
+        return `onclick=showChange(${jobHistoryId}) role="button"`
+    }
+    return ""
+}
+
+const getRole = function (role) {
+    return role ? "(" + role + ")" : ""
+}
+const getContactNumber = function (contactNumber) {
+    return contactNumber ? "(" + contactNumber + ")" : ""
+}
+const getEmail = function (email) {
+    return email || ""
+}
 $(function () {
     let indentHistoryModal = document.getElementById('indentHistoryModal')
     indentHistoryModal.addEventListener('hidden.bs.modal', function (event) {
@@ -37,14 +58,11 @@ $(function () {
                 let username = row.username
                 let contactNumber = row.contactNumber
                 let groupName = row.groupName
-                let remark = row.remark ? `(${row.remark})` : ""
+                let remark = getRemarks(row)
                 let createdAt = moment(row.createdAt).format("DD/MM HH:mm:ss")
                 let role = row.roleName
                 let jobHistoryId = row.jobHistoryId
-                let changeHistoryHtml = ""
-                if (jobHistoryId) {
-                    changeHistoryHtml = `onclick=showChange(${jobHistoryId}) role="button"`
-                }
+                let changeHistoryHtml = getChangeHistoryHtml(jobHistoryId)
                 let status = ""
                 if (action == 'change status') {
                     let statusArr = row.status.split(" - ")
@@ -58,13 +76,13 @@ $(function () {
                         <div class="custom-timeline-status custom-timeline-content-action text-capitalize" ${changeHistoryHtml}>${action}</div>
                         <div class="row custom-timeline-content mt-1">
                             <div class="mb-2">
-                                <label class="fw-bold">${username}${role ? "(" + role + ")" : ""}</label>
+                                <label class="fw-bold">${username}${getRole(role)}</label>
                             </div>
                             <div class="mb-2">
-                            <label class="fw-bold">${groupName}${contactNumber ? "(" + contactNumber + ")" : ""}</label>
+                            <label class="fw-bold">${groupName}${getContactNumber(contactNumber)}</label>
                             </div>
                             <div class="mb-2">
-                            <label class="fw-bold">${row.email ? row.email : ""}</label>
+                            <label class="fw-bold">${getEmail(row.email)}</label>
                             </div>
                             <div class="mb-2">
                                 <label class="color-time">${createdAt}</label>
@@ -89,55 +107,7 @@ $(function () {
                 let contactNumber = row.contactNumber
                 let vehicleNumber = row.vehicleNumber
                 let driverStatus = row.driverStatus
-                let statusFlow = ""
-                for (let row of driverStatus) {
-                    let username = row.username
-                    let role = row.roleName
-                    let groupName = row.groupName
-                    let contactNumber = row.contactNumber
-                    let action = row.status.toLowerCase().replaceAll("_", " ")
-                    let itemClass = GetItemClass(action)
-                    let remark = row.remark
-
-                    let createdAt = moment(row.createdAt).format("DD/MM HH:mm:ss")
-                    let details = ""
-                    if (row.action == "Change Status" || row.action == "Reset") {
-                        details = `<div class="mb-1">
-                                <label class="fw-bold">${username}${role ? "(" + role + ")" : ""}</label>
-                            </div>
-                            <div class="mb-1">
-                            <label class="fw-bold">${groupName}${contactNumber ? "(" + contactNumber + ")" : ""}</label>
-                            </div>`
-                    } else if (row.operatorId != -1) {
-                        details = `<div class="mb-1">
-                                    <label class="fw-bold">${username}${role ? "(" + role + ")" : ""}</label>
-                                </div>
-                                <div class="mb-1">
-                                <label class="fw-bold">${groupName}${contactNumber ? "(" + contactNumber + ")" : ""}</label>
-                                </div>
-                                <div class="mb-1">
-                            <label class="fw-bold">${row.email ? row.email : ""}</label>
-                            </div>`
-                    } else {
-                        details = `<div class="mb-1">
-                                    <label class="fw-bold">Third party</label>
-                                </div>`
-                    }
-
-                    statusFlow += `<li class="mt-2 custom-timeline-item custom-timeline-item-${itemClass}">
-                        <i class="custom-timeline-axis"></i>
-                        <div class="row custom-timeline-content">
-                            <div class="mb-1">
-                                <label class="fw-bold text-capitalize driver-status">${action == "completed" ? "On-Time" : action}</label>
-                                <label class="color-time ms-1">${createdAt}</label>
-                            </div>
-                            ${details}
-                            <div class="mb-1">
-                                ${remark}
-                            </div>
-                        </div>
-                    </li>`
-                }
+                let statusFlow = getDriverStatusHtml(driverStatus)
                 driverContent += `<tr>
                     <td>${externalTaskId || "-"}</td>
                     <td>${poc}</td>
@@ -156,6 +126,59 @@ $(function () {
         })
     })
 })
+
+const getDriverStatusHtml = function (driverStatus) {
+    let statusFlow = ""
+    for (let row of driverStatus) {
+        let username = row.username
+        let role = row.roleName
+        let groupName = row.groupName
+        let contactNumber = row.contactNumber
+        let action = row.status.toLowerCase().replaceAll("_", " ")
+        let itemClass = GetItemClass(action)
+        let remark = row.remark
+
+        let createdAt = moment(row.createdAt).format("DD/MM HH:mm:ss")
+        let details = ""
+        if (row.action == "Change Status" || row.action == "Reset") {
+            details = `<div class="mb-1">
+                                <label class="fw-bold">${username}${getRole(role)}</label>
+                            </div>
+                            <div class="mb-1">
+                            <label class="fw-bold">${groupName}${getContactNumber(contactNumber)}</label>
+                            </div>`
+        } else if (row.operatorId != -1) {
+            details = `<div class="mb-1">
+                                    <label class="fw-bold">${username}${getRole(role)}</label>
+                                </div>
+                                <div class="mb-1">
+                                <label class="fw-bold">${groupName}${getContactNumber(contactNumber)}</label>
+                                </div>
+                                <div class="mb-1">
+                            <label class="fw-bold">${getEmail(row.email)}</label>
+                            </div>`
+        } else {
+            details = `<div class="mb-1">
+                                    <label class="fw-bold">Third party</label>
+                                </div>`
+        }
+
+        statusFlow += `<li class="mt-2 custom-timeline-item custom-timeline-item-${itemClass}">
+                        <i class="custom-timeline-axis"></i>
+                        <div class="row custom-timeline-content">
+                            <div class="mb-1">
+                                <label class="fw-bold text-capitalize driver-status">${action == "completed" ? "On-Time" : action}</label>
+                                <label class="color-time ms-1">${createdAt}</label>
+                            </div>
+                            ${details}
+                            <div class="mb-1">
+                                ${remark}
+                            </div>
+                        </div>
+                    </li>`
+    }
+    return statusFlow
+}
 
 const GetItemClass = function (action) {
     let itemClass = ""

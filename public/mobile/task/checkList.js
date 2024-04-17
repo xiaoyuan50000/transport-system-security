@@ -11,7 +11,7 @@ $(async function () {
 		"background-color": 'white',
 	});
 	$tooneSignature.jSignature("reset");
-	$("#resetTooneSignature").on('click',function () {
+	$("#resetTooneSignature").on('click', function () {
 		$tooneSignature.jSignature("clear");
 	});
 
@@ -22,7 +22,7 @@ $(async function () {
 		"background-color": 'white',
 	});
 	$tloneSignature.jSignature("reset");
-	$("#resetTloneSignature").on('click',function () {
+	$("#resetTloneSignature").on('click', function () {
 		$tloneSignature.jSignature("clear");
 	});
 
@@ -34,7 +34,7 @@ $(async function () {
 		"background-color": 'white',
 	});
 	$hoUnitSignature.jSignature("reset");
-	$("#resetHoUnitSignature").on('click',function () {
+	$("#resetHoUnitSignature").on('click', function () {
 		$hoUnitSignature.jSignature("clear");
 	});
 
@@ -45,7 +45,7 @@ $(async function () {
 		"background-color": 'white',
 	});
 	$toTendererSignature.jSignature("reset");
-	$("#resetToTendererSignature").on('click',function () {
+	$("#resetToTendererSignature").on('click', function () {
 		$toTendererSignature.jSignature("clear");
 	});
 
@@ -56,7 +56,7 @@ $(async function () {
 		"background-color": 'white',
 	});
 	$hoTendererSignature.jSignature("reset");
-	$("#resetHoTendererSignature").on('click',function () {
+	$("#resetHoTendererSignature").on('click', function () {
 		$hoTendererSignature.jSignature("clear");
 	});
 
@@ -67,89 +67,57 @@ $(async function () {
 		"background-color": 'white',
 	});
 	$toUnitSignature.jSignature("reset");
-	$("#resetToUnitSignature").on('click',function () {
+	$("#resetToUnitSignature").on('click', function () {
 		$toUnitSignature.jSignature("clear");
 	});
 
 	await axios.post('/mobilePOC/getPOCCheckinfo', {
 		taskId: currentTaskId,
 	}).then(async function (res) {
-		if (res.data.code == 1) {
-			let pocCheckData = res.data.data;
-			if (pocCheckData) {
-				isEditCheckInfo = true;
-				if (pocCheckData.formOneData && pocCheckData.formTwoData) {
-					let formOneDataBytes = await pocCheckData.formOneData.data;
-					let formOneDataDataString = "";
-					formOneDataBytes.forEach(val=>{
-						formOneDataDataString += String.fromCharCode(val);
-					})
+		if (res.data.code != 1) {
+			return
+		}
+		let pocCheckData = res.data.data;
+		if (!pocCheckData) {
+			return
+		}
+		isEditCheckInfo = true;
+		if (pocCheckData.formOneData && pocCheckData.formTwoData) {
+			let formOneDataBytes = await pocCheckData.formOneData.data;
+			let formOneDataDataString = "";
+			formOneDataBytes.forEach(val => {
+				formOneDataDataString += String.fromCharCode(val);
+			})
 
-					let formTwoDataBytes = await pocCheckData.formTwoData.data;
-					let formTwoDataDataString = "";
-					formTwoDataBytes.forEach(val=>{
-						formTwoDataDataString += String.fromCharCode(val);
-					})
-					if (formOneDataDataString) {
-						let formOneData = JSON.parse(formOneDataDataString);
-						for (let key in formOneData) {
-							// console.log("key: " + key + ", value: " + formOneData[key]);
-							if (formOneData[key] == 'on') {
-								$("#check-page-one-form input[name=" + key + "]").trigger('click');
-							} else {
-								$("#check-page-one-form input[name=" + key + "]").val(formOneData[key]);
-							}
-
-							$("#tooneSignature").jSignature("importData", formOneData.tooneSignature)
-							$("#tloneSignature").jSignature("setData", formOneData.tloneSignature)
-						}
-
-					}
-					if (formTwoDataDataString) {
-						let formTwoData = JSON.parse(formTwoDataDataString);
-						for (let key in formTwoData) {
-							// console.log("key: " + key + ", value: " + formTwoData[key]);
-							if (formTwoData[key] == 'on') {
-								$("#check-page-two-form input[name=" + key + "]").trigger('click');
-								if ($("#check-page-two-form input[name=" + key + "]").hasClass('checkbox-no')) {
-									$("#check-page-two-form input[name=" + key + "]").parent().parent().find(".no-reason-div").show();
-								}
-							} else {
-								$("#check-page-two-form input[name=" + key + "]").val(formTwoData[key]);
-								$("#check-page-two-form textarea[name=" + key + "]").val(formTwoData[key]);
-							}
-
-							//hoUnitSignature toTendererSignature hoTendererSignature toUnitSignature
-							$("#hoUnitSignature").jSignature("setData", formTwoData.hoUnitSignature)
-							$("#toTendererSignature").jSignature("setData", formTwoData.toTendererSignature)
-							$("#hoTendererSignature").jSignature("setData", formTwoData.hoTendererSignature)
-							$("#toUnitSignature").jSignature("setData", formTwoData.toUnitSignature)
-						}
-					}
-				} else {
-					//oneVehicleType oneVehicleNo oneIndentReference oneCVMSPONo oneTopDateTime
-					let currentDateTime = moment().format('DD/MM/YYYY HH:mm:ss');
-					let currentDate = moment().format('DD/MM/YYYY');
-					let currentTime = moment().format('HH:mm:ss');
-					$("input[name=oneVehicleType]").val(pocCheckData.vehicleType);
-					$("input[name=oneVehicleNo]").val(pocCheckData.vehicleNo);
-					$("input[name=oneIndentReference]").val(pocCheckData.indentInfo);
-					$("input[name=oneCVMSPONo]").val(pocCheckData.poNumber);
-					$("input[name=oneTopDateTime]").val(currentDateTime);
-					$("input[name=toOneDate]").val(currentDate);
-					$("input[name=toOneTime]").val(currentTime);
-					$("input[name=tlOneDate]").val(currentDate);
-					$("input[name=tlOneTime]").val(currentTime);
-					$("input[name=hoUnitDate]").val(currentDate);
-					$("input[name=hoUnitTime]").val(currentTime);
-					$("input[name=toTendererDate]").val(currentDate);
-					$("input[name=toTendererTime]").val(currentTime);
-					$("input[name=hoTendererDate]").val(currentDate);
-					$("input[name=hoTendererTime]").val(currentTime);
-					$("input[name=toUnitDate]").val(currentDate);
-					$("input[name=toUnitTime]").val(currentTime);
-				}
-			}
+			let formTwoDataBytes = await pocCheckData.formTwoData.data;
+			let formTwoDataDataString = "";
+			formTwoDataBytes.forEach(val => {
+				formTwoDataDataString += String.fromCharCode(val);
+			})
+			setFormOneDataDataString(formOneDataDataString)
+			setFormTwoDataDataString(formTwoDataDataString)
+		} else {
+			//oneVehicleType oneVehicleNo oneIndentReference oneCVMSPONo oneTopDateTime
+			let currentDateTime = moment().format('DD/MM/YYYY HH:mm:ss');
+			let currentDate = moment().format('DD/MM/YYYY');
+			let currentTime = moment().format('HH:mm:ss');
+			$("input[name=oneVehicleType]").val(pocCheckData.vehicleType);
+			$("input[name=oneVehicleNo]").val(pocCheckData.vehicleNo);
+			$("input[name=oneIndentReference]").val(pocCheckData.indentInfo);
+			$("input[name=oneCVMSPONo]").val(pocCheckData.poNumber);
+			$("input[name=oneTopDateTime]").val(currentDateTime);
+			$("input[name=toOneDate]").val(currentDate);
+			$("input[name=toOneTime]").val(currentTime);
+			$("input[name=tlOneDate]").val(currentDate);
+			$("input[name=tlOneTime]").val(currentTime);
+			$("input[name=hoUnitDate]").val(currentDate);
+			$("input[name=hoUnitTime]").val(currentTime);
+			$("input[name=toTendererDate]").val(currentDate);
+			$("input[name=toTendererTime]").val(currentTime);
+			$("input[name=hoTendererDate]").val(currentDate);
+			$("input[name=hoTendererTime]").val(currentTime);
+			$("input[name=toUnitDate]").val(currentDate);
+			$("input[name=toUnitTime]").val(currentTime);
 		}
 	})
 
@@ -167,14 +135,54 @@ $(async function () {
 		}
 	})
 
-	$("#cancelCheckList").on('click',function () {
+	$("#cancelCheckList").on('click', function () {
 		backToTaskList()
 	});
 
-	$("#submitCheckList").on('click',function () {
+	$("#submitCheckList").on('click', function () {
 		submitCheckList()
 	});
 });
+
+const setFormOneDataDataString = function (formOneDataDataString) {
+	if (!formOneDataDataString) {
+		return
+	}
+	let formOneData = JSON.parse(formOneDataDataString);
+	for (let key in formOneData) {
+		if (formOneData[key] == 'on') {
+			$("#check-page-one-form input[name=" + key + "]").trigger('click');
+		} else {
+			$("#check-page-one-form input[name=" + key + "]").val(formOneData[key]);
+		}
+
+		$("#tooneSignature").jSignature("importData", formOneData.tooneSignature)
+		$("#tloneSignature").jSignature("setData", formOneData.tloneSignature)
+	}
+}
+const setFormTwoDataDataString = function (formTwoDataDataString) {
+	if (!formTwoDataDataString) {
+		return
+	}
+	let formTwoData = JSON.parse(formTwoDataDataString);
+	for (let key in formTwoData) {
+		if (formTwoData[key] == 'on') {
+			$("#check-page-two-form input[name=" + key + "]").trigger('click');
+			if ($("#check-page-two-form input[name=" + key + "]").hasClass('checkbox-no')) {
+				$("#check-page-two-form input[name=" + key + "]").parent().parent().find(".no-reason-div").show();
+			}
+		} else {
+			$("#check-page-two-form input[name=" + key + "]").val(formTwoData[key]);
+			$("#check-page-two-form textarea[name=" + key + "]").val(formTwoData[key]);
+		}
+
+		//hoUnitSignature toTendererSignature hoTendererSignature toUnitSignature
+		$("#hoUnitSignature").jSignature("setData", formTwoData.hoUnitSignature)
+		$("#toTendererSignature").jSignature("setData", formTwoData.toTendererSignature)
+		$("#hoTendererSignature").jSignature("setData", formTwoData.hoTendererSignature)
+		$("#toUnitSignature").jSignature("setData", formTwoData.toUnitSignature)
+	}
+}
 
 const backToTaskList = function () {
 	window.location.href = '/mobilePOC/task/';
@@ -308,10 +316,10 @@ const serializeToJson = function (d) {
 	return s
 }
 const getParams = function (key) {
-    let reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
-    let r = reg.exec(window.location.search.slice(1));
-    if (r != null) {
-        return decodeURIComponent(r[2]);
-    }
-    return null;
+	let reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
+	let r = reg.exec(window.location.search.slice(1));
+	if (r != null) {
+		return decodeURIComponent(r[2]);
+	}
+	return null;
 };

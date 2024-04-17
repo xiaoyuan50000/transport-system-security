@@ -61,7 +61,7 @@ async function getMonitorDriver() {
     }
     internal = setInterval(async function () {
         let list = await queryMonitorDriver();
-        updateMonitorLeftInterval(list)
+        // updateMonitorLeftInterval(list)
         markUserPosition(list);
     }, 5000);
 }
@@ -114,75 +114,75 @@ function createMonitorHtml(data, type) {
     return html;
 }
 
-function updateMonitorLeftInterval(list) {
-    let classList = []
-    let assignedNum = 0;
-    let completedNum = 0;
-    $(".driver-foot .track-card").each(function () {
-        let className = $(this).data('id');
-        classList.push(className);
-    })
-    let type = getMonitorType();
-    for (let data of list) {
-        let userType = data.type + "-" + data.id;
-        let lat = data.lat;
-        let lng = data.lng;
-        let dbStatus = data.status;
-        if (dbStatus.toLowerCase() == 'completed') {
-            completedNum += 1;
-        } else {
-            assignedNum += 1;
-        }
-        let isInArray = $.inArray(userType, classList);
-        let isNewAdd = false;
-        //  isInArray != -1 is contain
-        if (isInArray != -1) {
-            let curDiv = $(".driver-foot").find('.' + userType);
-            let curStatus = curDiv.data('status');
-            //  if status is not equal, remove current div and add new div
-            if (dbStatus != curStatus) {
-                curDiv.remove();
-                isNewAdd = true;
-            } else {
-                //  update position to center map
-                let nav = $(".driver-foot").find('.' + userType).find('.nav');
-                nav.data('lat', data.lat);
-                nav.data('lng', data.lng);
-                if (lat == -1 && lng == -1) {
-                    if (!nav.hasClass('pgs-gray')) {
-                        nav.addClass('pgs-gray')
-                    }
-                } else if (nav.hasClass('pgs-gray')) {
-                    nav.removeClass('pgs-gray')
-                }
+// function updateMonitorLeftInterval(list) {
+//     let classList = []
+//     let assignedNum = 0;
+//     let completedNum = 0;
+//     $(".driver-foot .track-card").each(function () {
+//         let className = $(this).data('id');
+//         classList.push(className);
+//     })
+//     let type = getMonitorType();
+//     for (let data of list) {
+//         let userType = data.type + "-" + data.id;
+//         let lat = data.lat;
+//         let lng = data.lng;
+//         let dbStatus = data.status;
+//         if (dbStatus.toLowerCase() == 'completed') {
+//             completedNum += 1;
+//         } else {
+//             assignedNum += 1;
+//         }
+//         let isInArray = $.inArray(userType, classList);
+//         let isNewAdd = false;
+//         //  isInArray != -1 is contain
+//         if (isInArray != -1) {
+//             let curDiv = $(".driver-foot").find('.' + userType);
+//             let curStatus = curDiv.data('status');
+//             //  if status is not equal, remove current div and add new div
+//             if (dbStatus != curStatus) {
+//                 curDiv.remove();
+//                 isNewAdd = true;
+//             } else {
+//                 //  update position to center map
+//                 let nav = $(".driver-foot").find('.' + userType).find('.nav');
+//                 nav.data('lat', data.lat);
+//                 nav.data('lng', data.lng);
+//                 if (lat == -1 && lng == -1) {
+//                     if (!nav.hasClass('pgs-gray')) {
+//                         nav.addClass('pgs-gray')
+//                     }
+//                 } else if (nav.hasClass('pgs-gray')) {
+//                     nav.removeClass('pgs-gray')
+//                 }
 
-            }
+//             }
 
-        } else {
-            isNewAdd = true;
-        }
-        if (isNewAdd) {
-            let html = createMonitorHtml(data, type);
-            if (data.status.toLowerCase() == 'completed') {
-                $(".completed-info").append(html);
-            } else {
-                $(".assigned-info").append(html);
-            }
-        }
-        let index = classList.indexOf(userType);
-        if (index != -1) {
-            classList.splice(index, 1);
-        }
-    }
-    //  remove div that user not in db
-    classList.forEach(function (value) {
-        let curDiv = $(".driver-foot").find('.' + value);
-        curDiv.remove();
-    })
-    $("#completedNum").html(completedNum);
-    $("#assignedNum").html(assignedNum);
-    initPopOver();
-}
+//         } else {
+//             isNewAdd = true;
+//         }
+//         if (isNewAdd) {
+//             let html = createMonitorHtml(data, type);
+//             if (data.status.toLowerCase() == 'completed') {
+//                 $(".completed-info").append(html);
+//             } else {
+//                 $(".assigned-info").append(html);
+//             }
+//         }
+//         let index = classList.indexOf(userType);
+//         if (index != -1) {
+//             classList.splice(index, 1);
+//         }
+//     }
+//     //  remove div that user not in db
+//     classList.forEach(function (value) {
+//         let curDiv = $(".driver-foot").find('.' + value);
+//         curDiv.remove();
+//     })
+//     $("#completedNum").html(completedNum);
+//     $("#assignedNum").html(assignedNum);
+//     initPopOver();
+// }
 
 const initRouteLine = function () {
     axios.post('../queryRouteLine').then(function (res) {

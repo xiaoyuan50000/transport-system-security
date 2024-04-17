@@ -113,6 +113,19 @@ function jcalendar_week(options){
 		calendarid.find(".calendar_day_bar").html(week_day);
 	}
 
+	function getNewtonowday(newtonowday, newyear_week, m_days, fdaynothisy){
+		if(newyear_week < 5){
+			newtonowday += newyear_week;
+			if(newyear_week==0 && m_days[2]==29){
+				fdaynothisy=true;
+			}
+		}else{
+			fdaynothisy=true;
+			newtonowday -= (7-newyear_week);
+		}
+		return {fdaynothisy, newtonowday}
+	}
+
 	_this.getweeknum = function(year,month,day){
 		let m_days=[31,28+is_leap(year),31,30,31,30,31,31,30,31,30,31];
 
@@ -123,15 +136,11 @@ function jcalendar_week(options){
 		newtonowday += day;
 		let newyear_week=(new Date(year,0,1)).getDay();
 		let fdaynothisy=false;
-		if(newyear_week < 5){
-			newtonowday += newyear_week;
-			if(newyear_week==0 && m_days[2]==29){
-				fdaynothisy=true;
-			}
-		}else{
-			fdaynothisy=true;
-			newtonowday -= (7-newyear_week);
-		}
+		
+		let result = getNewtonowday(newtonowday, newyear_week, m_days, fdaynothisy)
+		newtonowday = result.newtonowday
+		fdaynothisy = result.fdaynothisy
+
 		let weeknum_result = Math.ceil(newtonowday/7);
 		let weekyear=year;
 		if(weeknum_result==0){

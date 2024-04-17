@@ -72,23 +72,32 @@ const updateTaskState = async function (taskId, newState, optTime, justification
 
 }
 
+
+
+
 const buildTaskHtml = function (taskArray) {
+    const getNullOrValue = function (value) {
+        return value || ""
+    }
 
-    $('.item-div-list').empty();
-    for (let task of taskArray) {
-        task.startDay = moment(task.date).date();
-        task.startMonth = moment(task.date).month() + 1;
+    const getNullOrValue1 = function (value) {
+        return value || "-"
+    }
+
+    const getArriving = function (task) {
+        let arriving = null
         if (moment(task.endTime).isBefore(moment())) {
-            task.arriving = -1;
+            arriving = -1;
         } else if (moment().add(30, 'm').isAfter(moment(task.date + " " + task.startTime))) {
-            task.arriving = 1;
+            arriving = 1;
         } else if (moment().add(30, 'm').isBefore(moment(task.date + " " + task.startTime))) {
-            task.arriving = 0;
+            arriving = 0;
         }
+        return arriving
+    }
 
-
+    const getShowOpt = function (task) {
         let showArriveOpt = false;
-        let showNoShowOpt = false;
         let showDepartOpt = false;
         let showCompleteOpt = false;
         let showNoShowLabel = false;
@@ -96,39 +105,57 @@ const buildTaskHtml = function (taskArray) {
 
         if (task.driverStatus == 'Completed' || task.driverStatus == 'Late Trip') {
             showCompleteLabel = true;
-        } else if (task.driverStatus == 'No Show') {
+            return { showArriveOpt, showDepartOpt, showCompleteOpt, showNoShowLabel, showCompleteLabel }
+        }
+        if (task.driverStatus == 'No Show') {
             showNoShowLabel = true;
-        } else if (task.driverMobileNumber != null && task.driverMobileNumber != '') {
-            //has assign driver.
-            if (task.serviceMode == "delivery") {
-                if (!task.arrivalTime) {
-                    showArriveOpt = true;
-                } else if (!task.departTime) {
-                    showDepartOpt = true;
-                }
-            } else if (task.serviceMode == "pickup") {
-                if (!task.arrivalTime) {
-                    showArriveOpt = true;
-                } else if (!task.completeTime) {
-                    showCompleteOpt = true;
-                }
-
-            } else if (task.serviceMode == "ferry service") {
-                if (!task.arrivalTime) {
-                    showArriveOpt = true;
-                }
-            } else if (!task.arrivalTime && !task.departTime && !task.completeTime) {
-                showArriveOpt = true;
-            } else if (!task.departTime && !task.completeTime) {
-                showDepartOpt = true;
-            } else if (!task.completeTime) {
-                showCompleteOpt = true;
-            }
+            return { showArriveOpt, showDepartOpt, showCompleteOpt, showNoShowLabel, showCompleteLabel }
 
         }
-        if (showArriveOpt) {
-            showNoShowOpt = true;
+        if (!(task.driverMobileNumber != null && task.driverMobileNumber != '')) {
+            return { showArriveOpt, showDepartOpt, showCompleteOpt, showNoShowLabel, showCompleteLabel }
         }
+
+        return getShowOptAssignDriver(task)
+    }
+
+    const getShowArriveOpt = function (task) {
+        return task.serviceMode == "delivery" && !task.arrivalTime
+            || task.serviceMode == "pickup" && !task.arrivalTime
+            || task.serviceMode == "ferry service" && !task.arrivalTime
+            || !task.arrivalTime && !task.departTime && !task.completeTime
+    }
+
+    const getDepertOpt = function (task) {
+        return task.serviceMode == "delivery" && !task.departTime
+            || !task.departTime && !task.completeTime
+    }
+
+    const getCompleteOpt = function (task) {
+        return task.serviceMode == "pickup" && !task.completeTime
+            || !task.completeTime
+    }
+
+    const getShowOptAssignDriver = function (task) {
+        let showArriveOpt = false;
+        let showDepartOpt = false;
+        let showCompleteOpt = false;
+        let showNoShowLabel = false;
+        let showCompleteLabel = false;
+        //has assign driver.
+        if (getShowArriveOpt(task)) {
+            showArriveOpt = true;
+        } else if (getDepertOpt(task)) {
+            showDepartOpt = true;
+        } else if (getCompleteOpt(task)) {
+            showCompleteOpt = true;
+        }
+
+        return { showArriveOpt, showDepartOpt, showCompleteOpt, showNoShowLabel, showCompleteLabel }
+    }
+
+    const getHtmlAll = function (task) {
+        let { showArriveOpt, showDepartOpt, showCompleteOpt, showNoShowLabel, showCompleteLabel } = getShowOpt(task)
         let htmlOptBtn = ``;
         if (showNoShowLabel) {
             htmlOptBtn +=
@@ -146,7 +173,8 @@ const buildTaskHtml = function (taskArray) {
                 </div>
             `;
         }
-        if (showNoShowOpt) {
+
+        if (showArriveOpt) {
             htmlOptBtn +=
                 `<div onclick="updateTaskState(${task.taskId}, 'No Show')" style="width: 90%;height: 30px;border-radius: 2px;margin-top: 5px;background-color: #ff80a5;
                         display: flex;justify-content : flex-start;align-items : center">
@@ -154,9 +182,6 @@ const buildTaskHtml = function (taskArray) {
                     <span style="width: 80%;margin-left: 5px;"><font color="white" size="2">No Show</font></span>
                 </div>
             `;
-
-        }
-        if (showArriveOpt) {
             htmlOptBtn +=
                 `<div onclick="taskOptTime(${task.taskId}, 'Arrive', '${task.date + " " + task.startTime}')" style="width: 90%;height: 30px;border-radius: 2px;margin-top: 5px;background-color: #2bb982;
                         display: flex;justify-content : flex-start;align-items : center">
@@ -203,15 +228,15 @@ const buildTaskHtml = function (taskArray) {
             driverInfoHtml = `<div class="row" style="font-weight: 400;font-size: 13px;padding: 5px 10px;">
                 <div class="col-4" style="text-align: right;">
                     <img style="width: 16px;margin-right: 3px;margin-bottom:2px;" src="/images/schedule-job/person.png">
-                    <label>${task.driverName == null ? '-' : task.driverName}</label>
+                    <label>${getNullOrValue1(task.driverName)}</label>
                 </div>
                 <div class="col-4">
                     <img style="width: 16px;margin-right: 3px;margin-bottom:2px;" src="/images/indent/mobileRsp/phone-2.svg">
-                    <label>${task.driverMobileNumber == null ? '' : task.driverMobileNumber}</label>
+                    <label>${getNullOrValue(task.driverMobileNumber)}</label>
                 </div>
                 <div class="col-4">
                     <img style="width: 16px;margin-right: 3px;margin-bottom:2px;" src="/images/schedule-job/car.png">
-                    <label>${task.vehicleNumber == null ? '' : task.vehicleNumber}</label>
+                    <label>${getNullOrValue(task.vehicleNumber)}</label>
                 </div>
             </div>`;
 
@@ -241,11 +266,11 @@ const buildTaskHtml = function (taskArray) {
                     <div class="col-4">
                         <div style="height: 40px;margin-left: -20px;margin-bottom:2px; background-repeat: no-repeat;
                             background-image: ${bgImg}">
-                            <label style="color: white; margin-left: 10px;margin-top: 7px;">${task.driverStatus[0].toUpperCase() + task.driverStatus.substr(1)}</label>
+                            <label style="color: white; margin-left: 10px;margin-top: 7px;">${task.driverStatus[0].toUpperCase() + task.driverStatus.slice(1)}</label>
                         </div>
                     </div>
                     <div class="col-8" style="text-align: right; display: flex;justify-content: flex-end;">
-                        <label style="margin-top: 7px;">${task.tsp == null ? "" : task.tsp}</label>
+                        <label style="margin-top: 7px;">${getNullOrValue(task.tsp)}</label>
                         ${taskPinHtml}
                     </div>
                 </div>
@@ -272,7 +297,7 @@ const buildTaskHtml = function (taskArray) {
                             <tr>
                                 <td><img style="width: 25px;padding: 0 5px;" src="/images/logout/circle-end.png"></td>
                                 <td><label>${task.dropoffDestination}</label></td>
-                                <td><label style="padding-left: 10px;">${task.endTime ? task.endTime : ''}</label></td>
+                                <td><label style="padding-left: 10px;">${getNullOrValue(task.endTime)}</label></td>
                             </tr>
                         </table>
                     </div>
@@ -281,9 +306,17 @@ const buildTaskHtml = function (taskArray) {
                     </div>
                 </div>
                 ${driverInfoHtml}
-                <!-- ${task.arriving === 1 ? '<div class="row arriving-div"><div style="text-align: center;width: 100%;">Driver arriving in 30 mins</div></div>' : ''}-->
-            </div>
-            `;
+            </div>`;
+        return htmlAll
+    }
+
+    $('.item-div-list').empty();
+    for (let task of taskArray) {
+        task.startDay = moment(task.date).date();
+        task.startMonth = moment(task.date).month() + 1;
+        task.arriving = getArriving(task)
+
+        let htmlAll = getHtmlAll(task)
         $('.item-div-list').append(htmlAll);
     }
 }
