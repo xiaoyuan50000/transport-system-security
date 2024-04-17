@@ -65,7 +65,6 @@ const initDriverData = async function () {
         let driverDetailHtml = ``;
         $(".content-div").empty();
         for (let driverInfo of details) {
-            let fmt = "DD/MM/YYYY HH:mm:ss";
             if (!driverInfo.taskStatus) {
                 driverInfo.taskStatus = 'unassigned';
             }

@@ -220,14 +220,23 @@ const buildIndentsPage = function (indentList) {
     for (let indent of indentList) {
         let tripHtml = buildIndentsTripPage(indent)
 
-        let htmlAll = buidIndentHtmlAll(indent, tripHtml, currentIndex)
+        let htmlAll = buidIndentHtmlAll(indent, tripHtml, currentIndex, currentPage)
         $('.item-div-list').append(htmlAll);
 
         currentIndex++;
     }
 };
 
-const buidIndentHtmlAll = function (indent, tripHtml, currentIndex) {
+const buidIndentHtmlAll = function (indent, tripHtml, currentIndex, currentPage) {
+
+    const getColor = function (currentIndex, currentPage, indentNavBgColor) {
+        return (currentIndex === 1 && currentPage == 1) ? 'black' : indentNavBgColor
+    }
+
+    const getImg = function (currentIndex) {
+        return currentIndex === 1 ? 'add-white.svg' : 'add-green.svg'
+    }
+
     let indentNavBgColor = "#2bb982";
     let indentStatusStr = '';
     let htmlAll = `<div class="info-nav row ${(currentIndex === 1 && currentPage == 1) ? 'up active' : 'down'}" 
@@ -248,9 +257,9 @@ const buidIndentHtmlAll = function (indent, tripHtml, currentIndex) {
             </div>`
     if (roleName != "UCO") {
         htmlAll += `<div class="col-2 info-nav-right">
-                    <label class="col-5 col-sm-5 nav-statu-label" style="color:${(currentIndex === 1 && currentPage == 1) ? 'black' : indentNavBgColor}">${indentStatusStr}</label>
+                    <label class="col-5 col-sm-5 nav-statu-label" style="color:${getColor(currentIndex, currentPage, indentNavBgColor)}">${indentStatusStr}</label>
                     <img class="nav-add-trip" onclick="addNewTrip(this, '${indent.id}');" 
-                        src="/images/${currentIndex === 1 ? 'add-white.svg' : 'add-green.svg'}">
+                        src="/images/${getImg(currentIndex)}">
                 </div>`
     }
     htmlAll += `</div>
