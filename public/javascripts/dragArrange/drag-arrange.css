@@ -1,29 +1,18 @@
 
 body {
     font-family: Helvetica, Arial, Verdana, Tahoma, sans-serif;
-    /*background: rgb(242, 244, 246);*/
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
 }
 
-/*h3 {
-  color: rgb(199, 204, 209);
-  font-size: 28px;
-  text-align: center;
-}
 
-#elements-container {
-  text-align: center;
-}*/
 
 .draggable-element {
     display: inline-block;
     width: 200px;
     height: 200px;
-    /*background: white;*/
-    /*border: 1px solid rgb(196, 196, 196);*/
     line-height: 200px;
     text-align: center;
     margin: 10px;
@@ -39,8 +28,6 @@ body {
 
 .drag-list > li {
     list-style: none;
-    /*background: rgb(255, 255, 255);*/
-    /*border: 1px solid rgb(196, 196, 196);*/
     margin: 5px 0;
     font-size: 24px;
     padding-bottom: 5px;
@@ -50,19 +37,16 @@ body {
 .drag-list .title {
     display: inline-block;
     width: 130px;
-    /*padding: 6px 6px 6px 12px;*/
     vertical-align: top;
 }
 
 .drag-list .drag-area {
     display: inline-block;
-    /*background: rgb(158, 211, 179);*/
     background-image: url(../icons/drag-waypoint.png);
     background-size: 20px 20px;
     width: 20px;
     height: 20px;
     vertical-align: top;
-    float: left;
     cursor: move;
     border-radius: 15px;
     margin-left: 5%;
@@ -70,8 +54,6 @@ body {
 }
 
 .code {
-    /*background: rgb(255, 255, 255);*/
-    /*border: 1px solid rgb(196, 196, 196);*/
     width: 600px;
     margin: 22px auto;
     position: relative;
@@ -83,7 +65,6 @@ body {
     width: 96%;
     position: absolute;
     padding: 8px 2%;
-    /*color: rgb(255, 255, 255);*/
 }
 
 .code pre {
