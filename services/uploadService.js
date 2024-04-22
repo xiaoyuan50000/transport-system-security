@@ -769,7 +769,6 @@ module.exports.newContract = async function (req, res) {
                                 blockPeriod: val.blockPeriod,
                                 blockPrice: val.blockPrice,
                                 blockHourly: val.blockHourly,
-                                blockHourly: val.blockHourly,
                                 OTBlockPeriod: val.OTBlockPeriod,
                                 OTBlockPrice: val.OTBlockPrice,
                                 OTHourly: val.OTHourly,

@@ -39,7 +39,6 @@ module.exports.getPOCCheckDOC = async function (req, res) {
                 return Response.error(res, "Doesn't exist POCCheck record.")
             }
             
-            return Response.success(res, pocCheckInfo);
         }
     } catch(error) {
         log.error(error)

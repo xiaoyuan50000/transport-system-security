@@ -716,7 +716,6 @@ module.exports.ConfirmActive = async function (req, res) {
         let userId = req.body.rowUserId
         let remark = req.body.remark
         let action = req.body.action
-        let password = req.body.password
         let updateStatus = USER_STATUS.Active
         let operatorId = req.body.operatorId
         let currentTime = new Date()
@@ -735,15 +734,11 @@ module.exports.ConfirmActive = async function (req, res) {
             actionRecord.operatorId = operatorId
         }
         let user = await User.findByPk(userId)
-        // let historyPwd = user.historyPassword
 
-        password = utils.MD5(password)
         let updateUserRecord = {
             status: updateStatus,
             times: 0,
             activeTime: currentTime,
-            password: password,
-            // historyPassword: GetLatestHistoryPassword(password, historyPwd),
         }
 
         await sequelizeObj.transaction(t1 => {

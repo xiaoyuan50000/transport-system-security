@@ -87,7 +87,9 @@ const GetIndentDataByDate = async function (startDate, endDate, userId) {
             b.tripRemarks,
             o.remark,
             c.endorse,
-            c.poNumber
+            c.poNumber,
+            o1.createdAt as ucoApprovalTime,
+            o2.createdAt as rfApprovalTime
         FROM
             request a
         LEFT JOIN (select * from job where IFNULL(periodStartDate, CONCAT(executionDate,' ',executionTime)) = CONCAT(executionDate,' ',executionTime)) b ON a.id = b.requestId
@@ -98,6 +100,12 @@ const GetIndentDataByDate = async function (startDate, endDate, userId) {
         LEFT JOIN (select tripId, remark from operation_history where id in (
             select MAX(id) from operation_history where \`status\`='Pending for approval(UCO)' and action = 'Edit Trip' GROUP BY tripId
             )) o on b.id = o.tripId
+        LEFT JOIN (select tripId, Max(createdAt) as createdAt from operation_history 
+            where \`status\` = 'Pending for approval(RF)' and (action = 'Edit Trip' or action = 'Approve')
+            GROUP BY tripId) o1 on b.id = o1.tripId
+        LEFT JOIN (select tripId, MIN(createdAt) as createdAt from operation_history 
+            where \`status\` = 'Approved' and (action = 'Edit Trip' or action = 'Approve')
+            GROUP BY tripId) o2 on b.id = o2.tripId
         where DATE_FORMAT(c.startDate,'%Y-%m-%d') >= ? and DATE_FORMAT(c.startDate,'%Y-%m-%d') <= ? and b.serviceTypeId in (?)`,
         {
             replacements: [startDate, endDate, serviceTypeIds],
@@ -107,7 +115,7 @@ const GetIndentDataByDate = async function (startDate, endDate, userId) {
     let excelJson = []
     let title = ["Indent ID", "Task ID", "Job ID", "Tracking ID", "Unit", "Execution Date", "Pickup", "Dropoff", "Start Time", "End Date", "End Time", "Duration", "Seater", "TSP", "Service Mode", "Indent Status",
         "POC Name", "POC Contact", "Task Status", "Arrive Time", "Depart Time", "End Time", "Created Date", "Modified Date", "Funding", "Purpose", "Activity Name", "Trip Remarks", "RQ Justification", "Endorsement", 
-        "PO Number"]
+        "PO Number", "UCO Approval Date", "RF Approval Date"]
     excelJson.push(title)
     rows.forEach(r => {
         let indentStatus = r.indentStatus
@@ -146,6 +154,8 @@ const GetIndentDataByDate = async function (startDate, endDate, userId) {
             r.remark,
             r.endorse ? "Yes" : "No",
             r.poNumber,
+            r.ucoApprovalTime ? moment(r.ucoApprovalTime).format("DD/MM/YYYY HH:mm") : "",
+            r.rfApprovalTime ? moment(r.rfApprovalTime).format("DD/MM/YYYY HH:mm") : ""
         ])
     })
     return excelJson

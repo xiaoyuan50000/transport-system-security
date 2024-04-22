@@ -2195,10 +2195,8 @@ module.exports.EditDriver = async function (req, res) {
         selectableTsp: selectableTspStr
     }
     let serviceProviderId = task.serviceProviderId ? task.serviceProviderId : trip.serviceProviderId
-    let tspIsChanged = false;
     let oldServiceProviderId = serviceProviderId;
     if (newTsp && newTsp != serviceProviderId) {
-        tspIsChanged = true;
         serviceProviderId = newTsp
         updateTaskObj.serviceProviderId = serviceProviderId;
     }
@@ -2207,35 +2205,18 @@ module.exports.EditDriver = async function (req, res) {
     let newContractPartNo = '';
     if (task.externalJobId) {
         let currentDate = new Date()
-        if (tspIsChanged === true) {
-            if (task.taskStatus != TASK_STATUS.CANCELLED) {
-                //cancel driver
-                let msg = Buffer.from(JSON.stringify({
-                    externalJobId: task.externalJobId, operatorId: userId,
-                    serviceProviderId: oldServiceProviderId, createdAt: moment().format('YYYY-MM-DD HH:mm:ss'),
-                    requestId: task.requestId,
-                    tripId: task.tripId,
-                    taskId: task.id
-                }))
-                activeMQ.publicCancelJobMsg(msg)
-            }
-            //add
-            newContractPartNo = await SendAndGet3rdData(task, trip, serviceProviderId, currentDate, executionDate, executionTime, userId)
-        } else {
-            //FIXME: cancel driver (wait update interface implement, delete this code)
-            if (task.taskStatus != TASK_STATUS.CANCELLED) {
-                let msg = Buffer.from(JSON.stringify({
-                    externalJobId: task.externalJobId, operatorId: userId,
-                    serviceProviderId: oldServiceProviderId, createdAt: moment().format('YYYY-MM-DD HH:mm:ss'),
-                    requestId: task.requestId,
-                    tripId: task.tripId,
-                    taskId: task.id
-                }))
-                activeMQ.publicCancelJobMsg(msg)
-            }
-            //UPDATE
-            newContractPartNo = await SendAndGet3rdData(task, trip, serviceProviderId, currentDate, executionDate, executionTime, userId)
+        if (task.taskStatus != TASK_STATUS.CANCELLED) {
+            let msg = Buffer.from(JSON.stringify({
+                externalJobId: task.externalJobId, operatorId: userId,
+                serviceProviderId: oldServiceProviderId, createdAt: moment().format('YYYY-MM-DD HH:mm:ss'),
+                requestId: task.requestId,
+                tripId: task.tripId,
+                taskId: task.id
+            }))
+            activeMQ.publicCancelJobMsg(msg)
         }
+        //UPDATE
+        newContractPartNo = await SendAndGet3rdData(task, trip, serviceProviderId, currentDate, executionDate, executionTime, userId)
     }
     await sequelizeObj.transaction(async (t1) => {
         await task.update(updateTaskObj)

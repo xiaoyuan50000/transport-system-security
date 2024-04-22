@@ -42,20 +42,17 @@ const activity = function (e) {
     simplyForm1(content, function ($this) {
         let form = document.getElementById('active-form');
         form.classList.add('was-validated');
-        checkActiveFormInput(document.getElementById('active-password'))
-        checkActiveFormInput(document.getElementById('active-confirmPassword'))
         checkActiveFormInput(document.getElementById('active-remark'))
         if (form.checkValidity() === false) {
             return false
         } else {
             let remark = $this.$content.find('textarea').val();
-            let password = $this.$content.find('form').find("input[name='password']").val();
-            confirmActive(userId, remark, action, password)
+            confirmActive(userId, remark, action)
         }
     })
 
-    const confirmActive = async function (userId, remark, action, password) {
-        await axios.post("/confirmActive", { rowUserId: userId, remark: remark, action: action, password: password }).then(res => {
+    const confirmActive = async function (userId, remark, action) {
+        await axios.post("/confirmActive", { rowUserId: userId, remark: remark, action: action }).then(res => {
             if (res.data.code == 0) {
                 top.simplyError(res.data.msg)
             } else {

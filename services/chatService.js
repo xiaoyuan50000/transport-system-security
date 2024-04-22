@@ -251,7 +251,6 @@ const generateResponseUserList = function (userList) {
 			roleName: user.roleName,
 			username: user.username,
 			loginName: user.loginName,
-			roleName: user.roleName,
 			email: user.email,
 			contactNumber: user.contactNumber,
 		})

@@ -32,18 +32,12 @@ module.exports = {
             "a9": "Vehicle Group 2",
             "a10": "Cpt BBB",
         };
-        /*let data = [];
-        for (let i = 0; i < 2; i++) {
-            let d = JSON.parse(JSON.stringify(tempData));
-            d.a1 = i + 1;
-            data.push(d)
-        }*/
+        
         let data = [];
         data.push(tempData)
         data.push(tempData1)
         let result = data.slice(pageNum, (pageNum+1)*pageLength);
 
-        new Promise(resolve =>setTimeout(() =>resolve(), 2000));
 
         return Response.success(res, result, data.length);
     },

@@ -71,7 +71,7 @@ const verifyToken = async function (res, req, token, loginPageUrl, next) {
         }
     } catch (error) {
         if (error.expiredAt) {
-            log.warn('(Token Interceptor): Token is expired at ', err.expiredAt);
+            log.warn('(Token Interceptor): Token is expired at ', error.expiredAt);
         } else {
             log.warn('(Token Interceptor): Token is invalid !');
         }

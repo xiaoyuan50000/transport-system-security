@@ -177,7 +177,7 @@ module.exports.affectBulkCreateJobHandler = async function (body) {
 }
 
 const sendTaskToTSPPromise = function (tsp, taskId) {
-    return new Promise(async (resolve, reject) => {
+    const doSomething = async function (tsp, taskId, callback) {
         try {
             let taskAcceptObj = await TaskAccept.findOne({
                 where: {
@@ -210,11 +210,20 @@ const sendTaskToTSPPromise = function (tsp, taskId) {
                     }
                 })
             }
-            resolve({ "result": true })
+            callback(true)
         } catch (ex) {
             systemSendTo3rdLog.error(ex)
-            reject({ "result": false })
+            callback(false)
         }
+    }
+    return new Promise((resolve, reject) => {
+        doSomething(tsp, taskId, function (result) {
+            if (result) {
+                resolve({ "result": result })
+            } else {
+                reject({ "result": result })
+            }
+        })
     })
 
 }
