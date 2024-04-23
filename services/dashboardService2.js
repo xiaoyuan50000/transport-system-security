@@ -267,7 +267,7 @@ module.exports.GetDashboardDatas = async function (req, res) {
                         select a.contractNo, a.name, c.contractPartNo, c.isLate from contract a
                         LEFT JOIN contract_detail b on a.contractNo = b.contractNo
                         LEFT JOIN contract_rate c on b.contractPartNo = c.contractPartNo
-                    ) t on c.contractPartNo = t.contractPartNo
+                    ) t on FIND_IN_SET(t.contractPartNo, c.contractPartNo)
                 LEFT JOIN service_provider s on c.serviceProviderId = s.id
                 `,
                 {
@@ -287,7 +287,7 @@ module.exports.GetDashboardDatas = async function (req, res) {
     }
 
     let size = 20000
-    var idResultRange = idResult.filter((item, index) => index % size === 0)
+    let idResultRange = idResult.filter((item, index) => index % size === 0)
     log.info(idResultRange);
     console.time("GetDashboardDatas")
 

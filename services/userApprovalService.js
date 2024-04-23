@@ -172,16 +172,10 @@ module.exports.InitRejectedUsers = async function (req, res) {
         }
     )
     for (let user of users) {
-        let cvRole = user.cvRole
-        let roleObj = roleList.find(o => o.id == cvRole)
-        user.cvRoleName = roleObj ? roleObj.roleName : ""
-        let userObj = userList.find(o => o.id == user.cvRejectBy)
-        user.cvRejectByName = userObj ? userObj.username : ""
-        if (conf.view_nric) {
-            user.nric = utils.decodeAESCode(user.nric)
-        } else {
-            user.nric = ""
-        }
+        const userInfo = getUserInfo(user)
+        user.cvRoleName = userInfo.cvRoleName
+        user.cvRejectByName = userInfo.cvRejectByName
+        user.nric = userInfo.nric
         user.ORDExpired = getORDExpired(user.ord)
     }
 
@@ -194,6 +188,20 @@ module.exports.InitRejectedUsers = async function (req, res) {
     )
     let count = usersCount[0].count
     return res.json({ data: users, recordsFiltered: count, recordsTotal: count })
+}
+
+const getUserInfo = function (user, roleList, userList) {
+    let cvRole = user.cvRole
+    let roleObj = roleList.find(o => o.id == cvRole)
+    let cvRoleName = roleObj ? roleObj.roleName : ""
+
+    let userObj = userList.find(o => o.id == user.cvRejectBy)
+    let cvRejectByName = userObj ? userObj.username : ""
+    let nric = ""
+    if (conf.view_nric) {
+        nric = utils.decodeAESCode(user.nric)
+    }
+    return { cvRoleName, cvRejectByName, nric }
 }
 
 module.exports.ApproveUser = async function (req, res) {
@@ -212,7 +220,7 @@ module.exports.ApproveUser = async function (req, res) {
         }
         let operator = await User.findByPk(createdBy)
 
-        let { nric, loginName, fullName, contactNumber, cvRole, cvGroupId, createdAt, updatedAt, email, password, cvServiceProviderId, cvServiceTypeId, mvUserType, mvUserId, status, ord } = userBaseObj[0]
+        let { nric, loginName, fullName, contactNumber, cvRole, cvGroupId, email, password, cvServiceProviderId, cvServiceTypeId, mvUserType, mvUserId, status, ord } = userBaseObj[0]
         await sequelizeObj.transaction(async t1 => {
             let user = await User.create({
                 nric: nric,
@@ -228,7 +236,6 @@ module.exports.ApproveUser = async function (req, res) {
                 updatedAt: new Date(),
                 email: email,
                 ord: ord,
-                // default value
                 times: 0,
             })
             await UserManagementReport.create({

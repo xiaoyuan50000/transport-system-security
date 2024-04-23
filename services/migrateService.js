@@ -148,66 +148,10 @@ module.exports.MigrateDBDatas = async function () {
         log.info(JSON.stringify(element))
     });
 
-    let bulkRequest = []
-    for (let request of allRequest) {
-        bulkRequest.push({
-            id: request.id,
-            purposeType: request.purposeOfTrip,
-            startDate: request.startDate.substr(0, 10),
-            estimatedTripDuration: request.estimatedTripDuration.substr(0, request.estimatedTripDuration.indexOf('h')),
-            noOfTrips: request.noOfTrips,
-            additionalRemarks: request.remarks,
-            createdBy: request.createdBy,
-            creatorRole: request.creatorRole,
-            groupId: request.groupId,
-            createdAt: request.createdAt,
-
-            indentRemarks: request.indentRemarks, // not created fieled
-            serviceMode: request.typeOfRequest, // not created fieled
-        })
-    }
+    let bulkRequest = getBulkRequest(allRequest)
     log.info('Get all request.')
 
-    let tripId = 1
-    let requestIdArray = []
-    for (let job of allTrip) {
-        requestIdArray.push(job.requestId)
-        let count = requestIdArray.filter(item => item == job.requestId).length
-        job.tripNo = `${job.requestId}-${Utils.PrefixInteger(count, 3)}`
-        job.id = tripId
-        let completeCount = 0
-        let jobIds = job.jobIds.split(',')
-        let tasks = allTask.filter(item => jobIds.includes(item.jobId.toString()))
-
-        for (let task of tasks) {
-            if (indentStatus.indexOf(task.taskStatus) != -1) {
-                completeCount += 1
-            }
-            let jobData = task.jobData
-            let taskData = task.taskData
-            let returnData = null
-            if (jobData && taskData) {
-                let jobDataJSON = JSON.parse(jobData)
-                let taskDataJSON = JSON.parse(taskData)
-                jobDataJSON.job.task = [taskDataJSON]
-                returnData = JSON.stringify(jobDataJSON)
-            }
-            task.returnData = returnData
-            task.tripId = tripId
-        }
-        job.completeCount = completeCount
-        job.tasks = tasks
-        if (job.status.toLowerCase() == 'imported') {
-            job.status = 'Pending for approval(RF)'
-        }
-
-        let indent = allRequest.find(item => item.id == job.requestId)
-        job.tripRemarks = indent.indentRemarks
-        let serviceMode = serviceModeList.find(item => item.value.toLowerCase() == indent.typeOfRequest.toLowerCase())
-        job.serviceModeId = serviceMode.id
-        job.createdBy = indent.createdBy
-        if (tasks.length > 0) tripId += 1
-    }
+    setAllTrip(allTrip, allTask, allRequest, serviceModeList)
 
     log.info('Get all job.')
 
@@ -216,80 +160,7 @@ module.exports.MigrateDBDatas = async function () {
     let requestIdList = []
     let taskId = 0
     for (let job of allTrip) {
-        let driverNo = 1
-        for (let task of job.tasks) {
-            taskId += 1
-            let externalJobId = task.externalJobId
-            if (!externalJobId && task.isImport) {
-                requestIdList.push(task.requestId)
-                let num = GetCount(requestIdList, task.requestId)
-                externalJobId = `${job.requestId}-${Utils.PrefixInteger(num, 3)}`
-            }
-
-            let contractPartNo = null
-            let vehicleType = job.vehicleType
-            let serviceProviderId = job.serviceProviderId
-            let serviceModeId = job.serviceModeId
-            let dropoffDestination = job.dropoffDestination
-            let pickupDestination = job.pickupDestination
-            let executionTime = moment(job.startDate).format(fmtTime)
-            let selectableTspList = await indentService.FilterServiceProvider(vehicleType, serviceModeId, dropoffDestination, pickupDestination, executionTime)
-            let selectableTspStr = null;
-            if (selectableTspList && selectableTspList.length > 0) {
-                let tspIdArray = [];
-                for (let tsp of selectableTspList) {
-                    tspIdArray.push(tsp.id);
-                }
-                selectableTspStr = tspIdArray.join(",");
-            }
-            if (job.externalJobId) {
-                let tsp = selectableTspList.find(item => item.id == serviceProviderId)
-                contractPartNo = tsp ? tsp.contractPartNo : null
-            }
-
-            let taskObj = {
-                id: taskId,
-                jobId: task.jobId, // not created fieled
-                externalTaskId: task.externalTaskId,
-                externalJobId: externalJobId,
-                requestId: task.requestId,
-                startDate: task.startDate,
-                endDate: task.endDate,
-                pickupDestination: task.pickupDestination,
-                dropoffDestination: task.dropoffDestination,
-                poc: task.poc,
-                executionDate: moment(task.startDate).format(fmtDate),
-                executionTime: moment(task.startDate).format(fmtTime),
-                duration: task.duration,
-                taskStatus: task.taskStatus,
-                driverId: task.driverId,
-                arrivalTime: task.arrivalTime,
-                departTime: task.departTime,
-                endTime: task.endTime,
-                success: task.success,
-                copyFrom: task.copyFrom,
-                guid: task.guid,
-                jobStatus: task.jobStatus,
-                tripId: task.tripId,
-                sendData: task.sendData,
-                createdAt: task.createdAt,
-                updatedAt: task.updatedAt,
-                pocNumber: task.mobileNumber,
-                trackingId: task.trackingId ?? externalJobId,
-                returnData: task.returnData,
-                driverNo: driverNo,
-                contractPartNo: contractPartNo,
-                serviceProviderId: job.serviceProviderId,
-                selectableTsp: selectableTspStr,
-            }
-
-            let approveHistory = approveOprationHistory.find(item => item.requestId == task.requestId)
-            if (approveHistory) {
-                taskObj.notifiedTime = approveHistory.createdAt
-            }
-            bulkTask.push(taskObj)
-            driverNo += 1
-        }
+        await setJobTask(job, taskId, requestIdList, approveOprationHistory, bulkTask)
 
         bulkTrip.push({
             id: job.id,
@@ -385,6 +256,152 @@ module.exports.MigrateDBDatas = async function () {
     log.info('Migrate completed.')
 }
 
+const getBulkRequest = function (allRequest) {
+    let bulkRequest = []
+    for (let request of allRequest) {
+        bulkRequest.push({
+            id: request.id,
+            purposeType: request.purposeOfTrip,
+            startDate: request.startDate.substr(0, 10),
+            estimatedTripDuration: request.estimatedTripDuration.substr(0, request.estimatedTripDuration.indexOf('h')),
+            noOfTrips: request.noOfTrips,
+            additionalRemarks: request.remarks,
+            createdBy: request.createdBy,
+            creatorRole: request.creatorRole,
+            groupId: request.groupId,
+            createdAt: request.createdAt,
+
+            indentRemarks: request.indentRemarks, // not created fieled
+            serviceMode: request.typeOfRequest, // not created fieled
+        })
+    }
+    return bulkRequest
+}
+
+const setAllTrip = function (allTrip, allTask, allRequest, serviceModeList) {
+    let tripId = 1
+    let requestIdArray = []
+    for (let job of allTrip) {
+        requestIdArray.push(job.requestId)
+        let count = requestIdArray.filter(item => item == job.requestId).length
+        job.tripNo = `${job.requestId}-${Utils.PrefixInteger(count, 3)}`
+        job.id = tripId
+        let completeCount = 0
+        let jobIds = job.jobIds.split(',')
+        let tasks = allTask.filter(item => jobIds.includes(item.jobId.toString()))
+
+        for (let task of tasks) {
+            if (indentStatus.indexOf(task.taskStatus) != -1) {
+                completeCount += 1
+            }
+            let jobData = task.jobData
+            let taskData = task.taskData
+            let returnData = null
+            if (jobData && taskData) {
+                let jobDataJSON = JSON.parse(jobData)
+                let taskDataJSON = JSON.parse(taskData)
+                jobDataJSON.job.task = [taskDataJSON]
+                returnData = JSON.stringify(jobDataJSON)
+            }
+            task.returnData = returnData
+            task.tripId = tripId
+        }
+        job.completeCount = completeCount
+        job.tasks = tasks
+        if (job.status.toLowerCase() == 'imported') {
+            job.status = 'Pending for approval(RF)'
+        }
+
+        let indent = allRequest.find(item => item.id == job.requestId)
+        job.tripRemarks = indent.indentRemarks
+        let serviceMode = serviceModeList.find(item => item.value.toLowerCase() == indent.typeOfRequest.toLowerCase())
+        job.serviceModeId = serviceMode.id
+        job.createdBy = indent.createdBy
+        if (tasks.length > 0) tripId += 1
+    }
+}
+
+const setJobTask = async function (job, taskId, requestIdList, approveOprationHistory, bulkTask) {
+
+    const getContractPartNo = function (selectableTspList, serviceProviderId, job) {
+        let contractPartNo = null
+        let selectableTspStr = null;
+        if (selectableTspList && selectableTspList.length > 0) {
+            let tspIdArray = selectableTspList.map(o => o.id)
+            selectableTspStr = tspIdArray.join(",");
+        }
+        if (job.externalJobId) {
+            let tsp = selectableTspList.find(item => item.id == serviceProviderId)
+            contractPartNo = tsp ? tsp.contractPartNo : null
+        }
+        return { contractPartNo, selectableTspStr }
+    }
+
+    let driverNo = 1
+    for (let task of job.tasks) {
+        taskId += 1
+        let externalJobId = task.externalJobId
+        if (!externalJobId && task.isImport) {
+            requestIdList.push(task.requestId)
+            let num = GetCount(requestIdList, task.requestId)
+            externalJobId = `${job.requestId}-${Utils.PrefixInteger(num, 3)}`
+        }
+
+        let vehicleType = job.vehicleType
+        let serviceProviderId = job.serviceProviderId
+        let serviceModeId = job.serviceModeId
+        let dropoffDestination = job.dropoffDestination
+        let pickupDestination = job.pickupDestination
+        let executionTime = moment(job.startDate).format(fmtTime)
+        let selectableTspList = await indentService.FilterServiceProvider(vehicleType, serviceModeId, dropoffDestination, pickupDestination, executionTime)
+
+        let { contractPartNo, selectableTspStr } = getContractPartNo(selectableTspList, serviceProviderId, job)
+
+        let taskObj = {
+            id: taskId,
+            jobId: task.jobId, // not created fieled
+            externalTaskId: task.externalTaskId,
+            externalJobId: externalJobId,
+            requestId: task.requestId,
+            startDate: task.startDate,
+            endDate: task.endDate,
+            pickupDestination: task.pickupDestination,
+            dropoffDestination: task.dropoffDestination,
+            poc: task.poc,
+            executionDate: moment(task.startDate).format(fmtDate),
+            executionTime: moment(task.startDate).format(fmtTime),
+            duration: task.duration,
+            taskStatus: task.taskStatus,
+            driverId: task.driverId,
+            arrivalTime: task.arrivalTime,
+            departTime: task.departTime,
+            endTime: task.endTime,
+            success: task.success,
+            copyFrom: task.copyFrom,
+            guid: task.guid,
+            jobStatus: task.jobStatus,
+            tripId: task.tripId,
+            sendData: task.sendData,
+            createdAt: task.createdAt,
+            updatedAt: task.updatedAt,
+            pocNumber: task.mobileNumber,
+            trackingId: task.trackingId || externalJobId,
+            returnData: task.returnData,
+            driverNo: driverNo,
+            contractPartNo: contractPartNo,
+            serviceProviderId: job.serviceProviderId,
+            selectableTsp: selectableTspStr,
+        }
+
+        let approveHistory = approveOprationHistory.find(item => item.requestId == task.requestId)
+        if (approveHistory) {
+            taskObj.notifiedTime = approveHistory.createdAt
+        }
+        bulkTask.push(taskObj)
+        driverNo += 1
+    }
+}
+
 const GetCount = function (arr, data) {
     let index = arr.indexOf(data)
     let num = 0
@@ -406,24 +423,24 @@ const DeleteIndentTables = async function () {
 }
 
 const UpdateTspAvailable = async function () {
-//     let list = await sequelizeObj.query(`SELECT
-// 	a.id, a.selectableTsp, b.vehicleType, b.serviceModeId, b.dropoffDestination, b.pickupDestination, a.executionTime
-// FROM
-// 	job_task a
-// LEFT JOIN job b ON a.tripId = b.id
-// where a.selectableTsp is null`,
-//         {
-//             type: QueryTypes.SELECT
-//         });
-let list = await sequelizeObj.query(`SELECT
+    //     let list = await sequelizeObj.query(`SELECT
+    // 	a.id, a.selectableTsp, b.vehicleType, b.serviceModeId, b.dropoffDestination, b.pickupDestination, a.executionTime
+    // FROM
+    // 	job_task a
+    // LEFT JOIN job b ON a.tripId = b.id
+    // where a.selectableTsp is null`,
+    //         {
+    //             type: QueryTypes.SELECT
+    //         });
+    let list = await sequelizeObj.query(`SELECT
 a.id, a.selectableTsp, b.vehicleType, b.serviceModeId, b.dropoffDestination, b.pickupDestination, a.executionTime
 FROM
 job_task a
 LEFT JOIN job b ON a.tripId = b.id
 where b.dropoffDestination in ('') or b.pickupDestination in ('')`,
-    {
-        type: QueryTypes.SELECT
-    });
+        {
+            type: QueryTypes.SELECT
+        });
     await sequelizeObj.transaction(async t1 => {
         for (let task of list) {
             if (!task.selectableTsp) {
@@ -556,9 +573,9 @@ const UpdateSelectableTsp = async function () {
     job_task a
     LEFT JOIN job b ON a.tripId = b.id
     where b.serviceModeId in (6,7)`,
-    {
-        type: QueryTypes.SELECT
-    });
+        {
+            type: QueryTypes.SELECT
+        });
     await sequelizeObj.transaction(async t1 => {
         for (let task of list) {
             let id = task.id
@@ -581,3 +598,35 @@ const UpdateSelectableTsp = async function () {
     })
 }
 module.exports.UpdateSelectableTsp = UpdateSelectableTsp
+
+const UpdateContractPartNoByTsp = async function () {
+    let list = await sequelizeObj.query(`SELECT
+    a.id, a.selectableTsp, b.vehicleType, b.serviceModeId, b.dropoffDestination, b.pickupDestination, a.executionTime, a.executionDate, a.serviceProviderId
+    FROM
+    job_task a
+    LEFT JOIN job b ON a.tripId = b.id
+    where a.contractPartNo is null and a.serviceProviderId is not null and a.externalJobId is not null`,
+        {
+            type: QueryTypes.SELECT
+        });
+    await sequelizeObj.transaction(async t1 => {
+        for (let task of list) {
+            let id = task.id
+            let vehicleType = task.vehicleType
+            let serviceModeId = task.serviceModeId
+            let dropoffDestination = task.dropoffDestination
+            let pickupDestination = task.pickupDestination
+            let executionTime = task.executionTime
+            let executionDate = task.executionDate
+            let serviceProviderId = task.serviceProviderId
+
+            let selectableTspList = await indentService.FilterServiceProvider(vehicleType, serviceModeId, dropoffDestination, pickupDestination, executionDate, executionTime)
+            if (selectableTspList && selectableTspList.length > 0) {
+                let tsp = selectableTspList.find(item => item.id == serviceProviderId)
+                if (tsp) {
+                    await Task2.update({ contractPartNo: tsp.contractPartNo }, { where: { id: id } })
+                }
+            }
+        }
+    })
+}

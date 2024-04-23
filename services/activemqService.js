@@ -1,5 +1,4 @@
 const log4js = require('../log4js/log.js');
-// const log = log4js.logger('MQInfo');
 const systemSendTo3rdLog = log4js.logger("SystemSendTo3rdInfo");
 const conf = require('../conf/conf.js');
 const Utils = require('../util/utils')
@@ -7,14 +6,14 @@ const { Task2 } = require('../model/task');
 const { OperationHistory } = require('../model/job2')
 const { ServiceProvider } = require('../model/serviceProvider')
 const { TaskAccept } = require('../model/taskAccept')
-const { QueryTypes, Op } = require('sequelize');
+const { Op } = require('sequelize');
 
 const atmsAckService = require('../services/atmsAckService')
 
 const convertSendData = function (data) {
     let sendData = JSON.parse(data)
     let custom_fields_attributes = sendData.job.tasks_attributes[0].custom_fields_attributes
-    for (var item of custom_fields_attributes) {
+    for (let item of custom_fields_attributes) {
         if (item.custom_field_description_id == 2493) {
             item.custom_field_description_id = conf.CreateJobJsonField.UserNameField
         } else if (item.custom_field_description_id == 2550) {
@@ -74,7 +73,6 @@ module.exports.affectCreateJobHandler = async function (body) {
 module.exports.affectCancelJobHandler = async function (body) {
     try {
         let { externalJobId, operatorId, serviceProviderId, createdAt, requestId, tripId, taskId } = JSON.parse(body)
-        // let task = await Task2.findOne({ where: { externalJobId: externalJobId } })
         await Utils.CancelJob(externalJobId)
         await saveOprationHistory({ requestId, tripId, id: taskId }, operatorId, serviceProviderId, null, createdAt, `Cancel TSP`)
     } catch (ex) {
@@ -165,8 +163,6 @@ const saveWogOprationHistory = async (task, operatorId, createdAt, status) => {
 module.exports.affectBulkCreateJobHandler = async function (body) {
     try {
         let { taskId, tspList } = JSON.parse(body)
-        // let task = await Task2.findByPk(taskId)
-        // let sendData = convertSendData(task.sendData)
 
         await Promise.all(tspList.map(tsp => {
             return sendTaskToTSPPromise(tsp, taskId)
@@ -199,7 +195,6 @@ const sendTaskToTSPPromise = function (tsp, taskId) {
                     externalJobId: externalJobId,
                     externalTaskId: externalTaskId,
                     returnData: JSON.stringify(ReturnJson),
-                    // sendData: JSON.stringify(sendData),
                 }, {
                     where: {
                         taskId: taskId,

@@ -55,8 +55,8 @@ module.exports.UploadContract = async function (req, res) {
             let newPath = path.join(process.cwd(), indent_path, filename);
             fs.renameSync(oldPath, newPath);
 
-            var datas = []
-            var obj = xlsx.parse(newPath, { cellDates: false });
+            let datas = []
+            let obj = xlsx.parse(newPath, { cellDates: false });
             for (let sheet of obj) {
                 let data = sheet.data.slice(1)
                 data = data.filter(o => o.length > 0)

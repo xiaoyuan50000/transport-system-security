@@ -8,7 +8,7 @@ const { sequelizeObj } = require('../sequelize/dbConf');
 
 
 module.exports.queryTaskSchedule = async function (req, res) {
-    var tasks = await sequelizeObj.query(`select 
+    let tasks = await sequelizeObj.query(`select 
     a.id, a.jobId, a.state, a.startDate, a.endDate, a.pickupDestination, a.dropoffDestination, a.repeats,
     b.name as driverName, b.contactNumber, c.vehicleNumber
 from job_task a 
@@ -17,7 +17,7 @@ LEFT JOIN driver b on a.id = b.taskId
         type: QueryTypes.SELECT
     });
 
-    var dates = await sequelizeObj.query("select date_format(startDate, '%Y-%m-%d') schedule_date from job_task group by date_format(startDate, '%Y-%m-%d');", {
+    let dates = await sequelizeObj.query("select date_format(startDate, '%Y-%m-%d') schedule_date from job_task group by date_format(startDate, '%Y-%m-%d');", {
         type: QueryTypes.SELECT
     });
 

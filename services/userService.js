@@ -91,6 +91,86 @@ module.exports.CreateUser = async function (req, res) {
 }
 
 const doCreateUser = async function (req, res, isPoc) {
+
+    const getLoginInfo = function (isPoc, isCreate, pwd, mobileNumber, nric, username) {
+        if (isPoc) {
+            let password = pwd
+            let username = mobileNumber
+            return { password, username, loginName: "" }
+        } else if (isCreate) {
+            let loginName = utils.GetLoginName(nric, username)
+            let password = utils.GetPassword(loginName, mobileNumber);
+            return { password, username, loginName }
+        }
+    }
+
+    const getGroupInfo = async function (groupId) {
+        if (groupId == "") {
+            return { groupId: null, groupName: null }
+        }
+        groupId = Number(groupId)
+
+        let group = await Group.findByPk(groupId)
+        groupName = group.groupName
+        return { groupId, groupName }
+    }
+
+    const getRoleInfo = function (roleId) {
+        if (roleId == "") {
+            return null
+        }
+        return Number(roleId)
+    }
+
+    const getServiceProvider = function (serviceProviderList) {
+        if (serviceProviderList instanceof Array && serviceProviderList.length > 0) {
+            return serviceProviderList.join(",");
+        }
+        return ''
+    }
+
+    const getOperatorRecord = async function (operatorId) {
+        let actionRecord = {
+            userId: null,
+            operateDate: new Date(),
+            activity: "",
+            triggeredBy: ""
+        }
+        if (operatorId) {
+            let operator = await User.findByPk(operatorId)
+            actionRecord.triggeredBy = operator.username
+            actionRecord.operatorId = operatorId
+        }
+        return actionRecord
+    }
+
+    const createUser = async function (createUserObj, actionRecord, isPoc, groupName, createdBy) {
+        await sequelizeObj.transaction(async t1 => {
+            let u = await User.create(createUserObj)
+            actionRecord.userId = u.id
+            await UserManagementReport.create(actionRecord)
+            createUserObj.userId = u.id
+        })
+
+        if (!isPoc) {
+            // create user base
+            createUserObj.groupName = groupName
+            createUserObj.createdBy = createdBy
+            let success = await createUserBase(createUserObj)
+            if (!success) {
+                return false
+            }
+        }
+        return true
+    }
+
+    const getEditLoginName = function (user, username, isPoc) {
+        if (user.username != username && !isPoc) {
+            return user.loginName.slice(0, -3) + username.split(" ").join("").substr(0, 3).toUpperCase()
+        }
+        return user.loginName
+    }
+
     try {
         let id = req.body.id
         let nric = req.body.nric
@@ -105,52 +185,24 @@ const doCreateUser = async function (req, res, isPoc) {
         let loginName = "";
         let password = "";
         let isCreate = (id == "" || id == null)
-        if (isPoc) {
-            password = req.body.password
-            // nric = mobileNumber
-            username = mobileNumber
-        } else {
-            if (isCreate) {
-                loginName = utils.GetLoginName(nric, username)
-                password = utils.GetPassword(loginName, mobileNumber);
-            }
-            if (username.split(" ").join("").length<3) {
-                return Response.error(res, "Create user failed! The length of the name must be greater than 3!")
-            }
+
+        if (!isPoc && username.split(" ").join("").length < 3) {
+            return Response.error(res, "Create user failed! The length of the name must be greater than 3!")
         }
 
-        let groupId = req.body.group
-        groupId = groupId == "" ? null : Number(groupId)
+        let loginInfo = getLoginInfo(isPoc, isCreate, req.body.password, mobileNumber, nric, username)
+        password = loginInfo.password
+        username = loginInfo.username
+        loginName = loginInfo.loginName
 
-        let groupName = null
-        if (groupId) {
-            let group = await Group.findByPk(groupId)
-            groupName = group.groupName
-        }
+        let { groupId, groupName } = await getGroupInfo(req.body.group)
 
-        let roleId = req.body.role
-        roleId = roleId == "" ? null : Number(roleId)
+        let roleId = getRoleInfo(req.body.role)
 
-        let serviceProviderList = req.body.serviceProvider
-        let serviceProvider = '';
-        if (serviceProviderList instanceof Array && serviceProviderList.length > 0) {
-            serviceProvider = serviceProviderList.join(",");
-        } else {
-            serviceProvider = serviceProviderList
-        }
-        let serviceProviderId = serviceProvider;
+        let serviceProviderId = getServiceProvider(req.body.serviceProvider);
 
-        let actionRecord = {
-            userId: null,
-            operateDate: new Date(),
-            activity: "",
-            triggeredBy: ""
-        }
-        if (operatorId) {
-            let operator = await User.findByPk(operatorId)
-            actionRecord.triggeredBy = operator.username
-            actionRecord.operatorId = operatorId
-        }
+        let actionRecord = getOperatorRecord(operatorId)
+
         if (isCreate) {
             actionRecord.activity = USER_ACTIVITY.AccountCreation
             let nricAESCode = utils.generateAESCode(nric)
@@ -166,25 +218,11 @@ const doCreateUser = async function (req, res, isPoc) {
                 serviceTypeId: serviceTypeId,
                 email: email,
                 ord: ord,
-                // default value
                 times: 0,
             }
-            await sequelizeObj.transaction(async t1 => {
-                let u = await User.create(createUserObj)
-                actionRecord.userId = u.id
-                await UserManagementReport.create(actionRecord)
-                createUserObj.userId = u.id
-            })
 
-            if (!isPoc) {
-                // create user base
-                createUserObj.groupName = groupName
-                createUserObj.createdBy = createdBy
-                let success = await createUserBase(createUserObj)
-                if (!success) {
-                    return Response.error(res, "Create user failed!")
-                }
-            }
+            let result = await createUser(createUserObj, actionRecord, isPoc, groupName, createdBy)
+            if (!result) return Response.error(res, "Create user failed!")
         } else {
             actionRecord.activity = USER_ACTIVITY.AccountEdit
             actionRecord.userId = id
@@ -196,10 +234,7 @@ const doCreateUser = async function (req, res, isPoc) {
                 return Response.error(res, ATLEASTONEOCCMGR)
             }
 
-            let loginName = user.loginName
-            if (user.username != username && !isPoc) {
-                loginName = user.loginName.slice(0, -3) + username.split(" ").join("").substr(0, 3).toUpperCase()
-            }
+            let loginName = getEditLoginName(user, username, isPoc)
 
             let MVOperationRecord = null
             if (user.contactNumber != mobileNumber || user.email != email || user.role != roleId
@@ -486,21 +521,26 @@ module.exports.InitUserTable = async function (req, res) {
         }
     })
     for (let row of data) {
-        if (conf.view_nric) {
-            if (row.nric != row.loginName && row.nric != null && row.nric != "") {
-                row.nric = utils.decodeAESCode(row.nric)
-            }
-        } else {
-            row.nric = ""
+        row.nric = ""
+        if (conf.view_nric && row.nric != row.loginName && row.nric != null && row.nric != "") {
+            row.nric = utils.decodeAESCode(row.nric)
         }
-        let operator = userManageReportList.find(o => o.userId == row.id && o.activity == USER_ACTIVITY.AccountCreation)
-        let approvedUser = userManageReportList.find(o => o.userId == row.id && o.activity == USER_ACTIVITY.AccountApprove)
-        row.requestBy = operator ? operator.triggeredBy : ""
-        row.approvedOn = approvedUser ? approvedUser.operateDate : ""
-        row.approvedBy = approvedUser ? approvedUser.triggeredBy : ""
+        let approvalUserInfo = getApprovalUserInfo(userManageReportList, row)
+        row.requestBy = approvalUserInfo.requestBy
+        row.approvedOn = approvalUserInfo.approvedOn
+        row.approvedBy = approvalUserInfo.approvedBy
 
     }
     return res.json({ data: data, recordsFiltered: totalRecord, recordsTotal: totalRecord })
+}
+
+const getApprovalUserInfo = function (userManageReportList, row) {
+    let operator = userManageReportList.find(o => o.userId == row.id && o.activity == USER_ACTIVITY.AccountCreation)
+    let approvedUser = userManageReportList.find(o => o.userId == row.id && o.activity == USER_ACTIVITY.AccountApprove)
+    let requestBy = operator ? operator.triggeredBy : ""
+    let approvedOn = approvedUser ? approvedUser.operateDate : ""
+    let approvedBy = approvedUser ? approvedUser.triggeredBy : ""
+    return { requestBy, approvedOn, approvedBy }
 }
 
 module.exports.CheckIfPwdReuse = async function (req, res) {

@@ -45,14 +45,14 @@ function UpdateDataByUpdatesJSON(obj, dataObj) {
             } else {
                 if (!dataObj.hasOwnProperty(key)) {
                     if (obj[key] instanceof Array) {
-                        var newVal = obj[key].slice(-1)[0]
+                        let newVal = obj[key].slice(-1)[0]
                         dataObj[key] = newVal
                     } else {
                         dataObj[key] = obj[key]
                     }
                 } else {
                     if (obj[key] instanceof Array) {
-                        var newVal = obj[key].slice(-1)[0]
+                        let newVal = obj[key].slice(-1)[0]
                         dataObj[key] = newVal
                     } else {
                         UpdateDataByUpdatesJSON(obj[key], dataObj[key])
@@ -175,7 +175,7 @@ function RequestAndSaveImage(url, path) {
 }
 
 function WriteAndSaveFile(res, path) {
-    var imageData = '';
+    let imageData = '';
     res.setEncoding('binary');
 
     res.on('data', function (chunk) {

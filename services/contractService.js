@@ -779,7 +779,7 @@ const getContractRecord = function (body) {
             record.monthlyPrice = monthlyPrice
             records.push(record)
         } else {
-            for (var i = 0; i <= 1; i++) {
+            for (let i = 0; i <= 1; i++) {
                 let newRecord = Object.assign({}, record)
                 newRecord.chargeType = (i == 0 ? ChargeType.BLOCKDAILY_1 : ChargeType.BLOCKDAILY_2)
                 newRecord.blockPeriod = blockPeriod[i]

@@ -82,7 +82,7 @@ const GetSendJobJson = function (additionalRemarks, user, pickUpLocation, dropOf
     sendJob.job.tasks_attributes[0].tracking_id = task.trackingId
 
     let custom_fields_attributes = sendJob.job.tasks_attributes[0].custom_fields_attributes
-    for (var item of custom_fields_attributes) {
+    for (let item of custom_fields_attributes) {
         if (item.custom_field_description_id == conf.CreateJobJsonField.UserNameField) {
             item.value = user.username
         } else if (item.custom_field_description_id == conf.CreateJobJsonField.ContactNumberField) {
@@ -711,7 +711,7 @@ module.exports.GetCreateTasks = GetCreateTasks
 //             let tasks_attributes = sendData.job.tasks_attributes[0]
 //             tasks_attributes.tracking_id = trackingId
 //             let custom_fields_attributes = tasks_attributes.custom_fields_attributes
-//             for (var item of custom_fields_attributes) {
+//             for (let item of custom_fields_attributes) {
 //                 if (item.custom_field_description_id == conf.CreateJobJsonField.TrackingIdField) {
 //                     item.value = sendDataTask.requestId.substr(0, 5) + trackingId
 //                 }
@@ -822,7 +822,7 @@ const UpdateOrCancelJobTask = async function (taskList, alreadySendDataTasks, ty
             let tasks_attributes = sendData.job.tasks_attributes[0]
             tasks_attributes.tracking_id = trackingId
             let custom_fields_attributes = tasks_attributes.custom_fields_attributes
-            for (var item of custom_fields_attributes) {
+            for (let item of custom_fields_attributes) {
                 if (item.custom_field_description_id == conf.CreateJobJsonField.TrackingIdField) {
                     item.value = sendDataTask.requestId.substr(0, 5) + trackingId
                 }
@@ -2317,7 +2317,7 @@ module.exports.CreateNewIndent = async function (req, res) {
         let sendData = JSON.parse(task.sendData)
         sendData.job.tasks_attributes[0].tracking_id = trackingId
         let custom_fields_attributes = sendData.job.tasks_attributes[0].custom_fields_attributes
-        for (var item of custom_fields_attributes) {
+        for (let item of custom_fields_attributes) {
             if (item.custom_field_description_id == conf.CreateJobJsonField.TrackingIdField) {
                 item.value = requestId.substr(0, 5) + trackingId
             }
@@ -2553,7 +2553,7 @@ const GetNewTrackingIdAndData = function (tripNo, task) {
     let tasks_attributes = sendData.job.tasks_attributes[0]
     tasks_attributes.tracking_id = trackingId
     let custom_fields_attributes = tasks_attributes.custom_fields_attributes
-    for (var item of custom_fields_attributes) {
+    for (let item of custom_fields_attributes) {
         if (item.custom_field_description_id == conf.CreateJobJsonField.TrackingIdField) {
             item.value = task.requestId.substr(0, 5) + trackingId
         }
@@ -2949,8 +2949,8 @@ const GetRestrictionOnDate = async function (unitId) {
         }
     })
     endTimeList.sort(function compare(a, b) {
-        var dateA = new Date(a);
-        var dateB = new Date(b);
+        let dateA = new Date(a);
+        let dateB = new Date(b);
         return dateA - dateB;
     });
     let earliestDate = moment(endTimeList[0]).add(conf.endorse_complete_limit_day, 'd')

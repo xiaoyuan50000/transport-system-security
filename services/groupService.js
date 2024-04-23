@@ -16,6 +16,16 @@ const moment = require('moment');
 const conf = require('../conf/conf.js');
 
 module.exports.InitTable = async function (req, res) {
+
+    const setServiceType = function (serviceType, serviceTypes) {
+        if (serviceType != null) {
+            let serviceTypeArray = serviceType.split(",")
+            return serviceTypes.filter(item => serviceTypeArray.indexOf(item.id.toString()) != -1)
+        }
+        return []
+
+    }
+
     let { groupName } = req.body
     let pageNum = Number(req.body.start);
     let pageLength = Number(req.body.length);
@@ -30,15 +40,9 @@ module.exports.InitTable = async function (req, res) {
     let serviceTypes = await GetAllServiceType()
     let today = moment().format("YYYY-MM-DD")
     for (let row of rows) {
-        let serviceType = row.serviceType
-        if (serviceType != null) {
-            let serviceTypeArray = serviceType.split(",")
-            row.serviceType = serviceTypes.filter(item => serviceTypeArray.indexOf(item.id.toString()) != -1)
-        } else {
-            row.serviceType = []
-        }
-        if (row.restrictionOnDate && moment(row.restrictionOnDate).isAfter(today)) {
-        } else {
+        row.serviceType = setServiceType(row.serviceType, serviceTypes)
+
+        if (!(row.restrictionOnDate && moment(row.restrictionOnDate).isAfter(today))) {
             let newRestrictionOnDate = await requestService2.GetRestrictionOnDate(row.id)
             if (!newRestrictionOnDate) {
                 row.restrictionOnDate = null
@@ -47,14 +51,15 @@ module.exports.InitTable = async function (req, res) {
             }
         }
 
+        row.unlockRestrictionBtn = false
         if (row.restrictionOnDate && moment(row.restrictionOnDate).isSameOrBefore(today)) {
             row.unlockRestrictionBtn = true
-        } else {
-            row.unlockRestrictionBtn = false
         }
     }
     return res.json({ data: rows, recordsFiltered: count, recordsTotal: count })
 }
+
+
 
 module.exports.UnLockRestrictionByGroupId = async function (req, res) {
     let { groupId } = req.body

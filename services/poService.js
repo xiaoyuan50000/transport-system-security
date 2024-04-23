@@ -242,9 +242,7 @@ const GetPOTableDetails = async function (pageResult, isMonthly) {
                     type: QueryTypes.SELECT,
                 }
             );
-            if (initialPOList.length > 0) {
-                row.iamounts = _.sumBy(initialPOList, (o) => { return Number(o.total) })
-            }
+            setIamounts(initialPOList)
         }
 
         let result = await sequelizeObj.query(
@@ -282,8 +280,7 @@ const GetPOTableDetails = async function (pageResult, isMonthly) {
             item.surchargeDepart = FormatPrice(item.surchargeDepart)
             item.total = FormatPrice(item.total)
 
-            let initialPOTask = initialPOList.find(a => a.taskId == item.taskId)
-            item.initialTotal = initialPOTask ? initialPOTask.total : 0
+            item.initialTotal = getInitialTotal(initialPOList, item)
 
             let task = result.find(a => a.id == item.taskId)
             if (task) {
@@ -322,11 +319,19 @@ const GetPOTableDetails = async function (pageResult, isMonthly) {
         }
         row.details = POList
         row.amounts = FormatPrice(row.amounts)
-        if (row.iamounts) {
-            row.iamounts = FormatPrice(row.iamounts)
-        }
     }
     return pageResult
+}
+const getInitialTotal = function (initialPOList, item) {
+    let initialPOTask = initialPOList.find(a => a.taskId == item.taskId)
+    return initialPOTask ? initialPOTask.total : 0
+}
+
+const setIamounts = function (initialPOList) {
+    if (initialPOList.length > 0) {
+        let iamounts = _.sumBy(initialPOList, (o) => { return Number(o.total) })
+        row.iamounts = FormatPrice(iamounts)
+    }
 }
 
 const GetInvoiceByIndent = async function (serviceProviderId, indentId, start, length, user, executionDate, creationDate) {

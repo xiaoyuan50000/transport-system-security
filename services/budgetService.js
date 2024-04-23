@@ -1,7 +1,7 @@
 const log4js = require('../log4js/log.js');
 const log = log4js.logger('Budget Service');
 const { sequelizeObj } = require('../sequelize/dbConf');
-const { Op, Model, QueryTypes } = require('sequelize');
+const { QueryTypes } = require('sequelize');
 const Response = require('../util/response.js');
 const { Wallet, WalletBudgetRecord } = require('../model/wallet');
 const { Task2 } = require('../model/task');
@@ -163,7 +163,6 @@ module.exports.SavePayout = async function (req, res) {
 }
 
 module.exports.GetWalletsByFunding = async function (user, funding) {
-    // let roleName = user.roleName
     let sql = `SELECT
                     a.id, a.walletName, a.funding
                 FROM
@@ -171,11 +170,9 @@ module.exports.GetWalletsByFunding = async function (user, funding) {
                 LEFT JOIN \`user\` b ON a.createdBy = b.id where 1=1
                 `
     let replacements = []
-    // if (roleName == ROLE.UCO) {
-        let unitId = user.group
-        sql += ` and b.\`group\` = ?`
-        replacements.push(unitId)
-    // }
+    let unitId = user.group
+    sql += ` and b.\`group\` = ?`
+    replacements.push(unitId)
 
     if (funding) {
         sql += ` and a.funding = ?`

@@ -55,20 +55,7 @@ const SaveATMSAck = async function (trip, tasks, transacationType, ngtsJobStatus
     let recordList = []
     for (let task of tasks) {
         let driverId = task.driverId
-        let driverName = ""
-        let driverMobileNumber = ""
-        let vehicleNumber = ""
-        if (task.driverId) {
-            let driver = await Driver.findByPk(task.id)
-            let vehicle = await Vehicle.findByPk(task.id)
-            if (driver) {
-                driverName = driver.name
-                driverMobileNumber = driver.contactNumber
-            }
-            if (vehicle) {
-                vehicleNumber = vehicle.vehicleNumber
-            }
-        }
+        let { driverName, driverMobileNumber, vehicleNumber } = await getDriverInfo(task)
         let startDate = moment(task.startDate).format("YYYY-MM-DD HH:mm:ss")
         let endDate = task.endDate ? moment(task.endDate).format("YYYY-MM-DD HH:mm:ss") : null
 
@@ -112,6 +99,24 @@ const SaveATMSAck = async function (trip, tasks, transacationType, ngtsJobStatus
     await NGTSResp.bulkCreate(recordList)
 }
 module.exports.SaveATMSAck = SaveATMSAck
+
+const getDriverInfo = async function (task) {
+    let driverName = ""
+    let driverMobileNumber = ""
+    let vehicleNumber = ""
+    if (task.driverId) {
+        let driver = await Driver.findByPk(task.id)
+        if (driver) {
+            driverName = driver.name
+            driverMobileNumber = driver.contactNumber
+        }
+        let vehicle = await Vehicle.findByPk(task.id)
+        if (vehicle) {
+            vehicleNumber = vehicle.vehicleNumber
+        }
+    }
+    return { driverName, driverMobileNumber, vehicleNumber }
+}
 
 module.exports.SaveCancelByTSPForATMSAck = async function (task, createdBy = null) {
     let trip = await Job2.findByPk(task.tripId)

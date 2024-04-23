@@ -91,7 +91,7 @@ module.exports.uploadJobFile = async function (req, res) {
 }
 
 function readExcel(path, callback) {
-    var obj = xlsx.parse(path);
+    let obj = xlsx.parse(path);
     let data = obj[0].data
     let titleArray = data[0];
     let indentArray = data.slice(1);
@@ -405,7 +405,7 @@ module.exports.uploadOldIndentFile = async function (req, res) {
 
             fs.renameSync(oldPath, newPath);
 
-            var obj = xlsx.parse(newPath, { cellDates: false });
+            let obj = xlsx.parse(newPath, { cellDates: false });
             let data = obj[0].data
             let indentArray = data.slice(1);
 
@@ -613,7 +613,7 @@ module.exports.newContract = async function (req, res) {
 
             fs.renameSync(oldPath, newPath);
 
-            var obj = xlsx.parse(newPath, { cellDates: false });
+            let obj = xlsx.parse(newPath, { cellDates: false });
             let data = obj[0].data.slice(1)
             data = data.filter(item => item.length > 0)
             let serviceProviderName = ""

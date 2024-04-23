@@ -408,8 +408,8 @@ const GetPODetails = async function (row, contractRateList) {
                 let contractRate = contractRateList[0]
                 let { blockPrice, blockHourly, OTHourly, OTBlockPrice, blockPeriod, OTBlockPeriod, dailyPrice } = GetContractRateField(contractRate)
 
-                var [dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0];
-                var newStartTime;
+                let [dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0];
+                let newStartTime;
                 ({ count: dailyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(startTime, endTime, 'd'));
                 let surplusHr = GetSurplusHrDuration(newStartTime, endTime);
 
@@ -424,7 +424,7 @@ const GetPODetails = async function (row, contractRateList) {
                 // Cheapest
                 if (dailyPrice <= blockHourly * block_hourly + OTHourly * ot_hourly + blockPrice * blockCount + OTBlockPrice * otblockCount) {
                     dailyCount += 1
-                    var [ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0]
+                    let [ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0]
                 }
                 log.info(`(Cheapest) -> ChargeType: ${chargeType},
                                         dailyCount: ${dailyCount}, 
@@ -455,8 +455,8 @@ const GetPODetails = async function (row, contractRateList) {
                 }
                 let { blockPrice, blockHourly, OTHourly, OTBlockPrice, blockPeriod, OTBlockPeriod, dailyPrice, monthlyPrice } = GetContractRateField(contractRateList[index])
 
-                var [monthlyCount, dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0, 0];
-                var newStartTime;
+                let [monthlyCount, dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0, 0];
+                let newStartTime;
                 ({ count: monthlyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(startTime, endTime, 'M'));
                 ({ count: dailyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(newStartTime, endTime, 'd'));
                 let surplusHr = GetSurplusHrDuration(newStartTime, endTime);
@@ -475,10 +475,10 @@ const GetPODetails = async function (row, contractRateList) {
 
                 if (monthlyPrice <= dailyCost + hourlyCost) {
                     monthlyCount += 1
-                    var [dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0]
+                    let [dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0]
                 } else if (dailyPrice <= hourlyCost) {
                     dailyCount += 1
-                    var [ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0]
+                    let [ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0]
                 }
                 log.info(`(Cheapest) -> ChargeType: ${chargeType},
                                         monthlyCount: ${monthlyCount}, 
@@ -511,8 +511,8 @@ const GetPODetails = async function (row, contractRateList) {
             let contractRate = contractRateList[0]
             let { blockPrice, blockHourly, OTHourly, OTBlockPrice, blockPeriod, OTBlockPeriod, dailyPrice, weeklyPrice, monthlyPrice, transCost } = GetContractRateField(contractRate)
 
-            var [monthlyCount, weeklyCount, dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0, 0, 0]
-            var newStartTime;
+            let [monthlyCount, weeklyCount, dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0, 0, 0]
+            let newStartTime;
 
             ({ count: monthlyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(startTime, endTime, 'M'));
             ({ count: weeklyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(newStartTime, endTime, 'w'));
@@ -533,13 +533,13 @@ const GetPODetails = async function (row, contractRateList) {
             let hourlyCost = blockHourly * block_hourly + OTHourly * ot_hourly + blockPrice * blockCount + OTBlockPrice * otblockCount
             if (monthlyPrice <= weeklyCost + dailyCost + hourlyCost) {
                 monthlyCount += 1
-                var [weeklyCount, dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0, 0]
+                let [weeklyCount, dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0, 0]
             } else if (weeklyPrice <= dailyCost + hourlyCost) {
                 weeklyCount += 1
-                var [dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0]
+                let [dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0]
             } else if (dailyPrice <= hourlyCost) {
                 dailyCount += 1
-                var [ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0]
+                let [ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0]
             }
             log.info(`(Cheapest) -> ChargeType: ${chargeType},
                                 monthlyCount: ${monthlyCount}, 
@@ -574,8 +574,8 @@ const GetPODetails = async function (row, contractRateList) {
         let { startTime, endTime } = GetStartEndTime(row)
         let { price } = GetContractRateField(contractRateList[0])
 
-        var monthlyCount = 0;
-        var newStartTime;
+        let monthlyCount = 0;
+        let newStartTime;
         ({ count: monthlyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(startTime, endTime, 'M'));
         if (newStartTime != endTime) {
             monthlyCount += 1
@@ -597,8 +597,8 @@ const GetPODetails = async function (row, contractRateList) {
 
         let total = GetDailyPrice(startTime, endTime, price, dailyDaytime, halfDayMorning, halfDayAfternoon, 0)
         detail.total = total
-        // var dailyCount = 0;
-        // var newStartTime;
+        // let dailyCount = 0;
+        // let newStartTime;
         // ({ count: dailyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(startTime, endTime, 'd'));
         // if (newStartTime != endTime) {
         //     dailyCount += 1
@@ -610,8 +610,8 @@ const GetPODetails = async function (row, contractRateList) {
         let { startTime, endTime } = GetStartEndTime(row)
         let { price } = GetContractRateField(contractRateList[0])
 
-        var yearlyCount = 0;
-        var newStartTime;
+        let yearlyCount = 0;
+        let newStartTime;
         ({ count: yearlyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(startTime, endTime, 'Y'));
         if (newStartTime != endTime) {
             yearlyCount += 1
@@ -624,7 +624,7 @@ const GetPODetails = async function (row, contractRateList) {
 module.exports.GetPODetails = GetPODetails
 
 
-var GetDailyPrice = function (startTime, endTime, price, dailyDaytime, halfDayMorning, halfDayAfternoon, total) {
+const GetDailyPrice = function (startTime, endTime, price, dailyDaytime, halfDayMorning, halfDayAfternoon, total) {
     // 2023-09-04 18:01 ~ 2023-09-05 08:00
     // 2023-09-05 08:00 ~ 2023-09-06 08:00
     // 2023-09-06 08:00 ~ 2023-09-06 10:00
@@ -922,7 +922,7 @@ module.exports.DownloadFile = function (req, res) {
         return Response.error(res, 'Download error, no filename!')
     }
     const safeFilename = Utils.getSafeFileName(filename)
-    var rs = fs.createReadStream(path.join('./public/download/invoice/', safeFilename));
+    let rs = fs.createReadStream(path.join('./public/download/invoice/', safeFilename));
     res.writeHead(200, {
         'Content-Type': 'application/force-download',
         'Content-Disposition': 'attachment; filename=' + safeFilename

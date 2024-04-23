@@ -3,9 +3,9 @@ const log = log4js.logger('Job Service');
 const moment = require('moment');
 const fs = require('fs');
 const path = require('path');
-var PizZip = require('pizzip');
-var Docxtemplater = require('docxtemplater');
-var ImageModule = require('open-docxtemplater-image-module');
+let PizZip = require('pizzip');
+let Docxtemplater = require('docxtemplater');
+let ImageModule = require('open-docxtemplater-image-module');
 const Response = require('../util/response.js');
 const { Task2 } = require('../model/task');
 const { Job2 } = require('../model/job2.js');
@@ -48,13 +48,13 @@ module.exports.getPOCCheckDOC = async function (req, res) {
 
 const WriteDataIntoWord = async function (pocCheckData, filename, tripNo) {
     let formOneCheckInfoBytes = await pocCheckData.formOneData;
-    var formOneDataString = "";
-    for (var i = 0; i < formOneCheckInfoBytes.length; i++) {
+    let formOneDataString = "";
+    for (let i = 0; i < formOneCheckInfoBytes.length; i++) {
         formOneDataString += String.fromCharCode(formOneCheckInfoBytes[i]);
     }
     let formTwoCheckInfoBytes = await pocCheckData.formTwoData;
-    var formTwoDataString = "";
-    for (var i = 0; i < formTwoCheckInfoBytes.length; i++) {
+    let formTwoDataString = "";
+    for (let i = 0; i < formTwoCheckInfoBytes.length; i++) {
         formTwoDataString += String.fromCharCode(formTwoCheckInfoBytes[i]);
     }
     let formOneData = formOneDataString ? JSON.parse(formOneDataString) : {};
@@ -76,9 +76,9 @@ const WriteDataIntoWord = async function (pocCheckData, filename, tripNo) {
         }
     }
 
-    var content = fs.readFileSync(path.resolve(pocCheckDownloadFolder, 'templateDocx.docx'), 'binary');
-    var zip = new PizZip(content);
-    var doc =new Docxtemplater();
+    let content = fs.readFileSync(path.resolve(pocCheckDownloadFolder, 'templateDocx.docx'), 'binary');
+    let zip = new PizZip(content);
+    let doc =new Docxtemplater();
     doc.loadZip(zip);
     doc.attachModule(new ImageModule(opts));
     doc.setOptions({
@@ -88,7 +88,7 @@ const WriteDataIntoWord = async function (pocCheckData, filename, tripNo) {
     });
     doc.setData(formData);
     doc.render()
-    var buf = doc.getZip().generate({ type: 'nodebuffer' });
+    let buf = doc.getZip().generate({ type: 'nodebuffer' });
 
     fs.writeFileSync(path.resolve(pocCheckDownloadFolder, filename), buf, function (err) { 
         if (err) {
@@ -99,8 +99,8 @@ const WriteDataIntoWord = async function (pocCheckData, filename, tripNo) {
 
 function toImageByteArray(imageBase64String)
 {
-   var parts = imageBase64String.split(";base64,");
-   var base64String = parts[1];
+   let parts = imageBase64String.split(";base64,");
+   let base64String = parts[1];
 
    return Buffer.from(base64String, 'base64');
 }

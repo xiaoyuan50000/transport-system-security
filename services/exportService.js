@@ -6,7 +6,6 @@ const path = require('path');
 const Response = require('../util/response.js');
 const moment = require('moment');
 const { sequelizeObj } = require('../sequelize/dbConf');
-// const xlsx = require('xlsx');
 const xlsx = require('node-xlsx');
 const { INDENT_STATUS } = require('../util/content')
 const { User } = require('../model/user');
@@ -43,7 +42,7 @@ module.exports.DownloadIndent = async function (req, res) {
 
 	filename = utils.getSafeFileName(filename);
 
-    var rs = fs.createReadStream(folder + filename);
+    let rs = fs.createReadStream(folder + filename);
     res.writeHead(200, {
         'Content-Type': 'application/force-download',
         'Content-Disposition': 'attachment; filename=' + filename

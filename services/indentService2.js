@@ -431,7 +431,7 @@ module.exports.InitIndentTable = async function (req, res) {
 }
 
 const GetWorkFlowBtns = async function (rows, instanceIdList, roleName, groupId, assignedLoanMVTripIds) {
-    var isEndorsed = true
+    let isEndorsed = true
     if (roleName == ROLE.UCO) {
         isEndorsed = await requestService.CheckTaskIsEndorsedByUnitId(groupId)
     }
@@ -546,7 +546,7 @@ const MergerWogTSP = async function (tspAvailableSelect, currentTspId = null) {
 }
 
 const remove = function (arry, val) {
-    var index = arry.indexOf(val);
+    let index = arry.indexOf(val);
     if (index > -1) {
         arry.splice(index, 1);
     }

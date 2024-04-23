@@ -243,82 +243,38 @@ const QueryEndorseDatas = async function (reqParams) {
         LEFT JOIN request f ON b.requestId = f.id
         LEFT JOIN service_type st on a.serviceTypeId = st.id
         where 1=1 and a.loaTagId is null and a.vehicleType != '-' AND b.serviceProviderId is not null`
+
     let whereSql = ``;
-    if (currentUserRole == ROLE.RF || ROLE.OCC.indexOf(currentUserRole) != -1) {
-        whereSql += ` and FIND_IN_SET(a.serviceTypeId, ?)`
-        replacements.push(user.serviceTypeId)
-    } else if (currentUserRole == ROLE.UCO || currentUserRole == ROLE.RQ) {
-        whereSql += ` and f.groupId = ?`
-        replacements.push(user.group)
-    } else if (currentUserRole == ROLE.TSP) {
-        whereSql += ` and FIND_IN_SET(b.serviceProviderId, ?)`
-        replacements.push(user.serviceProviderId)
-    }
+    let filter1 = filterByUserRole(currentUserRole, user, mvServiceTypeIds, isEndorse, endorsed)
+    addWhereSql(filter1, whereSql, replacements)
 
-    if (mvServiceTypeIds.length > 0) {
-        whereSql += ` and a.serviceTypeId not in (?)`
-        replacements.push(mvServiceTypeIds)
-    }
+    let filter2 = filerByEndorseStatus(endorseTaskStatus)
+    addWhereSql(filter2, whereSql, replacements)
 
-    if (isEndorse) {
-        whereSql += ` and (CONCAT(b.executionDate,' ',b.executionTime) <= ?)`
-        replacements.push(moment().format(fmt))
-    }
+    let filter3 = filterByExecutionDate(execution_date)
+    addWhereSql(filter3, whereSql, replacements)
 
-    if (endorsed) {
-        whereSql += ` AND b.endorse = 1 `
-    }
 
-    if (endorseTaskStatus != "" && endorseTaskStatus != null) {
-        if (endorseTaskStatus == "-") {
-            whereSql += ` and b.taskStatus not in (?)`
-            replacements.push(indentStatus)
-        } else if (endorseTaskStatus == "Completed") {
-            whereSql += ` and b.taskStatus in (?)`
-            replacements.push([indentStatus[1]])
-        } else if (endorseTaskStatus == "Late Trip") {
-            whereSql += ` and b.taskStatus in (?)`
-            replacements.push([indentStatus[2]])
-        } else if (endorseTaskStatus == "No Show") {
-            whereSql += ` and b.taskStatus in (?)`
-            replacements.push([indentStatus[0]])
-        } else if (endorseTaskStatus == "Cancelled") {
-            whereSql += ` and b.taskStatus in (?)`
-            replacements.push([indentStatus[3], indentStatus[4]])
-        }
-    }
-    if (execution_date != "" && execution_date != null) {
-        if (execution_date.indexOf('~') != -1) {
-            const dates = execution_date.split(' ~ ')
-            whereSql += ` and (b.executionDate >= ? and b.executionDate <= ?)`
-            replacements.push(dates[0])
-            replacements.push(dates[1])
-        } else {
-            whereSql += ` and b.executionDate = ?`
-            replacements.push(`${execution_date}`)
-        }
-    }
-
-    if (vehicleType != "" && vehicleType != null) {
+    if (isNotEmptyNull(vehicleType)) {
         whereSql += ` and a.vehicleType = ?`
         replacements.push(vehicleType)
     }
 
-    if (tripNo != "" && tripNo != null) {
+    if (isNotEmptyNull(tripNo)) {
         whereSql += ` and a.tripNo like ?`
         replacements.push(`${tripNo}%`)
     }
-    if (unit != "" && unit != null) {
+    if (isNotEmptyNull(unit)) {
         whereSql += ` and f.groupId = ?`
         replacements.push(`${Number(unit)}`)
     }
 
-    if (created_date != "" && created_date != null) {
+    if (isNotEmptyNull(created_date)) {
         whereSql += ` and b.createdAt like ?`
         replacements.push(`${created_date}%`)
     }
 
-    if (status != "" && status != null) {
+    if (isNotEmptyNull(status)) {
         whereSql += ` and b.taskStatus = ?`
         replacements.push(status)
     }
@@ -365,126 +321,203 @@ const QueryEndorseDatas = async function (reqParams) {
         }
     );
 
-    if (pageResult.length > 0) {
-        let taskIds = pageResult.map(a => a.taskId)
-        let serviceTypeIds = pageResult.map(a => a.serviceTypeId)
-        let serviceModeIds = pageResult.map(a => a.serviceModeId)
-        let serviceProviderIds = pageResult.map(a => a.serviceProviderId)
-        let walletIds = pageResult.map(a => a.walletId)
+    if (pageResult.length == 0) {
+        return { data: pageResult, recordsFiltered: totalRecord, recordsTotal: totalRecord, user: user }
+    }
 
-        let ucoDetails = []
-        if (ROLE.OCC.indexOf(currentUserRole) != -1) {
-            ucoDetails = await sequelizeObj.query(
-                `SELECT 
+    let taskIds = pageResult.map(a => a.taskId)
+    let serviceTypeIds = pageResult.map(a => a.serviceTypeId)
+    let serviceModeIds = pageResult.map(a => a.serviceModeId)
+    let serviceProviderIds = pageResult.map(a => a.serviceProviderId)
+    let walletIds = pageResult.map(a => a.walletId)
+
+
+
+    let serviceTypes = await ServiceType.findAll({
+        attributes: ['id', 'category'],
+        where: {
+            id: {
+                [Op.in]: serviceTypeIds
+            }
+        }
+    });
+    let serviceModes = await ServiceMode.findAll({
+        attributes: ['id', 'name', 'value'],
+        where: {
+            id: {
+                [Op.in]: serviceModeIds
+            }
+        }
+    });
+    let serviceProviders = await ServiceProvider.findAll({
+        attributes: ['id', 'name'],
+        where: {
+            id: {
+                [Op.in]: serviceProviderIds
+            }
+        }
+    });
+    let wallets = await Wallet.findAll({
+        attributes: ['id', 'walletName'],
+        where: {
+            id: {
+                [Op.in]: walletIds
+            }
+        }
+    });
+
+    let ucoDetails = []
+    if (ROLE.OCC.indexOf(currentUserRole) != -1) {
+        ucoDetails = await sequelizeObj.query(
+            `SELECT 
                     a.taskId, b.contactNumber, b.username 
                 from 
                     (SELECT taskId, operatorId from operation_history where taskId in (?) and action = 'Endorse') a 
                 LEFT JOIN \`user\` b on a.operatorId = b.id`,
-                {
-                    replacements: [taskIds],
-                    type: QueryTypes.SELECT,
-                }
-            );
-        }
-        // let drivers = await Driver.findAll({
-        //     where: {
-        //         taskId: {
-        //             [Op.in]: taskIds
-        //         }
-        //     }
-        // });
-        // let vehicles = await Vehicle.findAll({
-        //     where: {
-        //         taskId: {
-        //             [Op.in]: taskIds
-        //         }
-        //     }
-        // });
-        let serviceTypes = await ServiceType.findAll({
-            attributes: ['id', 'category'],
-            where: {
-                id: {
-                    [Op.in]: serviceTypeIds
-                }
+            {
+                replacements: [taskIds],
+                type: QueryTypes.SELECT,
             }
-        });
-        let serviceModes = await ServiceMode.findAll({
-            attributes: ['id', 'name', 'value'],
-            where: {
-                id: {
-                    [Op.in]: serviceModeIds
-                }
-            }
-        });
-        let serviceProviders = await ServiceProvider.findAll({
-            attributes: ['id', 'name'],
-            where: {
-                id: {
-                    [Op.in]: serviceProviderIds
-                }
-            }
-        });
-        let wallets = await Wallet.findAll({
-            attributes: ['id', 'walletName'],
-            where: {
-                id: {
-                    [Op.in]: walletIds
-                }
-            }
-        });
+        );
+    }
 
-        for (let row of pageResult) {
-            // row.driverId = null
-            // row.status = null
-            // row.name = null
-            // row.nric = null
-            // row.contactNumber = null
-            // row.vehicleNumber = null
-            row.tsp = null
-            row.category = null
-            row.serviceMode = null
-            // row.serviceModeName = null
-            row.walletName = null
-            row.ucoDetail = null
-
-            // let driver = drivers.find(a => a.taskId == row.taskId)
-            // if (driver) {
-            //     row.driverId = driver.driverId
-            //     row.status = driver.status
-            //     row.name = driver.name
-            //     row.nric = driver.nric
-            //     row.contactNumber = driver.contactNumber
-            // }
-            // let vehicle = vehicles.find(a => a.taskId == row.taskId)
-            // if (vehicle) {
-            //     row.vehicleNumber = driver.vehicleNumber
-            // }
-            let serviceProvider = serviceProviders.find(a => a.id == row.serviceProviderId)
-            if (serviceProvider) {
-                row.tsp = serviceProvider.name
-            }
-            let serviceType = serviceTypes.find(a => a.id == row.serviceTypeId)
-            if (serviceType) {
-                row.category = serviceType.category
-            }
-            let serviceMode = serviceModes.find(a => a.id == row.serviceModeId)
-            if (serviceMode) {
-                row.serviceMode = serviceMode.value
-                // row.serviceModeName = serviceMode.name
-            }
-            let wallet = wallets.find(a => a.id == row.walletId)
-            if (wallet) {
-                row.walletName = wallet.walletName
-            }
-
-            if (ucoDetails.length > 0) {
-                let ucoDetail = ucoDetails.find(a => a.taskId == row.taskId)
-                if (ucoDetail) {
-                    row.ucoDetail = ucoDetail
-                }
-            }
-        }
+    for (let row of pageResult) {
+        row.tsp = getRowTSPName(serviceProviders, row)
+        row.category = getRowCategory(serviceTypes, row)
+        row.serviceMode = getRowServiceMode(serviceModes, row)
+        row.walletName = getRowWalletName(wallets, row)
+        row.ucoDetail = getRowUCODetail(ucoDetails, row)
     }
     console.timeEnd("QueryEndorseDatas")
     return { data: pageResult, recordsFiltered: totalRecord, recordsTotal: totalRecord, user: user }
+}
+
+const addWhereSql = function (filters, whereSql, replacements) {
+    if (filters.whereSql) {
+        whereSql += filters.whereSql
+    }
+    if (filters.replacements) {
+        replacements.push(...filters.replacements)
+    }
+}
+
+const filterByUserRole = function (currentUserRole, user, mvServiceTypeIds, isEndorse, endorsed) {
+    let whereSql = ""
+    let replacements = []
+    if (currentUserRole == ROLE.RF || ROLE.OCC.indexOf(currentUserRole) != -1) {
+        whereSql += ` and FIND_IN_SET(a.serviceTypeId, ?)`
+        replacements.push(user.serviceTypeId)
+    } else if (currentUserRole == ROLE.UCO || currentUserRole == ROLE.RQ) {
+        whereSql += ` and f.groupId = ?`
+        replacements.push(user.group)
+    } else if (currentUserRole == ROLE.TSP) {
+        whereSql += ` and FIND_IN_SET(b.serviceProviderId, ?)`
+        replacements.push(user.serviceProviderId)
+    }
+
+    if (mvServiceTypeIds.length > 0) {
+        whereSql += ` and a.serviceTypeId not in (?)`
+        replacements.push(mvServiceTypeIds)
+    }
+
+    if (isEndorse) {
+        whereSql += ` and (CONCAT(b.executionDate,' ',b.executionTime) <= ?)`
+        replacements.push(moment().format(fmt))
+    }
+
+    if (endorsed) {
+        whereSql += ` AND b.endorse = 1 `
+    }
+    return { whereSql, replacements }
+}
+
+const filerByEndorseStatus = function (endorseTaskStatus) {
+    let whereSql = ""
+    let replacements = []
+    if (endorseTaskStatus == "" || endorseTaskStatus == null) {
+        return { whereSql, replacements }
+    }
+
+    if (endorseTaskStatus == "-") {
+        whereSql += ` and b.taskStatus not in (?)`
+        replacements.push(indentStatus)
+    } else if (endorseTaskStatus == "Completed") {
+        whereSql += ` and b.taskStatus in (?)`
+        replacements.push([indentStatus[1]])
+    } else if (endorseTaskStatus == "Late Trip") {
+        whereSql += ` and b.taskStatus in (?)`
+        replacements.push([indentStatus[2]])
+    } else if (endorseTaskStatus == "No Show") {
+        whereSql += ` and b.taskStatus in (?)`
+        replacements.push([indentStatus[0]])
+    } else if (endorseTaskStatus == "Cancelled") {
+        whereSql += ` and b.taskStatus in (?)`
+        replacements.push([indentStatus[3], indentStatus[4]])
+    }
+    return { whereSql, replacements }
+}
+
+const filterByExecutionDate = function (execution_date) {
+    let whereSql = ""
+    let replacements = []
+    if (execution_date != "" && execution_date != null) {
+        if (execution_date.indexOf('~') != -1) {
+            const dates = execution_date.split(' ~ ')
+            whereSql += ` and (b.executionDate >= ? and b.executionDate <= ?)`
+            replacements.push(dates[0])
+            replacements.push(dates[1])
+        } else {
+            whereSql += ` and b.executionDate = ?`
+            replacements.push(`${execution_date}`)
+        }
+    }
+    return { whereSql, replacements }
+
+}
+
+const getRowTSPName = function (serviceProviders, row) {
+    let serviceProvider = serviceProviders.find(a => a.id == row.serviceProviderId)
+    if (serviceProvider) {
+        return serviceProvider.name
+    }
+    return null
+}
+
+const getRowCategory = function (serviceTypes, row) {
+    let serviceType = serviceTypes.find(a => a.id == row.serviceTypeId)
+    if (serviceType) {
+        return serviceType.category
+    }
+    return null
+
+}
+
+const getRowServiceMode = function (serviceModes, row) {
+    let serviceMode = serviceModes.find(a => a.id == row.serviceModeId)
+    if (serviceMode) {
+        return serviceMode.value
+    }
+    return null
+}
+
+const getRowWalletName = function (wallets, row) {
+    let wallet = wallets.find(a => a.id == row.walletId)
+    if (wallet) {
+        return wallet.walletName
+    }
+    return null
+}
+
+const getRowUCODetail = function (ucoDetails, row) {
+    if (ucoDetails.length > 0) {
+        let ucoDetail = ucoDetails.find(a => a.taskId == row.taskId)
+        if (ucoDetail) {
+            return ucoDetail
+        }
+    }
+    return null
+}
+
+const isNotEmptyNull = function (value) {
+    return value != "" && value != null
 }
