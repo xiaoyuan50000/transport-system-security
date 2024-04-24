@@ -968,7 +968,7 @@ const GetFulfilment = function (result, contracts) {
                 }]
             }
 
-            let contractNos = _.groupBy(datas, "contractNo")
+            let contractNos = _.groupBy(indnetByTSP, "contractNo")
             let contractPieChartData = Object.keys(contractNos).map((key) => {
                 let contract = contracts.find(a => a.contractNo == key)
                 if (contract) {

@@ -64,6 +64,61 @@ function UpdateDataByUpdatesJSON(obj, dataObj) {
 }
 
 function UpdateSpecialField(obj, dataObj, key) {
+
+
+    const setTaskAssignment = function (task_assignment, dataObj) {
+        if (task_assignment.hasOwnProperty("driver_id")) {
+            dataObj.task_assignment.driver.id = task_assignment["driver_id"]
+            if (task_assignment["driver_id"] instanceof Array) {
+                dataObj.task_assignment.driver.id = task_assignment["driver_id"].slice(-1)[0]
+            }
+        }
+        if (task_assignment.hasOwnProperty("vehicle_id")) {
+            dataObj.task_assignment.vehicle.id = task_assignment["vehicle_id"]
+            if (task_assignment["vehicle_id"] instanceof Array) {
+                dataObj.task_assignment.vehicle.id = task_assignment["vehicle_id"].slice(-1)[0]
+            }
+        }
+        if (task_assignment.hasOwnProperty("vehicle_part_id")) {
+            dataObj.task_assignment.vehicle_part.id = task_assignment["vehicle_part_id"]
+        }
+        if (task_assignment.hasOwnProperty("estimated_start_time")) {
+            dataObj.task_assignment.estimated_start_time = task_assignment["estimated_start_time"]
+        }
+        if (task_assignment.hasOwnProperty("travel_time")) {
+            dataObj.task_assignment.travel_time = task_assignment["travel_time"]
+        }
+    }
+
+    const setTaskAssignmentNull = function (dataObj) {
+        if (!dataObj.task_assignment.hasOwnProperty("driver") || dataObj.task_assignment.driver == null) {
+            dataObj.task_assignment.driver = {
+                "id": null,
+                "name": "",
+                "contact_number": "",
+            }
+        }
+        if (!dataObj.task_assignment.hasOwnProperty("vehicle") || dataObj.task_assignment.vehicle == null) {
+            dataObj.task_assignment.vehicle = {
+                "id": null,
+                "plate_number": ""
+            }
+        }
+        if (!dataObj.task_assignment.hasOwnProperty("vehicle_part") || dataObj.task_assignment.vehicle_part == null) {
+            dataObj.task_assignment.vehicle_part = {
+                "id": null,
+                "plate_number": ""
+            }
+        }
+        if (!dataObj.task_assignment.hasOwnProperty("attendant") || dataObj.task_assignment.attendant == null) {
+            dataObj.task_assignment.attendant = {
+                "id": null,
+                "name": "",
+                "contact_number": ""
+            }
+        }
+    }
+
     if (key === specialKey[0]) {
         dataObj.time_window_id = obj[key].slice(-1)[0]
     } else if (key === specialKey[1]) {
@@ -100,58 +155,11 @@ function UpdateSpecialField(obj, dataObj, key) {
         if (!dataObj.hasOwnProperty("task_assignment")) {
             dataObj.task_assignment = update_task_assignment
         } else {
-            if (!dataObj.task_assignment.hasOwnProperty("driver") || dataObj.task_assignment.driver == null) {
-                dataObj.task_assignment.driver = {
-                    "id": null,
-                    "name": "",
-                    "contact_number": "",
-                }
-            }
-            if (!dataObj.task_assignment.hasOwnProperty("vehicle") || dataObj.task_assignment.vehicle == null) {
-                dataObj.task_assignment.vehicle = {
-                    "id": null,
-                    "plate_number": ""
-                }
-            }
-            if (!dataObj.task_assignment.hasOwnProperty("vehicle_part") || dataObj.task_assignment.vehicle_part == null) {
-                dataObj.task_assignment.vehicle_part = {
-                    "id": null,
-                    "plate_number": ""
-                }
-            }
-            if (!dataObj.task_assignment.hasOwnProperty("attendant") || dataObj.task_assignment.attendant == null) {
-                dataObj.task_assignment.attendant = {
-                    "id": null,
-                    "name": "",
-                    "contact_number": ""
-                }
-            }
+            setTaskAssignmentNull(dataObj)
         }
 
         let task_assignment = obj[key]
-        if (task_assignment.hasOwnProperty("driver_id")) {
-            if (task_assignment["driver_id"] instanceof Array) {
-                dataObj.task_assignment.driver.id = task_assignment["driver_id"].slice(-1)[0]
-            } else {
-                dataObj.task_assignment.driver.id = task_assignment["driver_id"]
-            }
-        }
-        if (task_assignment.hasOwnProperty("vehicle_id")) {
-            if (task_assignment["vehicle_id"] instanceof Array) {
-                dataObj.task_assignment.vehicle.id = task_assignment["vehicle_id"].slice(-1)[0]
-            } else {
-                dataObj.task_assignment.vehicle.id = task_assignment["vehicle_id"]
-            }
-        }
-        if (task_assignment.hasOwnProperty("vehicle_part_id")) {
-            dataObj.task_assignment.vehicle_part.id = task_assignment["vehicle_part_id"]
-        }
-        if (task_assignment.hasOwnProperty("estimated_start_time")) {
-            dataObj.task_assignment.estimated_start_time = task_assignment["estimated_start_time"]
-        }
-        if (task_assignment.hasOwnProperty("travel_time")) {
-            dataObj.task_assignment.travel_time = task_assignment["travel_time"]
-        }
+        setTaskAssignment(task_assignment, dataObj)
     }
 }
 
@@ -257,222 +265,245 @@ async function updateJob(reqObj) {
     }
 }
 
+const isCancelledAPI = function (reqObj) {
+    if (reqObj.updates.hasOwnProperty("state") && reqObj.updates.state[1].toLowerCase().indexOf("cancel") != -1 && reqObj.user.name == "External API") {
+        systemReceiveFrom3rdLog.info("transportJsonApi cancelled intercept.")
+        return true
+    }
+    return false
+}
+
+
+const setDriverObj = async function (reqObj, driverObj, updateObj, task, secretID, secretKey) {
+    if (reqObj.updates.task_assignment.hasOwnProperty("driver_id")) {
+        driverObj.assign = true
+        let driverId = reqObj.updates.task_assignment.driver_id;
+        if (reqObj.updates.task_assignment.driver_id instanceof Array) {
+            driverId = reqObj.updates.task_assignment.driver_id[1]
+        }
+        driverObj.id = driverId
+        updateObj.driverId = driverId
+        if (driverId != null) {
+            let driver = await Utils.GetDriverFrom3rd(driverId, secretID, secretKey)
+            driverObj.data = {
+                taskId: task.id,
+                driverId: driverId,
+                status: driver.driver.status,
+                name: driver.driver.name,
+                contactNumber: driver.driver.contact_number,
+                data: JSON.stringify(driver),
+            }
+        }
+    }
+}
+
+const setVehicleObj = async function (reqObj, vehicleObj, task, secretID, secretKey) {
+    if (reqObj.updates.task_assignment.hasOwnProperty("vehicle_id")) {
+        vehicleObj.assign = true
+        let vehicleId = reqObj.updates.task_assignment.vehicle_id;
+        if (reqObj.updates.task_assignment.vehicle_id instanceof Array) {
+            vehicleId = reqObj.updates.task_assignment.vehicle_id[1]
+        }
+        vehicleObj.id = vehicleId
+        if (vehicleId != null) {
+            let vehicle = await Utils.GetVehicleFrom3rd(vehicleId, secretID, secretKey)
+            vehicleObj.data = {
+                taskId: task.id,
+                vehicleId: vehicleId,
+                vehicleStatus: vehicle.vehicle.status,
+                vehicleNumber: vehicle.vehicle.plate_number,
+                data: JSON.stringify(vehicle),
+            }
+        }
+    }
+}
+
+const getAllocationState = function (allocation_state) {
+    if (allocation_state == "allocation_declined") {
+        return "declined"
+    } else if (allocation_state == "allocation_pending") {
+        return "pending"
+    }
+    return allocation_state
+}
+
+const getCancelltionTime = function (reqObj) {
+    if (reqObj.updates.hasOwnProperty("state_updated_at")) {
+        let state_updated_at = reqObj.updates.state_updated_at[1].split(" ")
+        let created_at = `${state_updated_at[0]}T${state_updated_at[1]}${state_updated_at[2]}`
+        return created_at
+    }
+    return moment(reqObj.timestamp).format("YYYY-MM-DD HH:mm:ss")
+}
+
+const doDriverAction = async function (driverObj, task) {
+    if (driverObj.assign) {
+        if (driverObj.id != null) {
+            let driver = await Driver.findByPk(task.id)
+            if (driver == null) {
+                await Driver.create(driverObj.data)
+            } else {
+                await Driver.update(driverObj.data, { where: { taskId: task.id } })
+            }
+        } else {
+            await Driver.destroy({ where: { taskId: task.id } })
+        }
+    }
+}
+
+const doVehicleAction = async function (vehicleObj, task) {
+    if (vehicleObj.assign) {
+        if (vehicleObj.id != null) {
+            let vehicle = await Vehicle.findByPk(task.id)
+            if (vehicle == null) {
+                await Vehicle.create(vehicleObj.data)
+            } else {
+                await Vehicle.update(vehicleObj.data, { where: { taskId: task.id } })
+            }
+        } else {
+            await Vehicle.destroy({ where: { taskId: task.id } })
+        }
+    }
+}
+
+const recordStateChange = async function (reqObj, task) {
+    let newState = reqObj.updates.state[1].split("_").join(" ");
+    if (newState.indexOf("cancel") != -1) {
+        newState = "cancelled by TSP"
+    }
+    await requestService.RecordOperationHistory2(task.requestId, task.tripId, task.id, -1, newState, newState, "", JSON.stringify(reqObj))
+
+    let job = await Job2.findByPk(task.tripId)
+    if (Number(job.noOfVehicle) == 1) {
+        job.status = newState
+        if (newState == "cancelled by TSP") {
+            job.instanceId = null
+        }
+        await job.save();
+    }
+}
+
 async function updateTask(reqObj) {
-    try {
-        return await Task2.findOne({
-            where: {
-                externalTaskId: reqObj.data.id
+    return await Task2.findOne({
+        where: {
+            externalTaskId: reqObj.data.id
+        }
+    }).then(async (task) => {
+        if (task === null) {
+            systemReceiveFrom3rdLog.error('(updateTask) : ', 'Can not find task by data id.');
+            return false;
+        }
+
+        if (isCancelledAPI(reqObj)) {
+            return
+        }
+        let updateObj = UpdateDataModel(reqObj, task);
+        let historyObj = GetInsertHistoryDataModel(updateObj);
+
+        if (reqObj.updates.hasOwnProperty("photos")) {
+            DownloadPhotos(reqObj.updates.photos);
+        }
+        if (reqObj.updates.hasOwnProperty("time_from")) {
+            updateObj.startDate = reqObj.updates.time_from[1]
+        }
+        if (reqObj.updates.hasOwnProperty("time_to")) {
+            updateObj.endDate = reqObj.updates.time_to[1]
+        }
+        // update task assignment
+        let driverObj = { assign: false, id: null, data: null };
+        let vehicleObj = { assign: false, id: null, data: null };
+        if (reqObj.updates.hasOwnProperty("task_assignment")) {
+            let serviceProvider = await ServiceProvider.findByPk(task.serviceProviderId)
+            let secretID = serviceProvider.secretID
+            let secretKey = serviceProvider.secretKey
+
+            await setDriverObj(reqObj, driverObj, updateObj, task, secretID, secretKey)
+
+            await setVehicleObj(reqObj, vehicleObj, task, secretID, secretKey)
+        }
+
+        // update state
+        if (reqObj.updates.hasOwnProperty("allocation_state")) {
+            let allocation_state = reqObj.updates.allocation_state[1]
+            updateObj.state = getAllocationState(allocation_state)
+            historyObj.state = updateObj.state
+            updateObj.taskStatus = updateObj.state
+        }
+
+        // update address
+        if (reqObj.updates.hasOwnProperty("address")) {
+            let address = reqObj.updates.address
+            if (address.hasOwnProperty("line_1")) {
+                updateObj.pickupDestination = address.line_1[1]
             }
-        }).then(async (task) => {
-            if (task === null) {
-                systemReceiveFrom3rdLog.error('(updateTask) : ', 'Can not find task by data id.');
-                return false;
+        }
+        // update state
+        if (reqObj.updates.hasOwnProperty("state")) {
+            let state = reqObj.updates.state[1].split("_").join(" ");
+            updateObj.state = state
+            historyObj.state = state
+            updateObj.taskStatus = state
+        }
+        historyObj.jobId = task.tripId;
+        // delete don't need field
+        delete updateObj.type
+        delete updateObj.modelName
+        delete updateObj.user
+        delete updateObj.timestamp
+
+        return await sequelizeObj.transaction(async (t1) => {
+            if (updateObj.state == "declined") {
+                updateObj.driverId = null
             }
 
+            if (updateObj.taskStatus.indexOf("cancel") != -1) {
+                updateObj.taskStatus = "cancelled by TSP"
+                updateObj.externalTaskId = null
+                updateObj.externalJobId = null
+                updateObj.driverId = null
+                updateObj.cancellationTime = getCancelltionTime(reqObj)
+            }
+
+            await task.update(updateObj);
+            await task.save();
+            await TaskHistory.create(historyObj);
+
+            await doDriverAction(driverObj, task)
+            await doVehicleAction(vehicleObj, task)
+
+
+            // record state change
             if (reqObj.updates.hasOwnProperty("state")) {
-                if (reqObj.updates.state[1].toLowerCase().indexOf("cancel") != -1 && reqObj.user.name == "External API") {
-                    systemReceiveFrom3rdLog.info("transportJsonApi cancelled intercept.")
-                    return
-                }
+                await recordStateChange(reqObj, task)
             }
-            let updateObj = UpdateDataModel(reqObj, task);
-            let historyObj = GetInsertHistoryDataModel(updateObj);
-
-            if (reqObj.updates.hasOwnProperty("photos")) {
-                DownloadPhotos(reqObj.updates.photos);
-            }
-            if (reqObj.updates.hasOwnProperty("time_from")) {
-                updateObj.startDate = reqObj.updates.time_from[1]
-            }
-            if (reqObj.updates.hasOwnProperty("time_to")) {
-                updateObj.endDate = reqObj.updates.time_to[1]
-            }
-            // update task assignment
-            let driverObj = { assign: false, id: null, data: null };
-            let vehicleObj = { assign: false, id: null, data: null };
-            if (reqObj.updates.hasOwnProperty("task_assignment")) {
-                // let job = await Job2.findByPk(task.tripId)
-                let serviceProvider = await ServiceProvider.findByPk(task.serviceProviderId)
-                let secretID = serviceProvider.secretID
-                let secretKey = serviceProvider.secretKey
-                if (reqObj.updates.task_assignment.hasOwnProperty("driver_id")) {
-                    driverObj.assign = true
-                    let driverId = null;
-                    if (reqObj.updates.task_assignment.driver_id instanceof Array) {
-                        driverId = reqObj.updates.task_assignment.driver_id[1]
-                    } else {
-                        driverId = reqObj.updates.task_assignment.driver_id
-                    }
-                    driverObj.id = driverId
-                    updateObj.driverId = driverId
-                    if (driverId != null) {
-                        let driver = await Utils.GetDriverFrom3rd(driverId, secretID, secretKey)
-                        driverObj.data = {
-                            taskId: task.id,
-                            driverId: driverId,
-                            status: driver.driver.status,
-                            name: driver.driver.name,
-                            // nric: driver.driver.nric,
-                            contactNumber: driver.driver.contact_number,
-                            data: JSON.stringify(driver),
-                        }
-                    }
-                }
-
-                if (reqObj.updates.task_assignment.hasOwnProperty("vehicle_id")) {
-                    vehicleObj.assign = true
-                    let vehicleId = null;
-                    if (reqObj.updates.task_assignment.vehicle_id instanceof Array) {
-                        vehicleId = reqObj.updates.task_assignment.vehicle_id[1]
-                    } else {
-                        vehicleId = reqObj.updates.task_assignment.vehicle_id
-                    }
-                    vehicleObj.id = vehicleId
-                    if (vehicleId != null) {
-                        let vehicle = await Utils.GetVehicleFrom3rd(vehicleId, secretID, secretKey)
-                        vehicleObj.data = {
-                            taskId: task.id,
-                            vehicleId: vehicleId,
-                            vehicleStatus: vehicle.vehicle.status,
-                            vehicleNumber: vehicle.vehicle.plate_number,
-                            data: JSON.stringify(vehicle),
-                        }
-                    }
-                }
-            }
-
-            // update state
-            if (reqObj.updates.hasOwnProperty("allocation_state")) {
+            else if (reqObj.updates.hasOwnProperty("allocation_state")) {
                 let allocation_state = reqObj.updates.allocation_state[1]
                 if (allocation_state == "allocation_declined") {
-                    updateObj.state = "declined"
-                } else if (allocation_state == "allocation_pending") {
-                    updateObj.state = "pending"
-                } else {
-                    updateObj.state = allocation_state
-                }
-                historyObj.state = updateObj.state
-                updateObj.taskStatus = updateObj.state
-            }
-
-            // update address
-            if (reqObj.updates.hasOwnProperty("address")) {
-                let address = reqObj.updates.address
-                if (address.hasOwnProperty("line_1")) {
-                    updateObj.pickupDestination = address.line_1[1]
-                }
-            }
-            // update state
-            if (reqObj.updates.hasOwnProperty("state")) {
-                let state = reqObj.updates.state[1].split("_").join(" ");
-                updateObj.state = state
-                historyObj.state = state
-                updateObj.taskStatus = state
-            }
-            historyObj.jobId = task.tripId;
-            // delete don't need field
-            delete updateObj.type
-            delete updateObj.modelName
-            delete updateObj.user
-            delete updateObj.timestamp
-
-            return await sequelizeObj.transaction(async (t1) => {
-                if (updateObj.state == "declined") {
-                    updateObj.driverId = null
-                }
-
-                if (updateObj.taskStatus.indexOf("cancel") != -1) {
-                    updateObj.taskStatus = "cancelled by TSP"
-                    updateObj.externalTaskId = null
-                    updateObj.externalJobId = null
-                    updateObj.driverId = null
-
-                    if (reqObj.updates.hasOwnProperty("state_updated_at")) {
-                        let state_updated_at = reqObj.updates.state_updated_at[1].split(" ")
-                        let created_at = `${state_updated_at[0]}T${state_updated_at[1]}${state_updated_at[2]}`
-                        updateObj.cancellationTime = created_at
-                    } else {
-                        updateObj.cancellationTime = moment(reqObj.timestamp).format("YYYY-MM-DD HH:mm:ss")
-                    }
-                }
-
-                await task.update(updateObj);
-                await task.save();
-                await TaskHistory.create(historyObj);
-
-                if (driverObj.assign) {
-                    if (driverObj.id != null) {
-                        let driver = await Driver.findByPk(task.id)
-                        if (driver == null) {
-                            await Driver.create(driverObj.data)
-                        } else {
-                            await Driver.update(driverObj.data, { where: { taskId: task.id } })
-                        }
-                    } else {
-                        await Driver.destroy({ where: { taskId: task.id } })
-                    }
-                }
-                if (vehicleObj.assign) {
-                    if (vehicleObj.id != null) {
-                        let vehicle = await Vehicle.findByPk(task.id)
-                        if (vehicle == null) {
-                            await Vehicle.create(vehicleObj.data)
-                        } else {
-                            await Vehicle.update(vehicleObj.data, { where: { taskId: task.id } })
-                        }
-                    } else {
-                        await Vehicle.destroy({ where: { taskId: task.id } })
-                    }
-                }
-
-                // record state change
-                if (reqObj.updates.hasOwnProperty("state")) {
-                    let newState = reqObj.updates.state[1].split("_").join(" ");
-                    if (newState.indexOf("cancel") != -1) {
-                        newState = "cancelled by TSP"
-                    }
-                    await requestService.RecordOperationHistory2(task.requestId, task.tripId, task.id, -1, newState, newState, "", JSON.stringify(reqObj))
+                    let newState = "declined"
+                    let content = reqObj.data.task_allocation_rejection_notes[0].content
+                    await requestService.RecordOperationHistory2(task.requestId, task.tripId, task.id, -1, newState, newState, content, JSON.stringify(reqObj))
 
                     let job = await Job2.findByPk(task.tripId)
                     if (Number(job.noOfVehicle) == 1) {
                         job.status = newState
-                        if (newState == "cancelled by TSP") {
-                            job.instanceId = null
-                        }
                         await job.save();
                     }
                 }
-                else if (reqObj.updates.hasOwnProperty("allocation_state")) {
-                    let allocation_state = reqObj.updates.allocation_state[1]
-                    if (allocation_state == "allocation_declined") {
-                        let newState = "declined"
-                        let content = reqObj.data.task_allocation_rejection_notes[0].content
-                        await requestService.RecordOperationHistory2(task.requestId, task.tripId, task.id, -1, newState, newState, content, JSON.stringify(reqObj))
-
-                        let job = await Job2.findByPk(task.tripId)
-                        if (Number(job.noOfVehicle) == 1) {
-                            job.status = newState
-                            await job.save();
-                        }
-                    }
-                }
-                // ack
-                if (updateObj.taskStatus.indexOf("cancel") != -1) {
-                    await atmsAckService.SaveCancelByTSPForATMSAck(task)
-                }
-                if (driverObj.assign) {
-                    await atmsAckService.SaveDriverAssignedForATMSAck(task)
-                }
-                return true;
-            });
-        }).catch(ex => {
-            systemReceiveFrom3rdLog.error(ex);
-            return false;
+            }
+            // ack
+            if (updateObj.taskStatus.indexOf("cancel") != -1) {
+                await atmsAckService.SaveCancelByTSPForATMSAck(task)
+            }
+            if (driverObj.assign) {
+                await atmsAckService.SaveDriverAssignedForATMSAck(task)
+            }
+            return true;
         });
-    } catch (ex) {
+    }).catch(ex => {
         systemReceiveFrom3rdLog.error(ex);
         return false;
-    }
+    });
+
 }
 
 async function cancelledByTSP(reqObj) {
@@ -665,7 +696,7 @@ module.exports.AffectTaskAccept = async function (body) {
                 await OperationHistory.create(data)
             }
             // ack
-            await atmsAckService.SaveATMSAck(trip, [task], 'R', 'U', null) 
+            await atmsAckService.SaveATMSAck(trip, [task], 'R', 'U', null)
         }).catch(ex => {
             systemReceiveFrom3rdLog.error(ex);
             return false;

@@ -17,7 +17,7 @@ const requestService = require('../services/requestService2')
 const { sequelizeDriverObj } = require('../sequelize/dbConf-driver')
 const _ = require('lodash');
 const moment = require('moment');
-const { FormatPrice } = require('../util/utils')
+const { FormatPrice, isNotEmptyNull } = require('../util/utils')
 
 
 require('express-async-errors');
@@ -101,30 +101,22 @@ module.exports.GetContractTableList = async function (req, res) {
     let { contractName, serviceProvider, performanceGrade, poType, spendingAlert } = req.body
     let filter = ``
     let replacements = []
-    if (contractName != "" && contractName != null) {
+    if (isNotEmptyNull(contractName)) {
         filter += ` and a.name like ?`
         replacements.push(`%${contractName}%`)
     }
 
-    if (serviceProvider != "" && serviceProvider != null) {
-        // if (serviceProvider.indexOf(unitIdPrefix) != -1) {
-        //     let unitId = serviceProvider.split(unitIdPrefix)[1]
-        //     filter += ` and a.mobiusUnitId = ?`
-        //     replacements.push(unitId)
-        // } else {
-        //     filter += ` and a.serviceProviderId = ?`
-        //     replacements.push(serviceProvider)
-        // }
+    if (isNotEmptyNull(serviceProvider)) {
         filter += ` and a.serviceProviderId = ?`
         replacements.push(serviceProvider)
     }
 
-    if (performanceGrade != "" && performanceGrade != null) {
+    if (isNotEmptyNull(performanceGrade)) {
         filter += ` and a.performanceGrade = ?`
         replacements.push(performanceGrade)
     }
 
-    if (poType != "" && poType != null) {
+    if (isNotEmptyNull(poType)) {
         filter += ` and FIND_IN_SET(?, a.poType)`
         replacements.push(poType)
     }
@@ -141,7 +133,7 @@ module.exports.GetContractTableList = async function (req, res) {
         }
     }
 
-    if (spendingAlert != "" && spendingAlert != null) {
+    if (isNotEmptyNull(spendingAlert)) {
         let result = await GetReachedSpendingAlertContract(roleName, userId, serviceModeIds)
         let contractNoList = result.filter(o => o.color == spendingAlert).map(o => o.name)
         if (contractNoList.length > 0) {

@@ -111,7 +111,7 @@ const doCreateUser = async function (req, res, isPoc) {
         groupId = Number(groupId)
 
         let group = await Group.findByPk(groupId)
-        groupName = group.groupName
+        let groupName = group.groupName
         return { groupId, groupName }
     }
 
@@ -171,6 +171,14 @@ const doCreateUser = async function (req, res, isPoc) {
         return user.loginName
     }
 
+    const isCreateOrEdit = function (id) {
+        return id == "" || id == null
+    }
+
+    const isUserNameValid = function (isPoc, username) {
+        return !isPoc && username.split(" ").join("").length < 3
+    }
+
     try {
         let id = req.body.id
         let nric = req.body.nric
@@ -184,9 +192,9 @@ const doCreateUser = async function (req, res, isPoc) {
 
         let loginName = "";
         let password = "";
-        let isCreate = (id == "" || id == null)
+        let isCreate = isCreateOrEdit(id)
 
-        if (!isPoc && username.split(" ").join("").length < 3) {
+        if (isUserNameValid()) {
             return Response.error(res, "Create user failed! The length of the name must be greater than 3!")
         }
 
