@@ -15,7 +15,7 @@ const { Contract } = require('../model/contract.js')
 const { Group } = require('../model/group.js')
 const { ServiceProvider } = require('../model/serviceProvider.js')
 const { Wallet } = require('../model/wallet.js')
-const { FormatPrice } = require('../util/utils')
+const { FormatPrice, isNotEmptyNull } = require('../util/utils')
 const invoiceService = require('../services/invoiceService.js')
 
 const fmt = 'YYYY-MM'
@@ -179,17 +179,17 @@ const GetFeedBack = function (mvServiceTypeIds, userInfo, unit, tsp, month, year
                 replacements.push(userInfo.groupId)
             }
 
-            if (unit && unit != "") {
+            if (isNotEmptyNull(unit)) {
                 filter += ` and groupId = ?`
                 replacements.push(unit)
             }
-            if (tsp && tsp != "") {
+            if (isNotEmptyNull(tsp)) {
                 taskFilter += ` and serviceProviderId = ${tsp}`
             }
-            if (month && month != "") {
+            if (isNotEmptyNull(month)) {
                 taskFilter += ` and MONTH(executionDate) = ${month}`
             }
-            if (year && year != "") {
+            if (isNotEmptyNull(year)) {
                 taskFilter += ` and YEAR(executionDate) = ${year}`
             }
             let result = await sequelizeObj.query(
@@ -212,14 +212,14 @@ const GetFeedBack = function (mvServiceTypeIds, userInfo, unit, tsp, month, year
             let taskIdArr = result.map(a => a.id)
 
             let mobiusFilter = ""
-            if (month && month != "") {
+            if (isNotEmptyNull(month)) {
                 mobiusFilter += ` and MONTH(indentStartTime) = ${month}`
             }
-            if (year && year != "") {
+            if (isNotEmptyNull(year)) {
                 mobiusFilter += ` and YEAR(indentStartTime) = ${year}`
             }
             let unitFilter = ""
-            if (unitName && unitName != "") {
+            if (isNotEmptyNull(unitName)) {
                 unitFilter += ` and b.group = '${unitName}'`
             }
             let mobiusTaskResult = await sequelizeDriverObj.query(
@@ -243,15 +243,8 @@ const GetFeedBack = function (mvServiceTypeIds, userInfo, unit, tsp, month, year
                 return taskIdArr.includes(Number(o.taskId))
             })
 
-            let incidentResult = []
-            let nearMissResult = []
-            for (let row of newMobiusTaskResult) {
-                if (row.type == FEEDBACK.INCIDENT) {
-                    incidentResult.push(row)
-                } else if (row.type == FEEDBACK.NEARMISS) {
-                    nearMissResult.push(row)
-                }
-            }
+            let incidentResult = newMobiusTaskResult.filter(o => o.type == FEEDBACK.INCIDENT)
+            let nearMissResult = newMobiusTaskResult.filter(o => o.type == FEEDBACK.NEARMISS)
 
             let totalIncident = incidentResult.length
             let totalNearMiss = nearMissResult.length
@@ -557,41 +550,48 @@ const GetYetToFulfil = function (result) {
 
 }
 
+const GetFulfilmentIndentPurpose = function (datas) {
+    let lateArrivalBus = []
+    let noShowBus = []
+
+    let purposeTrainingTripId = []
+    let purposeExerciseTripId = []
+    let purposeAdminTripId = []
+    let purposeOpsTripId = []
+
+    for (let row of datas) {
+        let { id, tripId, purposeType, taskStatus } = row
+        if (taskStatus && taskStatus.toLowerCase() == "late trip") {
+            lateArrivalBus.push(id)
+        } else if (taskStatus && taskStatus.toLowerCase() == "no show") {
+            noShowBus.push(id)
+        }
+
+        if (purposeType.indexOf(PURPOSE.TRAINING) != -1) {
+            purposeTrainingTripId.push(tripId)
+        }
+        else if (purposeType.indexOf(PURPOSE.EXERCISE) != -1) {
+            purposeExerciseTripId.push(tripId)
+        }
+        else if (purposeType.indexOf(PURPOSE.ADMIN) != -1) {
+            purposeAdminTripId.push(tripId)
+        }
+        else if (purposeType.indexOf(PURPOSE.OPS) != -1) {
+            purposeOpsTripId.push(tripId)
+        }
+    }
+
+    return { lateArrivalBus, noShowBus, purposeTrainingTripId, purposeExerciseTripId, purposeAdminTripId, purposeOpsTripId }
+}
+
 const GetFulfilment = function (result, contracts) {
     return new Promise(async (resolve, reject) => {
         try {
             let datas = result.filter(a => ['completed', 'no show', 'late trip', 'cancelled'].indexOf(a.taskStatus ? a.taskStatus.toLowerCase() : "") != -1)
             let totalBuses = datas.length
             let totalIndents = [...new Set(datas.map(a => a.tripId))].length
-            let lateArrivalBus = []
-            let noShowBus = []
+            let { lateArrivalBus, noShowBus, purposeTrainingTripId, purposeExerciseTripId, purposeAdminTripId, purposeOpsTripId } = GetFulfilmentIndentPurpose(datas)
 
-            let purposeTrainingTripId = []
-            let purposeExerciseTripId = []
-            let purposeAdminTripId = []
-            let purposeOpsTripId = []
-
-            for (let row of datas) {
-                let { id, tripId, purposeType, taskStatus } = row
-                if (taskStatus && taskStatus.toLowerCase() == "late trip") {
-                    lateArrivalBus.push(id)
-                } else if (taskStatus && taskStatus.toLowerCase() == "no show") {
-                    noShowBus.push(id)
-                }
-
-                if (purposeType.indexOf(PURPOSE.TRAINING) != -1) {
-                    purposeTrainingTripId.push(tripId)
-                }
-                else if (purposeType.indexOf(PURPOSE.EXERCISE) != -1) {
-                    purposeExerciseTripId.push(tripId)
-                }
-                else if (purposeType.indexOf(PURPOSE.ADMIN) != -1) {
-                    purposeAdminTripId.push(tripId)
-                }
-                else if (purposeType.indexOf(PURPOSE.OPS) != -1) {
-                    purposeOpsTripId.push(tripId)
-                }
-            }
 
             let purposeDatas = {
                 "Training": _.uniqBy(purposeTrainingTripId).length,
@@ -599,7 +599,6 @@ const GetFulfilment = function (result, contracts) {
                 "Admin": _.uniqBy(purposeAdminTripId).length,
                 "Ops": _.uniqBy(purposeOpsTripId).length,
             }
-
             let totalLateArrivalBus = lateArrivalBus.length
             let totalnoShowBus = noShowBus.length
             let totalLateArrivalBusPct = '0.00%'
@@ -735,54 +734,118 @@ const GetUserPerformance = function (result, monthList, userInfo, cvServiceTypeI
         return moment(a).format('MMM')
     })
 
+    const GetUsersPerformanceIndents = function (datas, editTripIds) {
+        let resourceWithLateIndentSurcharge = []
+        let resourceWithNoShowIndentSurcharge = []
+        let resourceWithAmendmentSurcharge = []
+        let resourceWithCancelledSurcharge = []
+
+        let lateIndents = []
+        let cancelledIndents = []
+        let amendmentIndents = []
+        for (let row of datas) {
+            let { id, tripId, executionDate, executionTime, lateTime, isLate, tspChangeTime, cancellationTime, taskStatus,
+                surchargeLessThen48, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen4, surchargeDepart, transCostSurchargeLessThen4 } = row
+
+            let surcharge = Number(surchargeLessThen48) + Number(surchargeGenterThen12) + Number(surchargeLessThen12) + Number(surchargeLessThen4) + Number(surchargeDepart) + Number(transCostSurchargeLessThen4)
+
+            let executionDateTime = executionDate + " " + executionTime
+
+            let late = invoiceService.IsPeak(executionTime, lateTime)
+            if (late && isLate) {
+                resourceWithLateIndentSurcharge.push(tripId)
+                lateIndents.push(row)
+            }
+
+            if (taskStatus && taskStatus.toLowerCase() == "no show") {
+                resourceWithNoShowIndentSurcharge.push(tripId)
+            }
+
+            if (cancellationTime) {
+                let approveDateDiffHours = moment(executionDateTime).diff(moment(cancellationTime), 's')
+                if (approveDateDiffHours < 4 * 3600 && surcharge > 0) {
+                    resourceWithCancelledSurcharge.push(id)
+                    cancelledIndents.push(row)
+                }
+            }
+
+            if (tspChangeTime && editTripIds.includes(tripId)) {
+                let approveDateDiffHours = moment(executionDateTime).diff(moment(tspChangeTime), 's')
+                if (approveDateDiffHours < 4 * 3600 && surcharge > 0) {
+                    resourceWithAmendmentSurcharge.push(id)
+                    amendmentIndents.push(row)
+                }
+            }
+        }
+        return {
+            resourceWithLateIndentSurcharge,
+            resourceWithNoShowIndentSurcharge,
+            resourceWithAmendmentSurcharge,
+            resourceWithCancelledSurcharge,
+            lateIndents,
+            cancelledIndents,
+            amendmentIndents
+        }
+    }
+
     return new Promise(async (resolve, reject) => {
         try {
             let datas = result
             let totalBuses = datas.length
             let totalIndents = [...new Set(datas.map(a => a.tripId))].length
-            let resourceWithLateIndentSurcharge = []
-            let resourceWithNoShowIndentSurcharge = []
-            let resourceWithAmendmentSurcharge = []
-            let resourceWithCancelledSurcharge = []
-
             let editTripIds = await DashboardUtil.GetEditHistory(userInfo, cvServiceTypeIds, unit)
 
-            let lateIndents = []
-            let cancelledIndents = []
-            let amendmentIndents = []
-            for (let row of datas) {
-                let { id, tripId, executionDate, executionTime, lateTime, isLate, tspChangeTime, notifiedTime, cancellationTime, taskStatus,
-                    surchargeLessThen48, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen4, surchargeDepart, transCostSurchargeLessThen4 } = row
-                let surcharge = Number(surchargeLessThen48) + Number(surchargeGenterThen12) + Number(surchargeLessThen12) + Number(surchargeLessThen4) + Number(surchargeDepart) + Number(transCostSurchargeLessThen4)
+            // let resourceWithLateIndentSurcharge = []
+            // let resourceWithNoShowIndentSurcharge = []
+            // let resourceWithAmendmentSurcharge = []
+            // let resourceWithCancelledSurcharge = []
 
-                let executionDateTime = executionDate + " " + executionTime
 
-                let late = invoiceService.IsPeak(executionTime, lateTime)
-                if (late && isLate) {
-                    resourceWithLateIndentSurcharge.push(tripId)
-                    lateIndents.push(row)
-                }
+            // let lateIndents = []
+            // let cancelledIndents = []
+            // let amendmentIndents = []
+            // for (let row of datas) {
+            //     let { id, tripId, executionDate, executionTime, lateTime, isLate, tspChangeTime, notifiedTime, cancellationTime, taskStatus,
+            //         surchargeLessThen48, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen4, surchargeDepart, transCostSurchargeLessThen4 } = row
+            //     let surcharge = Number(surchargeLessThen48) + Number(surchargeGenterThen12) + Number(surchargeLessThen12) + Number(surchargeLessThen4) + Number(surchargeDepart) + Number(transCostSurchargeLessThen4)
 
-                if (taskStatus && taskStatus.toLowerCase() == "no show") {
-                    resourceWithNoShowIndentSurcharge.push(tripId)
-                }
+            //     let executionDateTime = executionDate + " " + executionTime
 
-                if (cancellationTime) {
-                    let approveDateDiffHours = moment(executionDateTime).diff(moment(cancellationTime), 's')
-                    if (approveDateDiffHours < 4 * 3600 && surcharge > 0) {
-                        resourceWithCancelledSurcharge.push(id)
-                        cancelledIndents.push(row)
-                    }
-                }
+            //     let late = invoiceService.IsPeak(executionTime, lateTime)
+            //     if (late && isLate) {
+            //         resourceWithLateIndentSurcharge.push(tripId)
+            //         lateIndents.push(row)
+            //     }
 
-                if (tspChangeTime && editTripIds.includes(tripId)) {
-                    let approveDateDiffHours = moment(executionDateTime).diff(moment(tspChangeTime), 's')
-                    if (approveDateDiffHours < 4 * 3600 && surcharge > 0) {
-                        resourceWithAmendmentSurcharge.push(id)
-                        amendmentIndents.push(row)
-                    }
-                }
-            }
+            //     if (taskStatus && taskStatus.toLowerCase() == "no show") {
+            //         resourceWithNoShowIndentSurcharge.push(tripId)
+            //     }
+
+            //     if (cancellationTime) {
+            //         let approveDateDiffHours = moment(executionDateTime).diff(moment(cancellationTime), 's')
+            //         if (approveDateDiffHours < 4 * 3600 && surcharge > 0) {
+            //             resourceWithCancelledSurcharge.push(id)
+            //             cancelledIndents.push(row)
+            //         }
+            //     }
+
+            //     if (tspChangeTime && editTripIds.includes(tripId)) {
+            //         let approveDateDiffHours = moment(executionDateTime).diff(moment(tspChangeTime), 's')
+            //         if (approveDateDiffHours < 4 * 3600 && surcharge > 0) {
+            //             resourceWithAmendmentSurcharge.push(id)
+            //             amendmentIndents.push(row)
+            //         }
+            //     }
+            // }
+            let {
+                resourceWithLateIndentSurcharge,
+                resourceWithNoShowIndentSurcharge,
+                resourceWithAmendmentSurcharge,
+                resourceWithCancelledSurcharge,
+                lateIndents,
+                cancelledIndents,
+                amendmentIndents
+            } = GetUsersPerformanceIndents(datas, editTripIds)
 
             resourceWithLateIndentSurcharge = _.uniqBy(resourceWithLateIndentSurcharge)
             let totalResourceWithLateIndentSurcharge = resourceWithLateIndentSurcharge.length

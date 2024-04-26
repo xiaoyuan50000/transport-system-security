@@ -639,12 +639,67 @@ module.exports.GetContractRateTableList = async function (req, res) {
     return res.json({ data: rows })
 }
 
+const setValueOrNull = function (value) {
+    return value || null
+}
+
+const setRecordChargeType5 = function (data, record) {
+    let records = []
+    for (let row of data) {
+        let newRecord = Object.assign({}, record)
+        if (row[0] == "daily") {
+            newRecord.chargeType = ChargeType.DAILY
+        } else if (row[0] == "weekly") {
+            newRecord.chargeType = ChargeType.WEEKLY
+        } else if (row[0] == "monthly") {
+            newRecord.chargeType = ChargeType.MONTHLY
+        } else if (row[0] == "yearly") {
+            newRecord.chargeType = ChargeType.YEARLY
+        }
+        newRecord.price = row[1]
+        newRecord.hasDriver = row[2]
+        newRecord.isWeekend = row[3]
+        records.push(newRecord)
+    }
+    return records
+}
+
+const setRecordChargeType6 = function (body, record) {
+    let { blockPeriod, blockPrice, blockHourlyPrice, overTimeBlockPeriod,
+        overTimeBlockPrice, overTimeHourlyPrice, dailyPrice, monthlyPrice, needSurcharge } = body
+    let records = []
+    if (!needSurcharge) {
+        record.chargeType = ChargeType.BLOCKDAILY
+        record.blockPeriod = blockPeriod
+        record.blockPrice = blockPrice
+        record.blockHourly = blockHourlyPrice
+        record.OTBlockPeriod = overTimeBlockPeriod
+        record.OTHourly = overTimeHourlyPrice
+        record.OTBlockPrice = overTimeBlockPrice
+        record.dailyPrice = dailyPrice
+        record.monthlyPrice = monthlyPrice
+        records.push(record)
+    } else {
+        for (let i = 0; i <= 1; i++) {
+            let newRecord = Object.assign({}, record)
+            newRecord.chargeType = (i == 0 ? ChargeType.BLOCKDAILY_1 : ChargeType.BLOCKDAILY_2)
+            newRecord.blockPeriod = blockPeriod[i]
+            newRecord.blockPrice = blockPrice[i]
+            newRecord.blockHourly = blockHourlyPrice[i]
+            newRecord.OTBlockPeriod = overTimeBlockPeriod[i]
+            newRecord.OTHourly = overTimeHourlyPrice[i]
+            newRecord.OTBlockPrice = overTimeBlockPrice[i]
+            newRecord.dailyPrice = dailyPrice[i]
+            newRecord.monthlyPrice = monthlyPrice[i]
+            records.push(newRecord)
+        }
+    }
+    return records
+}
 const getContractRecord = function (body) {
-    let { chargeType, roleName } = body
+    let { chargeType } = body
     let status = ContractRateStatus.PendingForApproval
-    // if (roleName == ROLE.RA) {
-    //     status = ContractRateStatus.Approved
-    // }
+
     let record = {
         contractPartNo: null,
         typeOfVehicle: body.vehicleType,
@@ -679,21 +734,31 @@ const getContractRecord = function (body) {
         excessPerTripPrice: null,
         status: status,
     }
-    if (chargeType == 1 || chargeType == 2) {
+    if (chargeType == 1) {
         let { basePrice, driverFee, weekendFee, peakFee, lateFee } = body
-        record.chargeType = chargeType == 1 ? ChargeType.TRIP : ChargeType.HOUR
+        record.chargeType = ChargeType.TRIP
         record.price = basePrice
         record.hasDriver = driverFee
         record.isWeekend = weekendFee
         record.isPeak = peakFee
         record.isLate = lateFee
-        if (chargeType == 1) {
-            record.hourlyPrice = body.hourlyPrice ? body.hourlyPrice : null;
-            record.dailyPrice = body.dailyPrice ? body.dailyPrice : null;
-            record.weeklyPrice = body.weeklyPrice ? body.weeklyPrice : null;
-            record.monthlyPrice = body.monthlyPrice ? body.monthlyPrice : null;
-        }
-    } else if (chargeType == 3) {
+
+        record.hourlyPrice = setValueOrNull(body.hourlyPrice);
+        record.dailyPrice = setValueOrNull(body.dailyPrice);
+        record.weeklyPrice = setValueOrNull(body.weeklyPrice);
+        record.monthlyPrice = setValueOrNull(body.monthlyPrice);
+
+    }
+    else if (chargeType == 2) {
+        let { basePrice, driverFee, weekendFee, peakFee, lateFee } = body
+        record.chargeType = ChargeType.HOUR
+        record.price = basePrice
+        record.hasDriver = driverFee
+        record.isWeekend = weekendFee
+        record.isPeak = peakFee
+        record.isLate = lateFee
+    }
+    else if (chargeType == 3) {
         let { blockPeriod, blockPrice, blockHourlyPrice, overTimeBlockPeriod, overTimeBlockPrice } = body
         record.chargeType = ChargeType.OTBLOCK
         record.blockPeriod = blockPeriod
@@ -740,51 +805,9 @@ const getContractRecord = function (body) {
         let { data, transCostSurcharge, transportCost } = body
         record.transCost = transportCost
         record.transCostSurchargeLessThen4 = transCostSurcharge
-        for (let row of data) {
-            let newRecord = Object.assign({}, record)
-            if (row[0] == "daily") {
-                newRecord.chargeType = ChargeType.DAILY
-            } else if (row[0] == "weekly") {
-                newRecord.chargeType = ChargeType.WEEKLY
-            } else if (row[0] == "monthly") {
-                newRecord.chargeType = ChargeType.MONTHLY
-            } else if (row[0] == "yearly") {
-                newRecord.chargeType = ChargeType.YEARLY
-            }
-            newRecord.price = row[1]
-            newRecord.hasDriver = row[2]
-            newRecord.isWeekend = row[3]
-            records.push(newRecord)
-        }
+        records = setRecordChargeType5(data, record)
     } else if (chargeType == 7) {
-        let { blockPeriod, blockPrice, blockHourlyPrice, overTimeBlockPeriod,
-            overTimeBlockPrice, overTimeHourlyPrice, dailyPrice, monthlyPrice, needSurcharge } = body
-        if (!needSurcharge) {
-            record.chargeType = ChargeType.BLOCKDAILY
-            record.blockPeriod = blockPeriod
-            record.blockPrice = blockPrice
-            record.blockHourly = blockHourlyPrice
-            record.OTBlockPeriod = overTimeBlockPeriod
-            record.OTHourly = overTimeHourlyPrice
-            record.OTBlockPrice = overTimeBlockPrice
-            record.dailyPrice = dailyPrice
-            record.monthlyPrice = monthlyPrice
-            records.push(record)
-        } else {
-            for (let i = 0; i <= 1; i++) {
-                let newRecord = Object.assign({}, record)
-                newRecord.chargeType = (i == 0 ? ChargeType.BLOCKDAILY_1 : ChargeType.BLOCKDAILY_2)
-                newRecord.blockPeriod = blockPeriod[i]
-                newRecord.blockPrice = blockPrice[i]
-                newRecord.blockHourly = blockHourlyPrice[i]
-                newRecord.OTBlockPeriod = overTimeBlockPeriod[i]
-                newRecord.OTHourly = overTimeHourlyPrice[i]
-                newRecord.OTBlockPrice = overTimeBlockPrice[i]
-                newRecord.dailyPrice = dailyPrice[i]
-                newRecord.monthlyPrice = monthlyPrice[i]
-                records.push(newRecord)
-            }
-        }
+        records = setRecordChargeType6(data, record)
     } else {
         records.push(record)
     }

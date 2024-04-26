@@ -15,7 +15,7 @@ const { Contract } = require('../model/contract.js')
 const { Group } = require('../model/group.js')
 const { ServiceProvider } = require('../model/serviceProvider.js')
 const { Wallet } = require('../model/wallet.js')
-const { FormatPrice } = require('../util/utils')
+const { FormatPrice, isNotEmptyNull } = require('../util/utils')
 const invoiceService = require('./invoiceService.js')
 
 const fmt = 'YYYY-MM'
@@ -162,12 +162,80 @@ module.exports.RenderDashboard = async function (req, res) {
 //         // feedBackDatas: feedBack
 //     })
 // }
+const queryDashboardResult = function (filter, taskFilter, replacements, startId, endId) {
+    return new Promise(async (resolve, reject) => {
+        let idFilter = ``
+        if (startId) {
+            idFilter += ` and a.id >= ${startId}`
+        }
+        if (endId) {
+            idFilter += ` and a.id < ${endId}`
+        }
+        let result = await sequelizeObj.query(
+            `
+            select 
+            c.*, t.contractNo, t.name, s.name as tsp, s.lateTime, t.isLate,
+            IFNULL(po.total, ipo.total) as total, 
+            IFNULL(po.surchargeLessThen48, ipo.surchargeLessThen48) as surchargeLessThen48,
+            IFNULL(po.surchargeGenterThen12, ipo.surchargeGenterThen12) as surchargeGenterThen12,
+            IFNULL(po.surchargeLessThen12, ipo.surchargeLessThen12) as surchargeLessThen12,
+            IFNULL(po.surchargeLessThen4, ipo.surchargeLessThen4) as surchargeLessThen4,
+            IFNULL(po.surchargeDepart, ipo.surchargeDepart) as surchargeDepart,
+            IFNULL(po.transCostSurchargeLessThen4, ipo.transCostSurchargeLessThen4) as transCostSurchargeLessThen4
+            from (
+                select 
+                    a.id, a.tripId, a.requestId, a.taskStatus, a.executionDate, a.executionTime, SUBSTRING_INDEX(a.contractPartNo, ',', 1) as contractPartNo, a.tspChangeTime, a.notifiedTime, a.cancellationTime, a.serviceProviderId, a.walletId, a.endorse,
+                    b.serviceTypeId, c.groupId, c.purposeType, b.serviceModeId
+                from request c 
+                LEFT JOIN job b on c.id = b.requestId
+                LEFT JOIN job_task a on b.id = a.tripId
+                where 
+                a.serviceProviderId is not null and
+                b.approve = 1 ${idFilter} ${filter} ${taskFilter} 
+            ) c LEFT JOIN initial_purchase_order ipo on c.id = ipo.taskId
+            LEFT JOIN purchase_order po on c.id = po.taskId
+            LEFT JOIN (
+                    select a.contractNo, a.name, c.contractPartNo, c.isLate from contract a
+                    LEFT JOIN contract_detail b on a.contractNo = b.contractNo
+                    LEFT JOIN contract_rate c on b.contractPartNo = c.contractPartNo
+                ) t on t.contractPartNo = c.contractPartNo
+            LEFT JOIN service_provider s on c.serviceProviderId = s.id
+            `,
+            {
+                replacements: replacements,
+                type: QueryTypes.SELECT
+            }
+        );
+
+        const resultValues = _.compact(_.map(result, 'walletId'));
+        const walletId = _.uniq(resultValues);
+
+        resolve({
+            "result": result,
+            "walletId": walletId,
+        })
+    })
+}
+
+const InitAllPromise = function (idResultRange, filter, taskFilter, replacements) {
+    let queryDashboardResultPromise = []
+    for (let i = 0; i < idResultRange.length; i++) {
+
+        let startId = idResultRange[i].id
+        let endId = null
+        if (i != idResultRange.length - 1) {
+            endId = idResultRange[i + 1].id
+        }
+        queryDashboardResultPromise.push(queryDashboardResult(filter, taskFilter, replacements, startId, endId))
+
+    }
+    return queryDashboardResultPromise
+}
 
 module.exports.GetDashboardDatas = async function (req, res) {
     let { userId, unit, tsp, month, year } = req.body
     let userInfo = await DashboardUtil.GetUserInfoById(userId)
     let serviceTypeList = await DashboardUtil.GetServiceType()
-    let mvServiceTypeIds = serviceTypeList.filter(a => a.category.toUpperCase() == "MV").map(a => a.id)
     let cvServiceTypeIds = serviceTypeList.filter(a => a.category.toUpperCase() != "MV" && a.category.toUpperCase() != "Fuel").map(a => a.id)
 
     let units = await DashboardUtil.GetAllUnits()
@@ -192,7 +260,7 @@ module.exports.GetDashboardDatas = async function (req, res) {
         replacements.push(userInfo.groupId)
     }
 
-    if (unit && unit != "") {
+    if (isNotEmptyNull(unit)) {
         filter += ` and c.groupId = ?`
         replacements.push(unit)
 
@@ -203,13 +271,13 @@ module.exports.GetDashboardDatas = async function (req, res) {
         unitStatistic = units
     }
 
-    if (tsp && tsp != "") {
+    if (isNotEmptyNull(tsp)) {
         taskFilter += ` and a.serviceProviderId = ${tsp}`
     }
-    if (month && month != "") {
+    if (isNotEmptyNull(month)) {
         taskFilter += ` and MONTH(a.executionDate) = ${month}`
     }
-    if (year && year != "") {
+    if (isNotEmptyNull(year)) {
         taskFilter += ` and YEAR(a.executionDate) = ${year}`
     }
 
@@ -231,77 +299,14 @@ module.exports.GetDashboardDatas = async function (req, res) {
         }
     );
 
-    const queryDashboardResult = function (filter, taskFilter, replacements, startId, endId) {
-        return new Promise(async (resolve, reject) => {
-            let idFilter = ``
-            if (startId) {
-                idFilter += ` and a.id >= ${startId}`
-            }
-            if (endId) {
-                idFilter += ` and a.id < ${endId}`
-            }
-            let result = await sequelizeObj.query(
-                `
-                select 
-                c.*, t.contractNo, t.name, s.name as tsp, s.lateTime, t.isLate,
-                IFNULL(po.total, ipo.total) as total, 
-                IFNULL(po.surchargeLessThen48, ipo.surchargeLessThen48) as surchargeLessThen48,
-                IFNULL(po.surchargeGenterThen12, ipo.surchargeGenterThen12) as surchargeGenterThen12,
-                IFNULL(po.surchargeLessThen12, ipo.surchargeLessThen12) as surchargeLessThen12,
-                IFNULL(po.surchargeLessThen4, ipo.surchargeLessThen4) as surchargeLessThen4,
-                IFNULL(po.surchargeDepart, ipo.surchargeDepart) as surchargeDepart,
-                IFNULL(po.transCostSurchargeLessThen4, ipo.transCostSurchargeLessThen4) as transCostSurchargeLessThen4
-                from (
-                    select 
-                        a.id, a.tripId, a.requestId, a.taskStatus, a.executionDate, a.executionTime, a.contractPartNo, a.tspChangeTime, a.notifiedTime, a.cancellationTime, a.serviceProviderId, a.walletId, a.endorse,
-                        b.serviceTypeId, c.groupId, c.purposeType, b.serviceModeId
-                    from request c 
-                    LEFT JOIN job b on c.id = b.requestId
-                    LEFT JOIN job_task a on b.id = a.tripId
-                    where 
-                    a.serviceProviderId is not null and
-                    b.approve = 1 ${idFilter} ${filter} ${taskFilter} 
-                ) c LEFT JOIN initial_purchase_order ipo on c.id = ipo.taskId
-                LEFT JOIN purchase_order po on c.id = po.taskId
-                LEFT JOIN (
-                        select a.contractNo, a.name, c.contractPartNo, c.isLate from contract a
-                        LEFT JOIN contract_detail b on a.contractNo = b.contractNo
-                        LEFT JOIN contract_rate c on b.contractPartNo = c.contractPartNo
-                    ) t on FIND_IN_SET(t.contractPartNo, c.contractPartNo)
-                LEFT JOIN service_provider s on c.serviceProviderId = s.id
-                `,
-                {
-                    replacements: replacements,
-                    type: QueryTypes.SELECT
-                }
-            );
 
-            const resultValues = _.compact(_.map(result, 'walletId'));
-            const walletId = _.uniq(resultValues);
 
-            resolve({
-                "result": result,
-                "walletId": walletId,
-            })
-        })
-    }
-
-    let size = 20000
+    let size = 10000
     let idResultRange = idResult.filter((item, index) => index % size === 0)
     log.info(idResultRange);
     console.time("GetDashboardDatas")
 
-    let queryDashboardResultPromise = []
-    for (let i = 0; i < idResultRange.length; i++) {
-
-        let startId = idResultRange[i].id
-        let endId = null
-        if (i != idResultRange.length - 1) {
-            endId = idResultRange[i + 1].id
-        }
-        queryDashboardResultPromise.push(queryDashboardResult(filter, taskFilter, replacements, startId, endId))
-
-    }
+    let queryDashboardResultPromise = InitAllPromise(idResultRange, filter, taskFilter, replacements)
 
     let allResult1 = await Promise.all(queryDashboardResultPromise)
 
@@ -377,17 +382,17 @@ const GetFeedBack = function (mvServiceTypeIds, userInfo, unit, tsp, month, year
                 replacements.push(userInfo.groupId)
             }
 
-            if (unit && unit != "") {
+            if (isNotEmptyNull(unit)) {
                 filter += ` and groupId = ?`
                 replacements.push(unit)
             }
-            if (tsp && tsp != "") {
+            if (isNotEmptyNull(tsp)) {
                 taskFilter += ` and serviceProviderId = ${tsp}`
             }
-            if (month && month != "") {
+            if (isNotEmptyNull(month)) {
                 taskFilter += ` and MONTH(executionDate) = ${month}`
             }
-            if (year && year != "") {
+            if (isNotEmptyNull(year)) {
                 taskFilter += ` and YEAR(executionDate) = ${year}`
             }
             let result = await sequelizeObj.query(
@@ -410,14 +415,14 @@ const GetFeedBack = function (mvServiceTypeIds, userInfo, unit, tsp, month, year
             let taskIdArr = result.map(a => a.id)
 
             let mobiusFilter = ""
-            if (month && month != "") {
+            if (isNotEmptyNull(month)) {
                 mobiusFilter += ` and MONTH(indentStartTime) = ${month}`
             }
-            if (year && year != "") {
+            if (isNotEmptyNull(year)) {
                 mobiusFilter += ` and YEAR(indentStartTime) = ${year}`
             }
             let unitFilter = ""
-            if (unitName && unitName != "") {
+            if (isNotEmptyNull(unitName)) {
                 unitFilter += ` and b.group = '${unitName}'`
             }
             let mobiusTaskResult = await sequelizeDriverObj.query(
@@ -441,15 +446,8 @@ const GetFeedBack = function (mvServiceTypeIds, userInfo, unit, tsp, month, year
                 return taskIdArr.includes(Number(o.taskId))
             })
 
-            let incidentResult = []
-            let nearMissResult = []
-            for (let row of newMobiusTaskResult) {
-                if (row.type == FEEDBACK.INCIDENT) {
-                    incidentResult.push(row)
-                } else if (row.type == FEEDBACK.NEARMISS) {
-                    nearMissResult.push(row)
-                }
-            }
+            let incidentResult = newMobiusTaskResult.filter(o => o.type == FEEDBACK.INCIDENT)
+            let nearMissResult = newMobiusTaskResult.filter(o => o.type == FEEDBACK.NEARMISS)
 
             let totalIncident = incidentResult.length
             let totalNearMiss = nearMissResult.length
@@ -891,6 +889,40 @@ const GetYetToFulfil = function (result) {
 
 }
 
+const GetFulfilmentIndentPurpose = function (datas) {
+    let lateArrivalBus = []
+    let noShowBus = []
+
+    let purposeTrainingTripId = []
+    let purposeExerciseTripId = []
+    let purposeAdminTripId = []
+    let purposeOpsTripId = []
+
+    for (let row of datas) {
+        let { id, tripId, purposeType, taskStatus } = row
+        if (taskStatus && taskStatus.toLowerCase() == "late trip") {
+            lateArrivalBus.push(id)
+        } else if (taskStatus && taskStatus.toLowerCase() == "no show") {
+            noShowBus.push(id)
+        }
+
+        if (purposeType.indexOf(PURPOSE.TRAINING) != -1) {
+            purposeTrainingTripId.push(tripId)
+        }
+        else if (purposeType.indexOf(PURPOSE.EXERCISE) != -1) {
+            purposeExerciseTripId.push(tripId)
+        }
+        else if (purposeType.indexOf(PURPOSE.ADMIN) != -1) {
+            purposeAdminTripId.push(tripId)
+        }
+        else if (purposeType.indexOf(PURPOSE.OPS) != -1) {
+            purposeOpsTripId.push(tripId)
+        }
+    }
+
+    return { lateArrivalBus, noShowBus, purposeTrainingTripId, purposeExerciseTripId, purposeAdminTripId, purposeOpsTripId }
+}
+
 const GetFulfilment = function (result, contracts) {
     return new Promise(async (resolve, reject) => {
         console.time("GetFulfilment")
@@ -899,35 +931,8 @@ const GetFulfilment = function (result, contracts) {
             let datas = result.filter(a => ['completed', 'no show', 'late trip', 'cancelled'].indexOf(a.taskStatus ? a.taskStatus.toLowerCase() : "") != -1)
             let totalBuses = datas.length
             let totalIndents = [...new Set(datas.map(a => a.tripId))].length
-            let lateArrivalBus = []
-            let noShowBus = []
+            let { lateArrivalBus, noShowBus, purposeTrainingTripId, purposeExerciseTripId, purposeAdminTripId, purposeOpsTripId } = GetFulfilmentIndentPurpose(datas)
 
-            let purposeTrainingTripId = []
-            let purposeExerciseTripId = []
-            let purposeAdminTripId = []
-            let purposeOpsTripId = []
-
-            for (let row of datas) {
-                let { id, tripId, purposeType, taskStatus } = row
-                if (taskStatus && taskStatus.toLowerCase() == "late trip") {
-                    lateArrivalBus.push(id)
-                } else if (taskStatus && taskStatus.toLowerCase() == "no show") {
-                    noShowBus.push(id)
-                }
-
-                if (purposeType.indexOf(PURPOSE.TRAINING) != -1) {
-                    purposeTrainingTripId.push(tripId)
-                }
-                else if (purposeType.indexOf(PURPOSE.EXERCISE) != -1) {
-                    purposeExerciseTripId.push(tripId)
-                }
-                else if (purposeType.indexOf(PURPOSE.ADMIN) != -1) {
-                    purposeAdminTripId.push(tripId)
-                }
-                else if (purposeType.indexOf(PURPOSE.OPS) != -1) {
-                    purposeOpsTripId.push(tripId)
-                }
-            }
 
             let purposeDatas = {
                 "Training": _.uniqBy(purposeTrainingTripId).length,
@@ -1072,6 +1077,60 @@ const GetUserPerformance = function (result, monthList, userInfo, cvServiceTypeI
         return moment(a).format('MMM')
     })
 
+    const GetUsersPerformanceIndents = function (datas, editTripIds) {
+        let resourceWithLateIndentSurcharge = []
+        let resourceWithNoShowIndentSurcharge = []
+        let resourceWithAmendmentSurcharge = []
+        let resourceWithCancelledSurcharge = []
+
+        let lateIndents = []
+        let cancelledIndents = []
+        let amendmentIndents = []
+        for (let row of datas) {
+            let { id, tripId, executionDate, executionTime, lateTime, isLate, tspChangeTime, cancellationTime, taskStatus,
+                surchargeLessThen48, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen4, surchargeDepart, transCostSurchargeLessThen4 } = row
+
+            let surcharge = Number(surchargeLessThen48) + Number(surchargeGenterThen12) + Number(surchargeLessThen12) + Number(surchargeLessThen4) + Number(surchargeDepart) + Number(transCostSurchargeLessThen4)
+
+            let executionDateTime = executionDate + " " + executionTime
+
+            let late = invoiceService.IsPeak(executionTime, lateTime)
+            if (late && isLate) {
+                resourceWithLateIndentSurcharge.push(tripId)
+                lateIndents.push(row)
+            }
+
+            if (taskStatus && taskStatus.toLowerCase() == "no show") {
+                resourceWithNoShowIndentSurcharge.push(tripId)
+            }
+
+            if (cancellationTime) {
+                let approveDateDiffHours = moment(executionDateTime).diff(moment(cancellationTime), 's')
+                if (approveDateDiffHours < 4 * 3600 && surcharge > 0) {
+                    resourceWithCancelledSurcharge.push(id)
+                    cancelledIndents.push(row)
+                }
+            }
+
+            if (tspChangeTime && editTripIds.includes(tripId)) {
+                let approveDateDiffHours = moment(executionDateTime).diff(moment(tspChangeTime), 's')
+                if (approveDateDiffHours < 4 * 3600 && surcharge > 0) {
+                    resourceWithAmendmentSurcharge.push(id)
+                    amendmentIndents.push(row)
+                }
+            }
+        }
+        return {
+            resourceWithLateIndentSurcharge,
+            resourceWithNoShowIndentSurcharge,
+            resourceWithAmendmentSurcharge,
+            resourceWithCancelledSurcharge,
+            lateIndents,
+            cancelledIndents,
+            amendmentIndents
+        }
+    }
+
     return new Promise(async (resolve, reject) => {
         console.time("GetUserPerformance")
 
@@ -1079,49 +1138,58 @@ const GetUserPerformance = function (result, monthList, userInfo, cvServiceTypeI
             let datas = result
             let totalBuses = datas.length
             let totalIndents = [...new Set(datas.map(a => a.tripId))].length
-            let resourceWithLateIndentSurcharge = []
-            let resourceWithNoShowIndentSurcharge = []
-            let resourceWithAmendmentSurcharge = []
-            let resourceWithCancelledSurcharge = []
-
             let editTripIds = await DashboardUtil.GetEditHistory(userInfo, cvServiceTypeIds, unit)
+            // let resourceWithLateIndentSurcharge = []
+            // let resourceWithNoShowIndentSurcharge = []
+            // let resourceWithAmendmentSurcharge = []
+            // let resourceWithCancelledSurcharge = []
 
-            let lateIndents = []
-            let cancelledIndents = []
-            let amendmentIndents = []
-            for (let row of datas) {
-                let { id, tripId, executionDate, executionTime, lateTime, isLate, tspChangeTime, notifiedTime, cancellationTime, taskStatus,
-                    surchargeLessThen48, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen4, surchargeDepart, transCostSurchargeLessThen4 } = row
-                let surcharge = Number(surchargeLessThen48) + Number(surchargeGenterThen12) + Number(surchargeLessThen12) + Number(surchargeLessThen4) + Number(surchargeDepart) + Number(transCostSurchargeLessThen4)
 
-                let executionDateTime = executionDate + " " + executionTime
+            // let lateIndents = []
+            // let cancelledIndents = []
+            // let amendmentIndents = []
+            // for (let row of datas) {
+            //     let { id, tripId, executionDate, executionTime, lateTime, isLate, tspChangeTime, notifiedTime, cancellationTime, taskStatus,
+            //         surchargeLessThen48, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen4, surchargeDepart, transCostSurchargeLessThen4 } = row
+            //     let surcharge = Number(surchargeLessThen48) + Number(surchargeGenterThen12) + Number(surchargeLessThen12) + Number(surchargeLessThen4) + Number(surchargeDepart) + Number(transCostSurchargeLessThen4)
 
-                let late = invoiceService.IsPeak(executionTime, lateTime)
-                if (late && isLate) {
-                    resourceWithLateIndentSurcharge.push(tripId)
-                    lateIndents.push(row)
-                }
+            //     let executionDateTime = executionDate + " " + executionTime
 
-                if (taskStatus && taskStatus.toLowerCase() == "no show") {
-                    resourceWithNoShowIndentSurcharge.push(tripId)
-                }
+            //     let late = invoiceService.IsPeak(executionTime, lateTime)
+            //     if (late && isLate) {
+            //         resourceWithLateIndentSurcharge.push(tripId)
+            //         lateIndents.push(row)
+            //     }
 
-                if (cancellationTime) {
-                    let approveDateDiffHours = moment(executionDateTime).diff(moment(cancellationTime), 's')
-                    if (approveDateDiffHours < 4 * 3600 && surcharge > 0) {
-                        resourceWithCancelledSurcharge.push(id)
-                        cancelledIndents.push(row)
-                    }
-                }
+            //     if (taskStatus && taskStatus.toLowerCase() == "no show") {
+            //         resourceWithNoShowIndentSurcharge.push(tripId)
+            //     }
 
-                if (tspChangeTime && editTripIds.includes(tripId)) {
-                    let approveDateDiffHours = moment(executionDateTime).diff(moment(tspChangeTime), 's')
-                    if (approveDateDiffHours < 4 * 3600 && surcharge > 0) {
-                        resourceWithAmendmentSurcharge.push(id)
-                        amendmentIndents.push(row)
-                    }
-                }
-            }
+            //     if (cancellationTime) {
+            //         let approveDateDiffHours = moment(executionDateTime).diff(moment(cancellationTime), 's')
+            //         if (approveDateDiffHours < 4 * 3600 && surcharge > 0) {
+            //             resourceWithCancelledSurcharge.push(id)
+            //             cancelledIndents.push(row)
+            //         }
+            //     }
+
+            //     if (tspChangeTime && editTripIds.includes(tripId)) {
+            //         let approveDateDiffHours = moment(executionDateTime).diff(moment(tspChangeTime), 's')
+            //         if (approveDateDiffHours < 4 * 3600 && surcharge > 0) {
+            //             resourceWithAmendmentSurcharge.push(id)
+            //             amendmentIndents.push(row)
+            //         }
+            //     }
+            // }
+            let {
+                resourceWithLateIndentSurcharge,
+                resourceWithNoShowIndentSurcharge,
+                resourceWithAmendmentSurcharge,
+                resourceWithCancelledSurcharge,
+                lateIndents,
+                cancelledIndents,
+                amendmentIndents
+            } = GetUsersPerformanceIndents(datas, editTripIds)
 
             resourceWithLateIndentSurcharge = _.uniqBy(resourceWithLateIndentSurcharge)
             let totalResourceWithLateIndentSurcharge = resourceWithLateIndentSurcharge.length

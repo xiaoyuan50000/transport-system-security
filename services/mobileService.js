@@ -34,8 +34,8 @@ module.exports.GetTasks = async function (req, res) {
 }
 
 const GetTask = async function (taskId, mobileNumber, status) {
-    let cvList = await ServiceType.findAll({where:{category: "CV"}})
-    let cvIds = cvList.map(a=>a.id)
+    let cvList = await ServiceType.findAll({ where: { category: "CV" } })
+    let cvIds = cvList.map(a => a.id)
     let sql = `select * from (SELECT
         c.id AS taskId,
         c.taskStatus AS state,
@@ -128,8 +128,57 @@ const DriverComplete = function (driver, trip, task, operationTime, executeTime)
     } else if (noOfVehicle == completeCount) {
         trip.set({ status: DRIVER_STATUS.COMPLETED })
     }
-    
+
     return status
+}
+
+const serviceModeDeliveryAndPickup = function (task, optType, operationTime, driver, trip, startDateTime) {
+    if (optType == 'Arrive') {
+        task.set({ arrivalTime: operationTime })
+    } else {
+        task.set({ departTime: operationTime })
+    }
+
+    let newDriverStatus = ""
+    if (optType == 'Arrive' && task.taskStatus.toLowerCase() == 'acknowledged' || task.taskStatus.toLowerCase() == 'assigned') {
+        newDriverStatus = DRIVER_STATUS.ARRIVED
+        if (driver) {
+            driver.set({ status: newDriverStatus })
+        }
+        task.set({ taskStatus: newDriverStatus })
+    } else if (optType != 'Arrive' && task.taskStatus.toLowerCase() == 'acknowledged' || task.taskStatus.toLowerCase() == 'assigned' || task.taskStatus.toLowerCase() == 'arrived') {
+        //taskStatus == 'Arrived' update departTime and state, other just update departTime.
+        newDriverStatus = DriverComplete(driver, trip, task, operationTime, startDateTime)
+    }
+    return newDriverStatus
+}
+
+const optTypeArrive = function (task, operationTime, driver) {
+    let newDriverStatus = ""
+
+    task.set({ arrivalTime: operationTime })
+    if (task.taskStatus.toLowerCase() == 'acknowledged' || task.taskStatus.toLowerCase() == 'assigned') {
+        newDriverStatus = DRIVER_STATUS.ARRIVED
+        if (driver) {
+            driver.set({ status: newDriverStatus })
+        }
+        task.set({ taskStatus: newDriverStatus })
+    }
+    return newDriverStatus
+}
+
+const optTypeDepart = function (task, operationTime, driver) {
+    let newDriverStatus = ""
+    task.set({ departTime: operationTime })
+    if (task.taskStatus.toLowerCase() == 'acknowledged' || task.taskStatus.toLowerCase() == 'assigned'
+        || task.taskStatus.toLowerCase() == 'arrived') {
+        newDriverStatus = DRIVER_STATUS.DEPARTED
+        if (driver) {
+            driver.set({ status: newDriverStatus })
+        }
+        task.set({ taskStatus: newDriverStatus })
+    }
+    return newDriverStatus
 }
 
 module.exports.UpdateTaskOptTime = async function (req, res) {
@@ -151,69 +200,20 @@ module.exports.UpdateTaskOptTime = async function (req, res) {
         task.set({ arrivalTime: operationTime })
         newDriverStatus = DriverComplete(driver, trip, task, operationTime, startDateTime)
     } else if (serviceModeVal == "delivery") {
-        if (optType == 'Arrive') {
-            task.set({ arrivalTime: operationTime })
-            if (task.taskStatus.toLowerCase() == 'acknowledged' || task.taskStatus.toLowerCase() == 'assigned') {
-                newDriverStatus = DRIVER_STATUS.ARRIVED
-                if (driver) {
-                    driver.set({ status: newDriverStatus })
-                }
-                task.set({ taskStatus: newDriverStatus })
-            }
-        } else {
-            task.set({ departTime: operationTime })
-            //taskStatus == 'Arrived' update departTime and state, other just update departTime.
-            if (task.taskStatus.toLowerCase() == 'acknowledged' || task.taskStatus.toLowerCase() == 'assigned' 
-                || task.taskStatus.toLowerCase() == 'arrived') {
-                newDriverStatus = DriverComplete(driver, trip, task, operationTime, startDateTime)
-            }
-        }
+        newDriverStatus = serviceModeDeliveryAndPickup(task, optType, operationTime, driver, trip, startDateTime)
     } else if (serviceModeVal == "pickup") {
-        if (optType == 'Arrive') {
-            task.set({ arrivalTime: operationTime })
-            if (task.taskStatus.toLowerCase() == 'acknowledged' || task.taskStatus.toLowerCase() == 'assigned') {
-                newDriverStatus = DRIVER_STATUS.ARRIVED
-                if (driver) {
-                    driver.set({ status: newDriverStatus })
-                }
-                task.set({ taskStatus: newDriverStatus })
-            }
-        } else {
-            task.set({ endTime: operationTime })
-            //taskStatus == 'arrived' update endTime and state, other just update endTime.
-            if (task.taskStatus.toLowerCase() == 'acknowledged' || task.taskStatus.toLowerCase() == 'assigned'
-                || task.taskStatus.toLowerCase() == 'arrived') {
-                newDriverStatus = DriverComplete(driver, trip, task, operationTime, startDateTime)
-            }
-        }
+        newDriverStatus = serviceModeDeliveryAndPickup(task, optType, operationTime, driver, trip, startDateTime)
+    } else if (optType == 'Arrive') {
+        newDriverStatus = optTypeArrive(task, operationTime, driver)
+    } else if (optType == 'Depart') {
+        newDriverStatus = optTypeDepart(task, operationTime, driver)
     } else {
-        if (optType == 'Arrive') {
-            task.set({ arrivalTime: operationTime })
-            if (task.taskStatus.toLowerCase() == 'acknowledged' || task.taskStatus.toLowerCase() == 'assigned') {
-                newDriverStatus = DRIVER_STATUS.ARRIVED
-                if (driver) {
-                    driver.set({ status: newDriverStatus })
-                }
-                task.set({ taskStatus: newDriverStatus })
-            }
-        } else if (optType == 'Depart') {
-            task.set({ departTime: operationTime })
-            if (task.taskStatus.toLowerCase() == 'acknowledged' || task.taskStatus.toLowerCase() == 'assigned' 
-                || task.taskStatus.toLowerCase() == 'arrived') {
-                newDriverStatus = DRIVER_STATUS.DEPARTED
-                if (driver) {
-                    driver.set({ status: newDriverStatus })
-                }
-                task.set({ taskStatus: newDriverStatus })
-            }
-        } else {
-            task.set({ endTime: operationTime })
-            //taskStatus == 'Arrived' update endTime and state, other just update endTime.
-            if (task.taskStatus.toLowerCase() == 'acknowledged' || task.taskStatus.toLowerCase() == 'assigned'
-                || task.taskStatus.toLowerCase() == 'arrived' 
-                || task.taskStatus.toLowerCase() == 'started') {
-                newDriverStatus = DriverComplete(driver, trip, task, operationTime, startDateTime)
-            }
+        task.set({ endTime: operationTime })
+        //taskStatus == 'Arrived' update endTime and state, other just update endTime.
+        if (task.taskStatus.toLowerCase() == 'acknowledged' || task.taskStatus.toLowerCase() == 'assigned'
+            || task.taskStatus.toLowerCase() == 'arrived'
+            || task.taskStatus.toLowerCase() == 'started') {
+            newDriverStatus = DriverComplete(driver, trip, task, operationTime, startDateTime)
         }
     }
 
@@ -229,7 +229,43 @@ module.exports.UpdateTaskOptTime = async function (req, res) {
     })
     return Response.success(res, null)
 }
+const updateServiceModeDelivery = function (arrivalTime, task, operationTime, driver, departTime, trip, startDateTime) {
+    let newDriverStatus = ""
+    if (arrivalTime == null) {
+        task.set({ arrivalTime: operationTime })
+        newDriverStatus = DRIVER_STATUS.ARRIVED
+        if (driver) {
+            driver.set({ status: newDriverStatus })
+        }
+        task.set({ taskStatus: newDriverStatus })
+    } else if (departTime == null) {
+        task.set({ departTime: operationTime })
+        newDriverStatus = DriverComplete(driver, trip, task, operationTime, startDateTime)
+    }
+    return newDriverStatus
+}
 
+const updateServiceModePickup = function (arrivalTime, task, operationTime, driver, endTime, trip, endDateTime) {
+    let newDriverStatus = ""
+    if (arrivalTime == null) {
+        task.set({ arrivalTime: operationTime })
+        newDriverStatus = DRIVER_STATUS.ARRIVED
+        if (driver) {
+            driver.set({ status: newDriverStatus })
+        }
+        task.set({ taskStatus: newDriverStatus })
+    } else if (endTime == null) {
+        task.set({ endTime: operationTime })
+        newDriverStatus = DriverComplete(driver, trip, task, operationTime, endDateTime)
+    }
+    return newDriverStatus
+}
+
+const setDriverStatus = function (driver, newDriverStatus) {
+    if (driver) {
+        driver.set({ status: newDriverStatus })
+    }
+}
 
 module.exports.UpdateTaskState = async function (req, res) {
     let { userId, taskId, operationTime, justification } = req.body;
@@ -258,44 +294,20 @@ module.exports.UpdateTaskState = async function (req, res) {
         newDriverStatus = DriverComplete(driver, trip, task, operationTime, startDateTime)
     }
     else if (serviceModeVal == "delivery") {
-        if (arrivalTime == null) {
-            task.set({ arrivalTime: operationTime })
-            newDriverStatus = DRIVER_STATUS.ARRIVED
-            if (driver) {
-                driver.set({ status: newDriverStatus })
-            }
-            task.set({ taskStatus: newDriverStatus })
-        } else if (departTime == null) {
-            task.set({ departTime: operationTime })
-            newDriverStatus = DriverComplete(driver, trip, task, operationTime, startDateTime)
-        }
+        newDriverStatus = updateServiceModeDelivery(arrivalTime, task, operationTime, driver, departTime, trip, startDateTime)
     }
     else if (serviceModeVal == "pickup") {
-        if (arrivalTime == null) {
-            task.set({ arrivalTime: operationTime })
-            newDriverStatus = DRIVER_STATUS.ARRIVED
-            if (driver) {
-                driver.set({ status: newDriverStatus })
-            }
-            task.set({ taskStatus: newDriverStatus })
-        } else if (endTime == null) {
-            task.set({ endTime: operationTime })
-            newDriverStatus = DriverComplete(driver, trip, task, operationTime, endDateTime)
-        }
+        newDriverStatus = updateServiceModePickup(arrivalTime, task, operationTime, driver, endTime, trip, endDateTime)
     } else {
         if (arrivalTime == null) {
             task.set({ arrivalTime: operationTime })
             newDriverStatus = DRIVER_STATUS.ARRIVED
-            if (driver) {
-                driver.set({ status: newDriverStatus })
-            }
+            setDriverStatus(driver, newDriverStatus)
             task.set({ taskStatus: newDriverStatus })
         } else if (departTime == null) {
             task.set({ departTime: operationTime })
             newDriverStatus = DRIVER_STATUS.DEPARTED
-            if (driver) {
-                driver.set({ status: newDriverStatus })
-            }
+            setDriverStatus(driver, newDriverStatus)
             task.set({ taskStatus: newDriverStatus })
         } else if (endTime == null) {
             task.set({ endTime: operationTime })
@@ -347,7 +359,7 @@ module.exports.UpdateTaskStateToNoshow = async function (req, res) {
         } else if (noOfVehicle == completeCount) {
             trip.set({ status: DRIVER_STATUS.COMPLETED })
         }
-        
+
         await trip.save()
         await requestService.RecordOperationHistory(requestId, tripId, taskId, userId, status, status, "")
     })
@@ -392,13 +404,13 @@ module.exports.updateJobPOCCheckinfo = async function (req, res) {
         if (job) {
             let tripNo = job.tripNo;
             await sequelizeObj.transaction(async (t1) => {
-                await Job2.update({ pocCheckStatus: 'checked' }, { where: { tripNo: tripNo} });
+                await Job2.update({ pocCheckStatus: 'checked' }, { where: { tripNo: tripNo } });
 
-                let pocCheck = {tripNo: tripNo, formOneData: JSON.stringify(checkData.formOneData), formTwoData:JSON.stringify(checkData.formTwoData), createdBy: userId};
+                let pocCheck = { tripNo: tripNo, formOneData: JSON.stringify(checkData.formOneData), formTwoData: JSON.stringify(checkData.formTwoData), createdBy: userId };
                 await JobPOCCheck.create(pocCheck, { updateOnDuplicate: ['formOneData', 'formTwoData', 'createdBy', 'updatedAt'] });
             })
         }
-    } catch(error) {
+    } catch (error) {
         log.error(error)
         return Response.error(res, "Update Job POCCheckinfo failed.")
     }
@@ -414,22 +426,22 @@ module.exports.getPOCCheckinfo = async function (req, res) {
         let job = await Job2.findByPk(task.tripId)
         if (job) {
             let tripNo = job.tripNo;
-            let pocCheckInfo = await JobPOCCheck.findOne({ where: {tripNo: tripNo}});
+            let pocCheckInfo = await JobPOCCheck.findOne({ where: { tripNo: tripNo } });
 
             if (!pocCheckInfo) {
                 pocCheckInfo = {};
             }
-            let vehicle = await Vehicle.findOne({ where: {taskId: task.id}});
-            pocCheckInfo.vehicleType=job.vehicleType
-            pocCheckInfo.indentInfo=job.requestId
+            let vehicle = await Vehicle.findOne({ where: { taskId: task.id } });
+            pocCheckInfo.vehicleType = job.vehicleType
+            pocCheckInfo.indentInfo = job.requestId
             pocCheckInfo.poNumber = task.poNumber
             if (vehicle) {
-                pocCheckInfo.vehicleNo=vehicle.vehicleNumber;
+                pocCheckInfo.vehicleNo = vehicle.vehicleNumber;
             }
-            
+
             return Response.success(res, pocCheckInfo);
         }
-    } catch(error) {
+    } catch (error) {
         log.error(error)
         return Response.error(res, "Get Job POCCheckinfo failed.")
     }

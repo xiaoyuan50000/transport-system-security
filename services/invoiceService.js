@@ -71,20 +71,31 @@ const GetContractRateField = function (contractRate) {
 const CalculateSurcharge = function ({ executionDateTime, cancellationTime, tspChangeTime, departTime, totalCost,
     surchargeLessThen48, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen4, surchargeDepart, chargeType }) {
 
+    const isApprovalDateHoursLess48 = function (approveDateDiffHours) {
+        return approveDateDiffHours <= 48 * 3600 && approveDateDiffHours > 24 * 3600
+    }
+    const isApprovalDateHoursLess24 = function (approveDateDiffHours) {
+        return approveDateDiffHours <= 24 * 3600 && approveDateDiffHours > 12 * 3600
+    }
+    const isApprovalDateHoursLess12 = function (approveDateDiffHours) {
+        return approveDateDiffHours <= 12 * 3600 && approveDateDiffHours >= 4 * 3600
+    }
+    const isApprovalDateHoursLess4 = function (approveDateDiffHours, chargeType) {
+        return approveDateDiffHours < 4 * 3600 && (chargeType == ChargeType.OTHOURLY || chargeType == ChargeType.OTBLOCK || chargeType == ChargeType.BLOCKDAILY)
+    }
+
     let [surchargeLessThen48Cost, surchargeGenter12Cost, surchargeLess12Cost, surchargeLess4Cost, surchargeDepartCost, total] = [0, 0, 0, 0, 0, totalCost]
-    let approveDateDiffHours = moment(executionDateTime).diff(moment(cancellationTime ?? tspChangeTime), 's')
-    if (approveDateDiffHours <= 48 * 3600 && approveDateDiffHours > 24 * 3600) {
+    let approveDateDiffHours = moment(executionDateTime).diff(moment(cancellationTime || tspChangeTime), 's')
+    if (isApprovalDateHoursLess48(approveDateDiffHours)) {
         surchargeLessThen48Cost = surchargeLessThen48 * total
     }
-    else if (approveDateDiffHours <= 24 * 3600 && approveDateDiffHours > 12 * 3600) {
+    else if (isApprovalDateHoursLess24(approveDateDiffHours)) {
         surchargeGenter12Cost = surchargeGenterThen12 * total
     }
-    else if (approveDateDiffHours <= 12 * 3600 && approveDateDiffHours >= 4 * 3600) {
-        if (typeof surchargeLessThen12 != 'undefined') {
-            surchargeLess12Cost = surchargeLessThen12 * total
-        }
+    else if (isApprovalDateHoursLess12(approveDateDiffHours) && typeof surchargeLessThen12 != 'undefined') {
+        surchargeLess12Cost = surchargeLessThen12 * total
     }
-    else if (approveDateDiffHours < 4 * 3600 && (chargeType == ChargeType.OTHOURLY || chargeType == ChargeType.OTBLOCK || chargeType == ChargeType.BLOCKDAILY)) {
+    else if (isApprovalDateHoursLess4(approveDateDiffHours, chargeType)) {
         surchargeLess4Cost = surchargeLessThen4 * total
     }
     // If cancel before indent 24hr, no trip or hourly fee, only surcharge fee

@@ -8,7 +8,7 @@ const requestService = require('../services/requestService2');
 const indentService = require('../services/indentService2');
 const budgetService = require('../services/budgetService');
 
-const { ContractRate } = require('../model/contractRate.js');
+const { isNotEmptyNull } = require('../util/utils');
 const { Task2 } = require('../model/task');
 
 const { ROLE, DRIVER_STATUS, TASK_STATUS } = require('../util/content')
@@ -17,27 +17,119 @@ const { sequelizeDriverObj } = require('../sequelize/dbConf-driver');
 const indentStatus = [DRIVER_STATUS.NOSHOW, DRIVER_STATUS.COMPLETED, DRIVER_STATUS.LATE, TASK_STATUS.CANCELLED, TASK_STATUS.CANCELLED3RD]
 const fmt = "YYYY-MM-DD HH:mm"
 
+const getForceIndex = function (isJob, isEndorse) {
+    if (isJob) {
+        return "force INDEX(inx_createAt)"
+    }
+    if (isEndorse) {
+        return "force INDEX(inx_b)"
+    }
+    return ""
+}
+
+const getCurrentUser = async function (userId) {
+    let user = null
+    let currentUserRole = null;
+
+    if (userId) {
+        user = await requestService.GetUserInfo(userId)
+        currentUserRole = user.roleName
+    }
+    return { user, currentUserRole }
+}
+
+const filterJobTask1 = function (currentUserRole, user, endorsed, isEndorse, execution_date) {
+    let whereSql = ""
+    let replacements = []
+    if (currentUserRole == ROLE.RF || ROLE.OCC.indexOf(currentUserRole) != -1) {
+        whereSql += ` and FIND_IN_SET(a.serviceTypeId, ?)`
+        replacements.push(user.serviceTypeId)
+    } else if (currentUserRole == ROLE.UCO || currentUserRole == ROLE.RQ) {
+        whereSql += ` and f.groupId = ?`
+        replacements.push(user.group)
+    } else if (currentUserRole == ROLE.TSP) {
+        whereSql += ` and FIND_IN_SET(e.id, ?) and b.endorse = 1`
+        replacements.push(user.serviceProviderId)
+    }
+
+    if (endorsed) {
+        whereSql += ` AND b.endorse = 1 `
+    }
+    if (isEndorse) {
+        whereSql += ` and (CONCAT(b.executionDate,' ',b.executionTime) <= ?)`
+        replacements.push(moment().format(fmt))
+    }
+    if (isNotEmptyNull(execution_date)) {
+        if (execution_date.indexOf('~') != -1) {
+            const dates = execution_date.split(' ~ ')
+            whereSql += ` and (b.executionDate >= ? and b.executionDate <= ?)`
+            replacements.push(dates[0])
+            replacements.push(dates[1])
+        } else {
+            whereSql += ` and b.executionDate = ?`
+            replacements.push(`${execution_date}`)
+        }
+    }
+    return { whereSql, replacements }
+}
+
+const filterJobTask2 = function (filterData) {
+    let whereSql = ""
+    let replacements = []
+    let { vehicleType, tripNo, unit, created_date, requestId, serviceProviderId, tsp, isMV, nodeList } = filterData
+    if (isNotEmptyNull(vehicleType)) {
+        whereSql += ` and a.vehicleType = ?`
+        replacements.push(vehicleType)
+    }
+
+    if (isNotEmptyNull(tripNo)) {
+        whereSql += ` and a.tripNo like ?`
+        replacements.push(`${tripNo}%`)
+    }
+    if (isNotEmptyNull(unit)) {
+        whereSql += ` and f.groupId = ?`
+        replacements.push(`${Number(unit)}`)
+    }
+
+    if (isNotEmptyNull(created_date)) {
+        whereSql += ` and b.createdAt like ?`
+        replacements.push(`${created_date}%`)
+    }
+
+
+    if (isNotEmptyNull(requestId)) {
+        whereSql += ` and a.requestId like ?`
+        replacements.push(`${requestId}%`)
+    }
+    if (isNotEmptyNull(serviceProviderId)) {
+        whereSql += ` and ifnull(b.serviceProviderId, a.serviceProviderId) = ?`
+        replacements.push(`${serviceProviderId}`)
+    }
+    if (isNotEmptyNull(tsp)) {
+        whereSql += ` and st.category != 'MV' and FIND_IN_SET(?, b.selectableTsp)`;
+        replacements.push(`${tsp}`);
+    }
+    if (isMV == "true") {
+        whereSql += ` and st.category = 'MV'`;
+        if (nodeList && nodeList.length > 0) {
+            whereSql += ` and b.mobiusUnit in (?)`;
+            replacements.push(nodeList);
+        }
+    }
+    return { whereSql, replacements }
+}
+
 const QueryAndFilterJobList = async function (reqParams) {
     console.time("QueryAndFilterJobList")
     let pageNum = reqParams.pageNum
     let pageLength = reqParams.pageLength
     let userId = reqParams.userId
-    let currentUserRole = null;
     let { execution_date, created_date, unit, status, driverStatus, tripNo, vehicleType,
         isEndorse, tsp, endorsed, isArbitration, requestId, serviceProviderId, endorseTaskStatus, isJob, isMV, nodeList, action = 1 } = reqParams
-    let user
-    if (userId) {
-        user = await requestService.GetUserInfo(userId)
-        currentUserRole = user.roleName
-    }
+    let { user, currentUserRole } = await getCurrentUser(userId)
     let replacements = []
 
-    let force_index = ""
-    if (isJob) {
-        force_index = "force INDEX(inx_createAt)"
-    } else if (isEndorse) {
-        force_index = "force INDEX(inx_b)"
-    }
+    let force_index = getForceIndex(isJob, isEndorse)
 
     let allFromSql = `
         FROM
@@ -56,43 +148,18 @@ const QueryAndFilterJobList = async function (reqParams) {
         LEFT JOIN purpose_service_type pst on pm.id = pst.purposeId and FIND_IN_SET(a.serviceTypeId, pst.serviceTypeId)
         LEFT JOIN wallet w on b.walletId = w.id
         where 1=1 and a.loaTagId is null and f.purposeType != 'Urgent'`
+
     let whereSql = ``;
-    if (currentUserRole == ROLE.RF || ROLE.OCC.indexOf(currentUserRole) != -1) {
-        whereSql += ` and FIND_IN_SET(a.serviceTypeId, ?)`
-        replacements.push(user.serviceTypeId)
-    } else if (currentUserRole == ROLE.UCO || currentUserRole == ROLE.RQ) {
-        whereSql += ` and f.groupId = ?`
-        replacements.push(user.group)
-    } else if (currentUserRole == ROLE.TSP) {
-        whereSql += ` and FIND_IN_SET(e.id, ?) and b.endorse = 1`
-        replacements.push(user.serviceProviderId)
-    }
-    if (endorsed) {
-        whereSql += ` AND b.endorse = 1 `
-    }
-    if (isEndorse) {
-        whereSql += ` and (CONCAT(b.executionDate,' ',b.executionTime) <= ?)`
-        replacements.push(moment().format(fmt))
-    }
+    let filter1 = filterJobTask1(currentUserRole, user, endorsed, isEndorse, execution_date)
+    whereSql += filter1.whereSql
+    replacements.push(...filter1.replacements)
 
-    if (execution_date != "" && execution_date != null) {
-        if (execution_date.indexOf('~') != -1) {
-            const dates = execution_date.split(' ~ ')
-            whereSql += ` and (b.executionDate >= ? and b.executionDate <= ?)`
-            replacements.push(dates[0])
-            replacements.push(dates[1])
-        } else {
-            whereSql += ` and b.executionDate = ?`
-            replacements.push(`${execution_date}`)
-        }
-    }
-
-    if (endorseTaskStatus != "" && endorseTaskStatus != null) {
+    if (isNotEmptyNull(endorseTaskStatus)) {
         whereSql += ` and b.taskStatus not in (?)`
         replacements.push(indentStatus)
     }
 
-    if (status != "" && status != null) {
+    if (isNotEmptyNull(status)) {
         if (!driverStatus) {
             whereSql += ` and b.taskStatus = ?`
             replacements.push(status)
@@ -102,46 +169,10 @@ const QueryAndFilterJobList = async function (reqParams) {
             replacements.push(status, driverStatus)
         }
     }
-    if (vehicleType != "" && vehicleType != null) {
-        whereSql += ` and a.vehicleType = ?`
-        replacements.push(vehicleType)
-    }
 
-    if (tripNo != "" && tripNo != null) {
-        whereSql += ` and a.tripNo like ?`
-        replacements.push(`${tripNo}%`)
-    }
-    if (unit != "" && unit != null) {
-        whereSql += ` and f.groupId = ?`
-        replacements.push(`${Number(unit)}`)
-    }
-
-    if (created_date != "" && created_date != null) {
-        whereSql += ` and b.createdAt like ?`
-        replacements.push(`${created_date}%`)
-    }
-
-
-    if (requestId != "" && requestId != null) {
-        whereSql += ` and a.requestId like ?`
-        replacements.push(`${requestId}%`)
-    }
-    if (serviceProviderId != "" && serviceProviderId != null) {
-        whereSql += ` and ifnull(b.serviceProviderId, a.serviceProviderId) = ?`
-        replacements.push(`${serviceProviderId}`)
-    }
-    if (tsp != "" && tsp != null) {
-        whereSql += ` and st.category != 'MV' and FIND_IN_SET(?, b.selectableTsp)`;
-        replacements.push(`${tsp}`);
-    }
-    if (isMV == "true") {
-        whereSql += ` and st.category = 'MV'`;
-        if(nodeList && nodeList.length > 0){
-            whereSql += ` and b.mobiusUnit in (?)`;
-            replacements.push(nodeList);
-        }
-    }
-
+    let filter2 = filterJobTask2({ vehicleType, tripNo, unit, created_date, requestId, serviceProviderId, tsp, isMV, nodeList })
+    whereSql += filter2.whereSql
+    replacements.push(...filter2.replacements)
 
     let arbitrationSort = ""
     let countFromSql = `FROM
@@ -260,8 +291,31 @@ module.exports.GetAllJobCountAndPendingMyActionCount = async function (req, res)
     return res.json({ allCount: allCountResult[0].countNum, myCount: myactionCountResult[0].countNum })
 }
 
+const getWalletSelect = async function (temp, user) {
+    if (temp.funding != null && temp.disableWallet == 0) {
+        let walletSelect = await budgetService.GetWalletsByFunding(user, temp.funding)
+        return walletSelect
+    }
+    return []
+}
+
+const getIsRandomUnit = function (temp, mobiusSubUnits) {
+    let isRandomUnit = 1
+    for (let item of mobiusSubUnits) {
+        if (item.group) {
+            let unitGroupArray = item.group.split(',');
+            let existGroup = unitGroupArray.find(item1 => item1.toLowerCase() == temp.groupName.toLowerCase());
+            if (existGroup) {
+                isRandomUnit = 0;
+                break
+            }
+        }
+    }
+    return isRandomUnit
+}
+
 module.exports.GetAllJobs = async function (req, res) {
-    let { execution_date, created_date, unit, status, tripNo, vehicleType, tsp, userId, action, isMV  } = req.body;
+    let { execution_date, created_date, unit, status, tripNo, vehicleType, tsp, userId, action, isMV } = req.body;
     let pageNum = Number(req.body.start);
     let pageLength = Number(req.body.length);
     let nodeList = req.body['nodeList[]']
@@ -275,57 +329,32 @@ module.exports.GetAllJobs = async function (req, res) {
     let user = result.user
 
     let jobs = await indentService.GetActionInfoForJob(pageResult)
-    if (jobs && jobs.length > 0) {
-        let mobiusSubUnits = await QueryMobiusSubUnits()
-        jobs[0].mobiusSubUnits = mobiusSubUnits
 
-        for (let temp of jobs) {
-            if (user.roleName == ROLE.RF || user.roleName== ROLE.OCCMgr) {
-                if (temp.category.toUpperCase() != 'MV') {
-                    // if(!temp.contractPartNo){
-                    //     continue
-                    // }
-                    // let contractPartNo = temp.contractPartNo
-                    // if (temp.contractPartNo.indexOf(',') != -1) {
-                    //     contractPartNo = temp.contractPartNo.split(',')[0]
-                    // }
-                    // let contractRate = await ContractRate.findOne({ where: { contractPartNo: contractPartNo, typeOfVehicle: temp.vehicleType } });
-                    // let fundingSelect = null;
-                    // if (contractRate) {
-                    //     let fundingStr = contractRate.funding
-                    //     if (fundingStr && fundingStr.split(',').length > 0) {
-                    //         fundingSelect = []
-                    //         let fundingArray = fundingStr.split(',')
-                    //         if (fundingArray) {
-                    //             for (let temp of fundingArray) {
-                    //                 fundingSelect.push({ name: temp });
-                    //             }
-                    //         }
-                    //     }
-                    // }
-                    temp.fundingSelect = [{name: 'Central'},{name: 'Unit'}]
-                    // wallet
-                    temp.walletSelect = []
-                    if (temp.funding != null && temp.disableWallet == 0) {
-                        temp.walletSelect = await budgetService.GetWalletsByFunding(user, temp.funding)
-                    }
+    if (jobs.length == 0) {
+        return res.json({
+            data: jobs, allCount: result.allCount, myCount: result.myCount,
+            recordsFiltered: result.recordsFiltered, recordsTotal: result.recordsTotal
+        })
+    }
 
-                } else {
-                    temp.isRandomUnit = 1;
-                    if (mobiusSubUnits && mobiusSubUnits.length > 0) {
-                        for (let item of mobiusSubUnits) {
-                            if (item.group) {
-                                let unitGroupArray = item.group.split(',');
-                                let existGroup = unitGroupArray.find(item1 => item1.toLowerCase() == temp.groupName.toLowerCase());
-                                if (existGroup) {
-                                    temp.isRandomUnit = 0;
-                                    break
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+    let mobiusSubUnits = await QueryMobiusSubUnits()
+    jobs[0].mobiusSubUnits = mobiusSubUnits
+
+    if (user.roleName != ROLE.RF && user.roleName != ROLE.OCCMgr) {
+        return res.json({
+            data: jobs, allCount: result.allCount, myCount: result.myCount,
+            recordsFiltered: result.recordsFiltered, recordsTotal: result.recordsTotal
+        })
+    }
+
+    for (let temp of jobs) {
+        if (temp.category.toUpperCase() != 'MV') {
+            temp.fundingSelect = [{ name: 'Central' }, { name: 'Unit' }]
+            // wallet
+            temp.walletSelect = await getWalletSelect(temp, user)
+
+        } else {
+            temp.isRandomUnit = getIsRandomUnit(temp, mobiusSubUnits)
         }
     }
 

@@ -502,6 +502,34 @@ const GetPickupAndDropoffLocation = async function (pickupDestination, dropoffDe
     return { pickUpLocation: pickUpLocation, dropOffLocation: dropOffLocation }
 }
 
+const getSelectableTspStr = function (selectableTspList) {
+    if (selectableTspList && selectableTspList.length > 0) {
+        return selectableTspList.map(o => o.id).join(",");
+    }
+    return null
+}
+
+const getMobiusUnitId = function (mobiusSubUnits, groupName) {
+    if (mobiusSubUnits.length == 0) {
+        return null
+    }
+    let mobiusUnitId = null
+    for (let item of mobiusSubUnits) {
+        if (item.group) {
+            let unitGroupArray = item.group.split(',');
+            let existGroup = unitGroupArray.find(temp => temp.toLowerCase() == groupName.toLowerCase());
+            if (existGroup) {
+                mobiusUnitId = item.id
+                break
+            }
+        }
+    }
+    if (mobiusUnitId == null) {
+        mobiusUnitId = mobiusSubUnits[0].id
+    }
+    return mobiusUnitId
+}
+
 const GetCreateTasks = async function (noOfVehicle, noOfDriver, pickupDestination, pickupNotes, dropoffDestination, dropoffNotes,
     executionDate, executionTime, duration, indent, tripId, pocName, contactNumber, typeOfVehicle, user, serviceMode, serviceModeId, serviceTypeId, tripNo, startDate, endDate) {
 
@@ -514,14 +542,8 @@ const GetCreateTasks = async function (noOfVehicle, noOfDriver, pickupDestinatio
     // let poNumber = indent.poNumber
 
     let selectableTspList = await indentService.FilterServiceProvider(typeOfVehicle, serviceModeId, dropoffDestination, pickupDestination, executionDate, executionTime)
-    let selectableTspStr = null;
-    if (selectableTspList && selectableTspList.length > 0) {
-        let tspIdArray = [];
-        for (let tsp of selectableTspList) {
-            tspIdArray.push(tsp.id);
-        }
-        selectableTspStr = tspIdArray.join(",");
-    }
+    let selectableTspStr = getSelectableTspStr(selectableTspList)
+
     let mobiusUnitId = null;
     let taskServiceType = await ServiceType.findByPk(serviceTypeId);
     if (taskServiceType && taskServiceType.category.toLowerCase() == 'mv') {
@@ -535,21 +557,7 @@ const GetCreateTasks = async function (noOfVehicle, noOfDriver, pickupDestinatio
                 type: QueryTypes.SELECT,
             }
         );
-        if (mobiusSubUnits && mobiusSubUnits.length > 0) {
-            for (let item of mobiusSubUnits) {
-                if (item.group) {
-                    let unitGroupArray = item.group.split(',');
-                    let existGroup = unitGroupArray.find(temp => temp.toLowerCase() == groupName.toLowerCase());
-                    if (existGroup) {
-                        mobiusUnitId = item.id
-                        break
-                    }
-                }
-            }
-            if (mobiusUnitId == null) {
-                mobiusUnitId = mobiusSubUnits[0].id
-            }
-        }
+        mobiusUnitId = getMobiusUnitId(mobiusSubUnits, groupName)
     }
 
     let tasks = []
@@ -794,82 +802,85 @@ module.exports.GetCreateTasks = GetCreateTasks
 
 // cancel and create or update
 const UpdateOrCancelJobTask = async function (taskList, alreadySendDataTasks, typeOfVehicle, serviceModeId, createdBy, tripNo) {
-    let updateTaskList = []
-    if (taskList.length > 0) {
-        let index = 0
-        for (let row of taskList) {
-            let sendDataTask = alreadySendDataTasks[index]
-            if (!sendDataTask) {
-                continue
-            }
-            row.externalJobId = sendDataTask.externalJobId
-            row.externalTaskId = sendDataTask.externalTaskId
-            row.serviceProviderId = sendDataTask.serviceProviderId
-            row.tspChangeTime = sendDataTask.tspChangeTime
-            row.notifiedTime = sendDataTask.notifiedTime
-            row.success = sendDataTask.success
-            row.guid = sendDataTask.guid
-            row.jobStatus = sendDataTask.jobStatus
-            row.returnData = sendDataTask.returnData
-
-            let dropoffDestination = row.dropoffDestination
-            let pickupDestination = row.pickupDestination
-            let executionTime = row.executionTime
-            let serviceProviderId = sendDataTask.serviceProviderId
-            let trackingId = GetTrackingId(tripNo)
-
-            let sendData = JSON.parse(row.sendData)
-            let tasks_attributes = sendData.job.tasks_attributes[0]
-            tasks_attributes.tracking_id = trackingId
-            let custom_fields_attributes = tasks_attributes.custom_fields_attributes
-            for (let item of custom_fields_attributes) {
-                if (item.custom_field_description_id == conf.CreateJobJsonField.TrackingIdField) {
-                    item.value = sendDataTask.requestId.substr(0, 5) + trackingId
-                }
-            }
-            row.trackingId = trackingId
-            row.sendData = JSON.stringify(sendData)
-
-            let serviceProviderList = await indentService.FilterServiceProvider(typeOfVehicle, serviceModeId, dropoffDestination, pickupDestination, row.executionDate, executionTime)
-            // log.info(JSON.stringify(serviceProviderList, null, 2))
-
-            row.selectableTsp = serviceProviderList.map(a => a.id).join(',')
-            let tsp = serviceProviderList.find(item => item.id == serviceProviderId)
-            if (tsp) {
-                row.contractPartNo = tsp.contractPartNo
-                let serviceProvider = await ServiceProvider.findByPk(serviceProviderId)
-                row.allocateeId = serviceProvider.allocateeId
-                updateTaskList.push(row)
-            }
-            index += 1
-        }
-
-        for (let row of updateTaskList) {
-            let id = row.id
-            await Task2.update({
-                externalJobId: row.externalJobId,
-                externalTaskId: row.externalTaskId,
-                serviceProviderId: row.serviceProviderId,
-                tspChangeTime: row.tspChangeTime,
-                notifiedTime: row.notifiedTime,
-                contractPartNo: row.contractPartNo,
-                trackingId: row.trackingId,
-                sendData: row.sendData,
-                selectableTsp: row.selectableTsp,
-                success: row.success,
-                guid: row.guid,
-                jobStatus: row.jobStatus,
-                returnData: row.returnData,
-            }, {
-                where: {
-                    id: id
-                }
-            })
-
-            let msg = JSON.stringify({ taskId: id, allocateeId: row.allocateeId, operatorId: createdBy, serviceProviderId: row.serviceProviderId, createdAt: moment().add(1, 's').format('YYYY-MM-DD HH:mm:ss') })
-            activeMQ.publicCreateJobMsg(Buffer.from(msg))
-        }
+    if (taskList.length == 0) {
+        return
     }
+
+    let updateTaskList = []
+    let index = 0
+    for (let row of taskList) {
+        let sendDataTask = alreadySendDataTasks[index]
+        if (!sendDataTask) {
+            continue
+        }
+        row.externalJobId = sendDataTask.externalJobId
+        row.externalTaskId = sendDataTask.externalTaskId
+        row.serviceProviderId = sendDataTask.serviceProviderId
+        row.tspChangeTime = sendDataTask.tspChangeTime
+        row.notifiedTime = sendDataTask.notifiedTime
+        row.success = sendDataTask.success
+        row.guid = sendDataTask.guid
+        row.jobStatus = sendDataTask.jobStatus
+        row.returnData = sendDataTask.returnData
+
+        let dropoffDestination = row.dropoffDestination
+        let pickupDestination = row.pickupDestination
+        let executionTime = row.executionTime
+        let serviceProviderId = sendDataTask.serviceProviderId
+        let trackingId = GetTrackingId(tripNo)
+
+        let sendData = JSON.parse(row.sendData)
+        let tasks_attributes = sendData.job.tasks_attributes[0]
+        tasks_attributes.tracking_id = trackingId
+        let custom_fields_attributes = tasks_attributes.custom_fields_attributes
+        for (let item of custom_fields_attributes) {
+            if (item.custom_field_description_id == conf.CreateJobJsonField.TrackingIdField) {
+                item.value = sendDataTask.requestId.substr(0, 5) + trackingId
+            }
+        }
+        row.trackingId = trackingId
+        row.sendData = JSON.stringify(sendData)
+
+        let serviceProviderList = await indentService.FilterServiceProvider(typeOfVehicle, serviceModeId, dropoffDestination, pickupDestination, row.executionDate, executionTime)
+        // log.info(JSON.stringify(serviceProviderList, null, 2))
+
+        row.selectableTsp = serviceProviderList.map(a => a.id).join(',')
+        let tsp = serviceProviderList.find(item => item.id == serviceProviderId)
+        if (tsp) {
+            row.contractPartNo = tsp.contractPartNo
+            let serviceProvider = await ServiceProvider.findByPk(serviceProviderId)
+            row.allocateeId = serviceProvider.allocateeId
+            updateTaskList.push(row)
+        }
+        index += 1
+    }
+
+    for (let row of updateTaskList) {
+        let id = row.id
+        await Task2.update({
+            externalJobId: row.externalJobId,
+            externalTaskId: row.externalTaskId,
+            serviceProviderId: row.serviceProviderId,
+            tspChangeTime: row.tspChangeTime,
+            notifiedTime: row.notifiedTime,
+            contractPartNo: row.contractPartNo,
+            trackingId: row.trackingId,
+            sendData: row.sendData,
+            selectableTsp: row.selectableTsp,
+            success: row.success,
+            guid: row.guid,
+            jobStatus: row.jobStatus,
+            returnData: row.returnData,
+        }, {
+            where: {
+                id: id
+            }
+        })
+
+        let msg = JSON.stringify({ taskId: id, allocateeId: row.allocateeId, operatorId: createdBy, serviceProviderId: row.serviceProviderId, createdAt: moment().add(1, 's').format('YYYY-MM-DD HH:mm:ss') })
+        activeMQ.publicCreateJobMsg(Buffer.from(msg))
+    }
+
 }
 
 module.exports.EditTrip = async function (req, res) {
@@ -940,28 +951,13 @@ module.exports.EditTrip = async function (req, res) {
             let taskList = taskList1.concat(taskList2)
             await UpdateOrCancelJobTask(taskList, alreadySendDataTasks, typeOfVehicle, serviceMode, createdBy, tripNo)
         }
+
         if (!additionalRemarks) {
             additionalRemarks = indent.additionalRemarks
         }
         await UpdateIndentInfo(requestId, additionalRemarks)
 
-        if (serviceTypeObj.category.toLowerCase() == 'mv') {
-            let job = await Job2.findByPk(oldTripId)
-            let jobs = [job]
-            if (preParkDate) {
-                let anotherTrip = await GetPeriodAnotherTrip(job)
-                if (anotherTrip) jobs.push(anotherTrip)
-            }
-            if (typeOfVehicle != "-" && driver == 1) {
-                await UpdateMVContractNo(jobs)
-            }
-
-            if (user.roleName == ROLE.RF || ROLE.OCC.indexOf(user.roleName) != -1) {
-                // send mobius server auto match driver
-                let tripIdList = jobs.map(o => o.id)
-                await Utils.SendTripToMobiusServer(tripIdList)
-            }
-        }
+        await EditUpdateMVTrip(serviceTypeObj, oldTripId, preParkDate, typeOfVehicle, driver, user)
         return Response.success(res, true)
     } catch (ex) {
         log.error(ex)
@@ -969,15 +965,64 @@ module.exports.EditTrip = async function (req, res) {
     }
 }
 
+const EditUpdateMVTrip = async function (serviceTypeObj, oldTripId, preParkDate, typeOfVehicle, driver, user) {
+    if (serviceTypeObj.category.toLowerCase() != 'mv') {
+        return
+    }
+
+    let job = await Job2.findByPk(oldTripId)
+    let jobs = [job]
+
+    if (preParkDate) {
+        let anotherTrip = await GetPeriodAnotherTrip(job)
+        if (anotherTrip) jobs.push(anotherTrip)
+    }
+    if (typeOfVehicle != "-" && driver == 1) {
+        await UpdateMVContractNo(jobs)
+    }
+
+    if (user.roleName == ROLE.RF || ROLE.OCC.indexOf(user.roleName) != -1) {
+        // send mobius server auto match driver
+        let tripIdList = jobs.map(o => o.id)
+        await Utils.SendTripToMobiusServer(tripIdList)
+    }
+}
+
+const getPeriodTrip = async function (trip) {
+    if (trip.repeats == "Period") {
+        let anotherTrip = await GetPeriodAnotherTrip(trip)
+        if (anotherTrip) {
+            return [anotherTrip]
+        }
+    }
+    return []
+}
+
+const getAlreadySendDataTasks = function (serviceType, tasks) {
+    let alreadySendDataTasks = []
+    if (serviceType.category.toLowerCase() != 'mv') {
+        let records = tasks.filter(a => a.externalJobId != null)
+        if (records.length > 0) {
+            alreadySendDataTasks.push(...records)
+        }
+    }
+    return alreadySendDataTasks
+}
+const isNotLoanMVTask = function (vehicleType, hasDriver) {
+    return vehicleType != "-" && hasDriver == 1
+}
+
+const isRFOrOCC = function (roleName) {
+    return roleName == ROLE.RF || ROLE.OCC.indexOf(roleName) != -1
+}
+
 const BeforeEditTrip = async function (trip, roleName, serviceType, createdBy) {
     let vehicleType = trip.vehicleType
     let hasDriver = trip.driver
 
     let oldTrips = [trip]
-    if (trip.repeats == "Period") {
-        let anotherTrip = await GetPeriodAnotherTrip(trip)
-        if (anotherTrip) oldTrips.push(anotherTrip)
-    }
+    let anotherTrip = getPeriodTrip(trip)
+    oldTrips.push(...anotherTrip)
 
     let jobHistoryIds = []
     let taskIdArray = []
@@ -996,32 +1041,22 @@ const BeforeEditTrip = async function (trip, roleName, serviceType, createdBy) {
         let historyId = await CopyRecordToHistory(oldTrip, tasks)
         jobHistoryIds.push(historyId)
 
-        if (serviceType.category.toLowerCase() != 'mv') {
-            let records = tasks.filter(a => a.externalJobId != null)
-            if (records.length > 0) {
-                alreadySendDataTasks.push(...records)
-            }
-        }
+        let alreadySendDataTaskList = getAlreadySendDataTasks(serviceType, tasks)
+        alreadySendDataTasks.push(...alreadySendDataTaskList)
 
         // cancel and create or update
-        if (roleName == ROLE.RF || ROLE.OCC.indexOf(roleName) != -1) {
+        if (isRFOrOCC(roleName)) {
             // cancel wog task
             await CancelledWogTasks(tasks)
             await CancelledTasksByExternalJobId(tasks)
-
-
         }
-
     }
 
-    if (roleName == ROLE.RF || ROLE.OCC.indexOf(roleName) != -1) {
-        if (serviceType.category.toLowerCase() == 'mv') {
-            if (vehicleType != "-" && hasDriver == 1) {
-                notLoanMVTaskIdArray.push(...taskAll.map(item => item.id))
-            } else {
-            }
-            loanMVTaskIdArray.push(...taskAll.map(item => item.id))
+    if (isRFOrOCC(roleName) && serviceType.category.toLowerCase() == 'mv') {
+        if (isNotLoanMVTask(vehicleType, hasDriver)) {
+            notLoanMVTaskIdArray.push(...taskAll.map(item => item.id))
         }
+        loanMVTaskIdArray.push(...taskAll.map(item => item.id))
     }
 
 
@@ -1217,6 +1252,13 @@ const GetPeriodAnotherTask = async function (tripId, driverNo) {
 }
 module.exports.GetPeriodAnotherTask = GetPeriodAnotherTask
 
+const getResourceId = function (vehicle) {
+    if (vehicle && vehicle[0]) {
+        return vehicle[0].id
+    }
+    return null
+}
+
 const DoEditTrip = async function (pickupDestination, pickupNotes, dropoffDestination, dropoffNotes, typeOfVehicle, noOfVehicle, noOfDriver, pocName,
     contactNumber, executionDate, executionTime, duration, createdBy, serviceProviderId, remark, roleName,
     periodStartDate, periodEndDate, driver, user, tripRemarks, serviceModeId, serviceTypeId, repeats,
@@ -1236,9 +1278,7 @@ const DoEditTrip = async function (pickupDestination, pickupNotes, dropoffDestin
                 type: QueryTypes.SELECT
             }
         );
-        if (vehicle && vehicle[0]) {
-            resourceId = vehicle[0].id
-        }
+        resourceId = getResourceId(vehicle)
     }
 
     let newJob = await Job2.create({
@@ -1300,7 +1340,7 @@ const DoEditTrip = async function (pickupDestination, pickupNotes, dropoffDestin
     let approve = 0
     let newStatus = ""
     let approved = false
-    if (roleName == ROLE.RF || ROLE.OCC.indexOf(roleName) != -1) {
+    if (isRFOrOCC(roleName)) {
         // await DoApprove(taskList, newJob)
         await Task2.update({ isChange: 1 }, {
             where: {
@@ -1324,7 +1364,7 @@ const DoEditTrip = async function (pickupDestination, pickupNotes, dropoffDestin
 
     let updateObj = { status: newStatus, approve: approve }
     if (isCreateWorkFlow) {
-        if ((roleName == ROLE.RF || roleName == ROLE.OCCMgr) && newJob.instanceId == null) {
+        if (isRFOrOCC(roleName) && newJob.instanceId == null) {
             let instanceId = await WorkFlow.create(roleName, newTripId)
             updateObj.instanceId = instanceId
         } else {

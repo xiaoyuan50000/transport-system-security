@@ -14,5 +14,5 @@ module.exports.UrlWhiteList = ['/login', '/mobilePOC/login','/mobileCV/login','/
     '/task/getAssignableTaskList2','/task/getAssignableTaskDashboard', '/task/assignTask', '/task/updateTask', '/task/getHubNumber',
     '/mobileTO/getTOIndents', '/mobileTO/updateDriver', '/mobileTO/updateVehicle', '/mobileTO/startTask', '/mobileTO/endTask',
     '/home', '/callback','/mobile-callback', '/mobileCV/mobileSingpass', '/mobileCV/loginUseSingpass', '/loginUseSingpass', '/contact_us', '/getRegisterUrl',
-    '/getDecodeAESCode'
+    '/getDecodeAESCode', '/cpu/usage'
 ]

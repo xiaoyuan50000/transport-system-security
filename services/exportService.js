@@ -91,7 +91,7 @@ const GetIndentDataByDate = async function (startDate, endDate, userId) {
             o2.createdAt as rfApprovalTime
         FROM
             request a
-        LEFT JOIN (select * from job where IFNULL(periodStartDate, CONCAT(executionDate,' ',executionTime)) = CONCAT(executionDate,' ',executionTime)) b ON a.id = b.requestId
+        LEFT JOIN job b ON a.id = b.requestId
         LEFT JOIN job_task c ON b.id = c.tripId
         LEFT JOIN \`group\` d ON a.groupId = d.id
         LEFT JOIN service_provider e ON ifnull(c.serviceProviderId, b.serviceProviderId) = e.id

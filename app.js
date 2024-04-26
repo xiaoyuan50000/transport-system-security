@@ -28,6 +28,8 @@ const home = require('./singpass/home')
 const callback = require('./singpass/callback')
 const mobileCallback = require('./singpass/mobileCallback')
 let ActiveMQ = require('./activemq/activemq.js');
+const cpuRouter = require('./routes/cpu')
+
 
 let app = express();
 
@@ -37,12 +39,12 @@ app.engine('html', ejs.__express);
 app.set('view engine', 'html');
 
 app.use(logger('dev'));
-app.use(express.json({limit: '16mb'}));
+app.use(express.json({ limit: '16mb' }));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
 	if (['/._darcs', '/.bzr', '/.hg', '/BitKeeper', '/latest/meta-data/'].includes(req.url)) {
 		const err = new Error('Not Found');
 		err.status = 404;
@@ -80,17 +82,17 @@ app.use(helmet({
 
 
 app.use(session({
-  secret: 'sessiontest',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
+	secret: 'sessiontest',
+	resave: false,
+	saveUninitialized: false,
+	cookie: {
 		sameSite: "Strict"
 	},
 }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 const options = {
-  maxAge: 30 * 24 * 3600 * 1000,
+	maxAge: 30 * 24 * 3600 * 1000,
 }
 app.use(express.static(path.join(__dirname, 'node_modules'), options));
 app.use(express.static(path.join(__dirname, 'resources'), options));
@@ -108,36 +110,39 @@ app.use('/provider', providerRouter);
 app.use('/mobileCV', mobileCVRouter);
 app.use('/mobilePOC', mobilePOCRouter);
 app.use('/mobileTO', mobileTORouter);
+app.use('/cpu', cpuRouter)
 
 app.get('/home', home)
 app.get('/callback', callback)
 app.get('/mobile-callback', mobileCallback)
 
+
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  res.render('404');
+	res.render('404');
 });
 
 // error handler
 app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-  log4js.logger("error").error("HTTP Request URL: %s", req.originalUrl);
-  log4js.logger("error").error("HTTP Request Body: %s", req.body);
-  log4js.logger("error").error(err);
-  // render the error page
-  res.status(err.status || 500);
-  Response.error(res, err.message, 500);
+	// set locals, only providing error in development
+	res.locals.message = err.message;
+	res.locals.error = req.app.get('env') === 'development' ? err : {};
+	log4js.logger("error").error("HTTP Request URL: %s", req.originalUrl);
+	log4js.logger("error").error("HTTP Request Body: %s", req.body);
+	log4js.logger("error").error(err);
+	// render the error page
+	res.status(err.status || 500);
+	Response.error(res, err.message, 500);
 });
 
 process.on('uncaughtException', function (e) {
-  log4js.logger("error").error(`uncaughtException`)
-  log4js.logger("error").error(e)
+	log4js.logger("error").error(`uncaughtException`)
+	log4js.logger("error").error(e)
 });
 process.on('unhandledRejection', function (err, promise) {
-  log4js.logger("error").error(`unhandledRejection`);
-  log4js.logger("error").error(err);
+	log4js.logger("error").error(`unhandledRejection`);
+	log4js.logger("error").error(err);
 })
 
 require('./sequelize/dbHelper');
@@ -159,5 +164,5 @@ if (!fs.existsSync(invoicePath)) fs.mkdirSync(invoicePath);
  * Init ActiveMQ Client
  */
 ActiveMQ.initActiveMQ();
- 
+
 module.exports = app;

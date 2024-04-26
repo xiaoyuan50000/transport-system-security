@@ -21,37 +21,49 @@ const cookieOptions = {
     path: "/",
     sameSite: "Strict"
 }
+
+const ifPOCLoginSuccess = function (user) {
+    return user != null && user.role != conf.poc_role_id
+}
+
+const checkLoginUser = async function (loginName, password) {
+    let user = await User.findOne({ where: { loginName: loginName, password: password } });
+
+    if (user != null) {
+        let role = await Role.findByPk(user.role)
+        if (role.roleName == "POC") {
+            return { user, loginError: "Login Failed. POC user cannot login." }
+        }
+    } else {
+        user = await User.findOne({ where: { loginName: loginName } });
+        if (!user) {
+            let { code, errorMsg } = await getUserExistByLoginName(loginName)
+            if (code == 0) {
+                return { user: null, loginError: errorMsg }
+            }
+        }
+        if (!user) {
+            return { user: null, loginError: "Login Failed. User does not exist." }
+        }
+    }
+    return { user, loginError: "" }
+}
+
 const loginServer = async function (req, res) {
     try {
         let loginName = req.body.username;
         let password = req.body.password;
-        // let autoLogin = req.body.autoLogin;
-        // if (!autoLogin) {
-        //     password = utils.MD5(password);
-        // }
+
         let user = null;
         if (loginName) {
-            user = await User.findOne({ where: { loginName: loginName, password: password } });
-            if (user != null) {
-                let role = await Role.findByPk(user.role)
-                if (role.roleName == "POC") {
-                    return Response.error(res, "Login Failed. POC user cannot login.");
-                }
-            } else {
-                user = await User.findOne({ where: { loginName: loginName } });
-                if (!user) {
-                    let { code, errorMsg } = await getUserExistByLoginName(loginName)
-                    if (code == 0) {
-                        return Response.error(res, errorMsg);
-                    }
-                }
-                if (!user) {
-                    return Response.error(res, "Login Failed. User does not exist.");
-                }
+            let loginUser = await checkLoginUser(loginName, password)
+            if (loginUser.loginError != "") {
+                return Response.error(res, loginUser.loginError);
             }
+            user = loginUser.user
         } else {
             user = await User.findOne({ where: { contactNumber: req.body.mobileNumber } });
-            if (user != null && user.role != conf.poc_role_id) {
+            if (ifPOCLoginSuccess(user)) {
                 return Response.error(res, "Login Failed. Not POC User.");
             }
         }
@@ -65,62 +77,47 @@ const loginServer = async function (req, res) {
         if (times > tryTimes) {
             return Response.error(res, `Account [${loginName}] is locked, please contact administrator.`);
         }
-        // valid expried login
-        if (user.status == USER_STATUS.LockOut) {
-            if (user.getDataValue('status') == null) {
-                await addUserManagementReport(user.id, "Last login date passed 90 days", USER_ACTIVITY.LockOut)
-                await User.update({ status: USER_STATUS.LockOut }, { where: { id: user.id } })
-            } else if (user.getDataValue('status') != USER_STATUS.LockOut) {
-                await addUserManagementReport(user.id, "Account locked", USER_ACTIVITY.LockOut)
-            }
-            return Response.error(res, `Account [${loginName}] is locked, please contact administrator.`);
-        } else if (user.status == USER_STATUS.Deactivated) {
-            if (user.getDataValue('status') == null) {
-                await addUserManagementReport(user.id, "Last login date passed 180 days", USER_ACTIVITY.Deactivate)
-                await User.update({ status: USER_STATUS.Deactivated }, { where: { id: user.id } })
-            } else if (user.getDataValue('status') != USER_STATUS.Deactivated) {
-                await addUserManagementReport(user.id, "Account deactivated", USER_ACTIVITY.Deactivate)
-            }
-            return Response.error(res, `Account [${loginName}] is deactivated, please contact administrator.`);
-        }
+
         // valid password
         if (password.toLowerCase() != user.password.toLowerCase()) {
-            if (times == tryTimes) {
-                await user.update({ status: USER_STATUS.LockOut })
-                await addUserManagementReport(user.id, "Account locked", USER_ACTIVITY.LockOut)
-            } else {
-                await user.update({ times: times + 1 })
-                addUserManagementReport(user.id, times + 1, "Login Attempt Failed");
-            }
-            await updatePwdErrorTimes(user.id, times + 1)
+            await tryTimesExceeded(times, tryTimes, user)
             if (tryTimes - times == 0) {
                 return Response.error(res, `Login Failed. Account [${loginName}] is locked, please contact administrator.`);
             }
             return Response.error(res, `Login Failed. Username or Password is incorrect. No. of tries left: ${tryTimes - times}`);
-        } else {
-            if (user.ORDExpired) {
-                return Response.error(res, `Login Failed. Account [${loginName}] ORD Expired, please contact administrator.`);
-            }
-            let token = utils.generateTokenKey({ id: user.id, groupId: user.group, loginName: loginName, date: new Date() });
-            let expireDate = moment(new Date()).add(JWTHeader.expire, "second")
-            res.setHeader('Set-Cookie', `token=${token}; path=/; httpOnly; SameSite=Strict; expires=${expireDate}`)
-
-            res.cookie("token", token, cookieOptions);
-
-            let role = await Role.findByPk(user.role)
-            user.roleName = role != null ? role.roleName : ""
-            let loginTime = new Date()
-            await user.update({ times: 0, lastLoginTime: loginTime, token: token })
-            await user.save()
-
-            await updatePwdErrorTimes(user.id, 0, loginTime)
-            let return_user = {
-                roleName: user.roleName,
-                username: user.username,
-            }
-            return Response.success(res, utils.generateAESCode(JSON.stringify({ ...return_user, expire: expireDate, isFirstLogin: user.lastChangePasswordDate == null })));
-            // return Response.success(res, { ...return_user, expire: expireDate, isFirstLogin: user.lastChangePasswordDate == null, token: token });
         }
+        else if (user.ORDExpired) {
+            return Response.error(res, `Login Failed. Account [${loginName}] ORD Expired, please contact administrator.`);
+        }
+        // valid expried login
+        else if (user.status == USER_STATUS.LockOut) {
+            await lockOutUser(user)
+            return Response.error(res, `Account [${loginName}] is locked, please contact administrator.`);
+        }
+        else if (user.status == USER_STATUS.Deactivated) {
+            await deactivatedUser(user)
+            return Response.error(res, `Account [${loginName}] is deactivated, please contact administrator.`);
+        }
+
+        let token = utils.generateTokenKey({ id: user.id, groupId: user.group, loginName: loginName, date: new Date() });
+        let expireDate = moment(new Date()).add(JWTHeader.expire, "second")
+        res.setHeader('Set-Cookie', `token=${token}; path=/; httpOnly; SameSite=Strict; expires=${expireDate}`)
+
+        res.cookie("token", token, cookieOptions);
+
+        let role = await Role.findByPk(user.role)
+        user.roleName = role != null ? role.roleName : ""
+        let loginTime = new Date()
+        await user.update({ times: 0, lastLoginTime: loginTime, token: token })
+        await user.save()
+
+        await updatePwdErrorTimes(user.id, 0, loginTime)
+        let return_user = {
+            roleName: user.roleName,
+            username: user.username,
+        }
+        return Response.success(res, utils.generateAESCode(JSON.stringify({ ...return_user, expire: expireDate, isFirstLogin: user.lastChangePasswordDate == null })));
+        // return Response.success(res, { ...return_user, expire: expireDate, isFirstLogin: user.lastChangePasswordDate == null, token: token });
     } catch (ex) {
         log.error(ex)
         return Response.error(res, "Server error.");
@@ -128,6 +125,16 @@ const loginServer = async function (req, res) {
 };
 module.exports.loginServer = loginServer;
 
+const tryTimesExceeded = async function (times, tryTimes, user) {
+    if (times == tryTimes) {
+        await user.update({ status: USER_STATUS.LockOut })
+        await addUserManagementReport(user.id, "Account locked", USER_ACTIVITY.LockOut)
+    } else {
+        await user.update({ times: times + 1 })
+        addUserManagementReport(user.id, times + 1, "Login Attempt Failed");
+    }
+    await updatePwdErrorTimes(user.id, times + 1)
+}
 
 const lockOutUser = async function (user) {
     if (user.getDataValue('status') == null) {
@@ -259,20 +266,10 @@ module.exports.loginUseSingpass = async function (req, res) {
     }
 
     if (user.status == USER_STATUS.LockOut) {
-        if (user.getDataValue('status') == null) {
-            await addUserManagementReport(user.id, "Last login date passed 90 days", USER_ACTIVITY.LockOut)
-            await User.update({ status: USER_STATUS.LockOut }, { where: { id: user.id } })
-        } else if (user.getDataValue('status') != USER_STATUS.LockOut) {
-            await addUserManagementReport(user.id, "Account locked", USER_ACTIVITY.LockOut)
-        }
+        await lockOutUser(user)
         return Response.error(res, `Account [${loginName}] is locked, please contact administrator.`);
     } else if (user.status == USER_STATUS.Deactivated) {
-        if (user.getDataValue('status') == null) {
-            await addUserManagementReport(user.id, "Last login date passed 180 days", USER_ACTIVITY.Deactivate)
-            await User.update({ status: USER_STATUS.Deactivated }, { where: { id: user.id } })
-        } else if (user.getDataValue('status') != USER_STATUS.Deactivated) {
-            await addUserManagementReport(user.id, "Account deactivated", USER_ACTIVITY.Deactivate)
-        }
+        await deactivatedUser(user)
         return Response.error(res, `Account [${loginName}] is deactivated, please contact administrator.`);
     }
     if (user.ORDExpired) {

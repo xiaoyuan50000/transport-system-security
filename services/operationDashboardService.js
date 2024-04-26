@@ -8,72 +8,66 @@ const { sequelizeObj } = require('../sequelize/dbConf');
 const { User } = require('../model/user.js');
 
 let operationDashboardUtil = {
-    initBodyData: async function(dataType, currentDate, userId, monthDay){
+    initBodyData: async function (dataType, currentDate, userId, monthDay) {
         let startDate = null;
         let endDate = null;
-        if(currentDate) {
+        if (currentDate) {
             currentDate = currentDate.split(' ~ ')
             startDate = moment(currentDate[0], "DD/MM/YYYY").format("YYYY-MM-DD")
             endDate = moment(currentDate[1], "DD/MM/YYYY").format("YYYY-MM-DD")
         }
-        if(monthDay){
-            if(startDate) {
+        if (monthDay) {
+            if (startDate) {
                 endDate = moment(startDate).format("YYYY-MM-DD");
             } else {
                 endDate = moment().format("YYYY-MM-DD");
             }
             startDate = moment(endDate).subtract(monthDay, 'months').format("YYYY-MM-DD");
-        } 
-        log.warn(`current Date ==> ${ JSON.stringify(startDate) } / ${ JSON.stringify(endDate) }`)
+        }
+        log.warn(`current Date ==> ${JSON.stringify(startDate)} / ${JSON.stringify(endDate)}`)
 
-        let typeSql = ` like 'bus%'`;
         let sqlList = []
-        if(dataType) {
-            if(dataType.toLowerCase() == 'bus') {
-                typeSql = ` like 'bus%'`;
-            } else {
-                typeSql = ` not like 'bus%'`;
-            }
+        let typeSql = ` like 'bus%'`;
+        if (dataType && dataType.toLowerCase() != 'bus') {
+            typeSql = ` not like 'bus%'`;
         }
 
         let user = await User.findByPk(userId)
         let userServiceconditionData = ' and 1=2 '
-        if(user){
-            if(user.serviceTypeId) {
-                userServiceconditionData = ` and st.id in (${ user.serviceTypeId.split(",") })`
-            }
+        if (user && user.serviceTypeId) {
+            userServiceconditionData = ` and st.id in (${user.serviceTypeId.split(",")})`
         }
 
         let serviceList = await sequelizeObj.query(`
             select st.id, st.\`name\` as serviceName
             from service_type st 
-            where lower(st.category) = 'cv' ${ userServiceconditionData } and st.\`name\` ${ typeSql } group by st.id
-        `, { type: QueryTypes.SELECT }); 
+            where lower(st.category) = 'cv' ${userServiceconditionData} and st.\`name\` ${typeSql} group by st.id
+        `, { type: QueryTypes.SELECT });
         let serviceTypeIdList = serviceList.map(item => item.id)
-        if(serviceTypeIdList.length > 0) {
-            sqlList.push(` jj.serviceTypeId in (${ serviceTypeIdList.join(',') })`)
+        if (serviceTypeIdList.length > 0) {
+            sqlList.push(` jj.serviceTypeId in (${serviceTypeIdList.join(',')})`)
         } else {
             sqlList.push(` 1 = 2`)
         }
 
-        if(startDate && endDate) {
+        if (startDate && endDate) {
             sqlList.push(`
-                (('${ startDate }' >= jj.periodStartDate AND '${ startDate }' <= jj.periodEndDate) 
-                OR ('${ endDate }' >= jj.periodStartDate AND '${ endDate }' <= jj.periodEndDate) 
-                OR ('${ startDate }' < jj.periodStartDate AND '${ endDate }' > jj.periodEndDate))
+                (('${startDate}' >= jj.periodStartDate AND '${startDate}' <= jj.periodEndDate) 
+                OR ('${endDate}' >= jj.periodStartDate AND '${endDate}' <= jj.periodEndDate) 
+                OR ('${startDate}' < jj.periodStartDate AND '${endDate}' > jj.periodEndDate))
             `)
         }
 
-       
+
         let purposeTypeCount = []
         let purposeList = ['Training', 'Admin', 'Ops', 'Exercise'];
         for (let index = 0; index < purposeList.length; index++) {
-            purposeTypeCount.push(`sum( IF ( jj.purposeType like '${ purposeList[index] }%', 1, 0 ) ) as total${ index }`)
+            purposeTypeCount.push(`sum( IF ( jj.purposeType like '${purposeList[index]}%', 1, 0 ) ) as total${index}`)
         }
-        let dataRage = `${ moment(startDate).format("DD/MM/YYYY") } ~ ${ moment(endDate).format("DD/MM/YYYY") }`;
+        let dataRage = `${moment(startDate).format("DD/MM/YYYY")} ~ ${moment(endDate).format("DD/MM/YYYY")}`;
         return { sqlList, purposeTypeCount, purposeList, serviceList, dataRage }
     },
-    getGroupList: async function(){
+    getGroupList: async function () {
         let groupList = await sequelizeObj.query(`
             select id, groupName from \`group\` group by id
         `, { type: QueryTypes.SELECT });
@@ -98,7 +92,7 @@ module.exports.getTotalResourcesIndented = async function (req, res) {
                 DATE_FORMAT(jt.endDate, '%Y-%m-%d') as periodEndDate
                 from job_task jt 
                 left join job j on j.id = jt.tripId
-            ) jj where 1=1 ${ conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : '' }
+            ) jj where 1=1 ${conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : ''}
         `, { type: QueryTypes.SELECT });
         indentTotal = indentTotal[0]
 
@@ -110,7 +104,7 @@ module.exports.getTotalResourcesIndented = async function (req, res) {
                 from job_task jt 
                 left join job j on j.id = jt.tripId
                 where jt.taskStatus not in ('cancelled', 'rejected') and jt.serviceProviderId is not null
-            ) jj where 1=1 ${ conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : '' } 
+            ) jj where 1=1 ${conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : ''} 
         `, { type: QueryTypes.SELECT });
         indentTotalByApprover = indentTotalByApprover[0]
 
@@ -126,33 +120,33 @@ module.exports.getBreakdownByPurpose = async function (req, res) {
         let { dataType, currentDate } = req.body;
         let conditionData = await operationDashboardUtil.initBodyData(dataType, currentDate, req.body.userId)
         let purposeData = await sequelizeObj.query(`
-            select ${ conditionData.purposeTypeCount.join(',') } from (
+            select ${conditionData.purposeTypeCount.join(',')} from (
                 select jt.id, r.purposeType, j.serviceTypeId, 
                 DATE_FORMAT(jt.startDate, '%Y-%m-%d') as periodStartDate, 
                 DATE_FORMAT(jt.endDate, '%Y-%m-%d') as periodEndDate
                 from job_task jt 
                 left join job j on j.id = jt.tripId
                 LEFT JOIN request r ON j.requestId = r.id
-            ) jj where 1=1 ${ conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : '' } 
+            ) jj where 1=1 ${conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : ''} 
         `, { type: QueryTypes.SELECT });
         purposeData = purposeData[0]
-        log.warn(`purpose type indent ==> ${ JSON.stringify(purposeData) }`)
+        log.warn(`purpose type indent ==> ${JSON.stringify(purposeData)}`)
         let purposeDataList = [];
         let purposeValues = Object.values(purposeData);
         for (let index = 0; index < conditionData.purposeList.length; index++) {
             let obj = {
-                name: conditionData.purposeList[index], 
+                name: conditionData.purposeList[index],
                 value: 0
             }
             for (let index2 = 0; index2 < purposeValues.length; index2++) {
-                if(index == index2) {
+                if (index == index2) {
                     obj.value = purposeValues[index2] ?? 0
                     continue
-                } 
+                }
             }
             purposeDataList.push(obj)
         }
-        log.warn(`new purpose type indent ==> ${ JSON.stringify(purposeDataList) }`)
+        log.warn(`new purpose type indent ==> ${JSON.stringify(purposeDataList)}`)
         return Response.success(res, purposeDataList);
     } catch (error) {
         log.error(error)
@@ -172,18 +166,18 @@ module.exports.getUtilisationByPlatform = async function (req, res) {
                 DATE_FORMAT(jt.endDate, '%Y-%m-%d') as periodEndDate
                 from job_task jt 
                 left join job j on j.id = jt.tripId
-            ) jj where 1=1 ${ conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : '' } 
+            ) jj where 1=1 ${conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : ''} 
             group by jj.serviceTypeId
         `, { type: QueryTypes.SELECT });
-        log.warn(`service type indent ==> ${ JSON.stringify(serviceTypeData) }`)
+        log.warn(`service type indent ==> ${JSON.stringify(serviceTypeData)}`)
         let newServiceTypeDataList = []
-        for(let item of serviceList){
+        for (let item of serviceList) {
             let obj = {
-                total: 0, 
+                total: 0,
                 serviceName: item.serviceName
             }
-            for(let item2 of serviceTypeData){
-                if(item.id == item2.serviceTypeId){
+            for (let item2 of serviceTypeData) {
+                if (item.id == item2.serviceTypeId) {
                     obj.total = item2.total
                     continue
                 }
@@ -196,7 +190,7 @@ module.exports.getUtilisationByPlatform = async function (req, res) {
         // for(let item of serviceTypeList){
         //     newServiceTypeDataList.push({ total: 0, serviceName: item })           
         // }
-        log.warn(`new service type indent ==> ==> ${ JSON.stringify(newServiceTypeDataList) }`)
+        log.warn(`new service type indent ==> ==> ${JSON.stringify(newServiceTypeDataList)}`)
         return Response.success(res, newServiceTypeDataList);
     } catch (error) {
         log.error(error)
@@ -205,53 +199,60 @@ module.exports.getUtilisationByPlatform = async function (req, res) {
 }
 
 module.exports.getMostResourcesIndentsByUnits = async function (req, res) {
+
+    const getPurposeDataList = function (item2, conditionData) {
+        let purposeDataList = [];
+        let totalNum = 0
+        let purposeValues = Object.values(item2);
+
+        for (let index = 0; index < conditionData.purposeList.length; index++) {
+            for (let index2 = 0; index2 < purposeValues.length; index2++) {
+                if (index == index2) {
+                    purposeDataList.push({ name: conditionData.purposeList[index], value: purposeValues[index2] })
+                    totalNum += Number(purposeValues[index2])
+                }
+            }
+        }
+        return { purposeDataList, totalNum }
+    }
+
     try {
         let { dataType, currentDate } = req.body;
         let conditionData = await operationDashboardUtil.initBodyData(dataType, currentDate, req.body.userId)
         let serviceTypeDataByGroup = await sequelizeObj.query(`
-            select ${ conditionData.purposeTypeCount.join(',') }, jj.groupId from (
+            select ${conditionData.purposeTypeCount.join(',')}, jj.groupId from (
                 select jt.id, r.purposeType, r.groupId, j.serviceTypeId,
                 DATE_FORMAT(jt.startDate, '%Y-%m-%d') as periodStartDate, 
                 DATE_FORMAT(jt.endDate, '%Y-%m-%d') as periodEndDate
                 from job_task jt 
                 left join job j on j.id = jt.tripId
                 LEFT JOIN request r ON j.requestId = r.id 
-            ) jj where 1=1 ${ conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : '' } 
+            ) jj where 1=1 ${conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : ''} 
             group by jj.groupId
         `, { type: QueryTypes.SELECT });
-        log.warn(`service type indent by group ==> ${ JSON.stringify(serviceTypeDataByGroup) }`)
+        log.warn(`service type indent by group ==> ${JSON.stringify(serviceTypeDataByGroup)}`)
         let groupList = await operationDashboardUtil.getGroupList();
         let serviceTypeDataByGroupList = []
-        for(let item of groupList){
+        for (let item of groupList) {
             let obj = {
                 groupName: item.groupName,
                 dataList: [],
                 totalNum: 0
             }
-            for(let item2 of serviceTypeDataByGroup){
-                if(item.id == item2.groupId){
-                    let purposeDataList = [];
-                    let totalNum = 0
-                    let purposeValues = Object.values(item2);
-                    for (let index = 0; index < conditionData.purposeList.length; index++) {
-                        for (let index2 = 0; index2 < purposeValues.length; index2++) {
-                            if(index == index2) {
-                                purposeDataList.push({ name: conditionData.purposeList[index], value: purposeValues[index2] })
-                                totalNum += Number(purposeValues[index2])
-                            }
-                        }
-                    }
+            for (let item2 of serviceTypeDataByGroup) {
+                if (item.id == item2.groupId) {
+                    let { purposeDataList, totalNum } = getPurposeDataList(item2, conditionData)
                     obj.dataList = purposeDataList
                     obj.totalNum = totalNum
                     continue
-                } 
+                }
             }
             serviceTypeDataByGroupList.push(obj)
         }
-        serviceTypeDataByGroupList.sort((a, b) =>{
+        serviceTypeDataByGroupList.sort((a, b) => {
             return b.totalNum - a.totalNum
         })
-        log.warn(`new service type indent by group ==> ${ JSON.stringify(serviceTypeDataByGroupList) }`)
+        log.warn(`new service type indent by group ==> ${JSON.stringify(serviceTypeDataByGroupList)}`)
 
         return Response.success(res, serviceTypeDataByGroupList);
     } catch (error) {
@@ -278,7 +279,7 @@ module.exports.getLateCreatedIndentsByUnits = async function (req, res) {
                     or ( \`status\` = 'Approved' and action = 'New Trip')
                     group by tripId
                 ) toh on toh.tripId = jt.tripId
-            ) jj where 1=1 ${ conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : '' } 
+            ) jj where 1=1 ${conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : ''} 
             and REPLACE(CAST(DATEDIFF(DATE_FORMAT(jj.createdAt, '%Y-%m-%d'), 
             DATE_FORMAT(jj.executionDate, '%Y-%m-%d')) AS CHAR), '-', '') < 5
             group by jj.groupId
@@ -286,16 +287,16 @@ module.exports.getLateCreatedIndentsByUnits = async function (req, res) {
         let groupList = await operationDashboardUtil.getGroupList();
         // and DATEDIFF(DATE_FORMAT(jt.startDate, '%Y-%m-%d'), DATE_FORMAT(jt.createdAt, '%Y-%m-%d')) < 5
         let addLateGroupList = [];
-        for(let item of groupList) {
+        for (let item of groupList) {
             let obj = {
-                total: 0, 
+                total: 0,
                 groupName: item.groupName
             }
-            for(let item2 of addlateIndentDataByGroup){
-                if(item.id == item2.groupId) {
+            for (let item2 of addlateIndentDataByGroup) {
+                if (item.id == item2.groupId) {
                     obj.total = item2.total
                     continue
-                } 
+                }
             }
             addLateGroupList.push(obj)
         }
@@ -310,7 +311,7 @@ module.exports.getLateCreatedIndentsByUnits = async function (req, res) {
         //     }
         // }
         // addlateIndentDataByGroup = addlateIndentDataByGroup.slice(0, 5)
-        log.warn(`late add Indent By Group ==> ${ JSON.stringify(addLateGroupList) }`)
+        log.warn(`late add Indent By Group ==> ${JSON.stringify(addLateGroupList)}`)
         return Response.success(res, addLateGroupList);
     } catch (error) {
         log.error(error)
@@ -335,20 +336,20 @@ module.exports.getMostLateCancellationByUnit = async function (req, res) {
                     where (\`status\` = 'Pending for approval(RF)' and action = 'Approve') or ( \`status\` = 'Approved' and action = 'New Trip')
                     group by tripId
                 ) toh on toh.tripId = jt.tripId
-            ) jj where 1=1 ${ conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : '' } 
+            ) jj where 1=1 ${conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : ''} 
             and REPLACE(CAST(DATEDIFF(DATE_FORMAT(jj.createdAt, '%Y-%m-%d'), DATE_FORMAT(jj.executionDate, '%Y-%m-%d')) AS CHAR), '-', '') < 5
             group by jj.groupId, jj.purposeType
         `, { type: QueryTypes.SELECT });
         let groupList = await operationDashboardUtil.getGroupList();
         //  and DATEDIFF(DATE_FORMAT(jt.startDate, '%Y-%m-%d'), DATE_FORMAT(jt.createdAt, '%Y-%m-%d')) < 5
         let cancellateLateGroupList = [];
-        for(let item of groupList) {
+        for (let item of groupList) {
             let obj = {
-                total: 0, 
+                total: 0,
                 groupName: item.groupName
             }
-            for(let item2 of cancellateIndentDataByGroup){
-                if(item.id == item2.groupId) {
+            for (let item2 of cancellateIndentDataByGroup) {
+                if (item.id == item2.groupId) {
                     obj.total = item2.total
                     continue
                 }
@@ -365,8 +366,8 @@ module.exports.getMostLateCancellationByUnit = async function (req, res) {
         //         cancellateIndentDataByGroup.push({ total: 0, groupName: item })
         //     }
         // }
-        log.warn(`late cancal Indent By Group ==> ${ JSON.stringify(cancellateLateGroupList) }`)
-       
+        log.warn(`late cancal Indent By Group ==> ${JSON.stringify(cancellateLateGroupList)}`)
+
         return Response.success(res, cancellateLateGroupList);
     } catch (error) {
         log.error(error)
@@ -388,17 +389,17 @@ module.exports.getExpenditureByPlatform = async function (req, res) {
                 left join job j on j.id = jt.tripId
                 LEFT JOIN request r ON j.requestId = r.id 
                 left join initial_purchase_order io on io.taskId = jt.id
-            ) jj where 1=1 ${ conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : '' } 
+            ) jj where 1=1 ${conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : ''} 
             group by jj.serviceTypeId 
         `, { type: QueryTypes.SELECT });
         let newmoneyIndentDataByServiceType = []
-        for(let item of serviceList){
+        for (let item of serviceList) {
             let obj = {
-                total: 0, 
+                total: 0,
                 serviceName: item.serviceName
             }
-            for(let item2 of moneyIndentDataByServiceType){
-                if(item.id == item2.serviceTypeId) {
+            for (let item2 of moneyIndentDataByServiceType) {
+                if (item.id == item2.serviceTypeId) {
                     obj.total = item2.total
                     continue
                 }
@@ -415,7 +416,7 @@ module.exports.getExpenditureByPlatform = async function (req, res) {
         //         moneyIndentDataByServiceType.push({ total: 0, serviceName: item })
         //     }
         // }
-        log.warn(`money Indent By Service Type ==> ${ JSON.stringify(newmoneyIndentDataByServiceType) }`)
+        log.warn(`money Indent By Service Type ==> ${JSON.stringify(newmoneyIndentDataByServiceType)}`)
         return Response.success(res, newmoneyIndentDataByServiceType);
     } catch (error) {
         log.error(error)
@@ -441,22 +442,22 @@ module.exports.getAddlateIndentDataByGroup = async function (req, res) {
                     or ( \`status\` = 'Approved' and action = 'New Trip')
                     group by tripId
                 ) toh on toh.tripId = jt.tripId
-            ) jj where 1=1 ${ conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : '' } 
+            ) jj where 1=1 ${conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : ''} 
             and REPLACE(CAST(DATEDIFF(DATE_FORMAT(jj.createdAt, '%Y-%m-%d'), 
             DATE_FORMAT(jj.executionDate, '%Y-%m-%d')) AS CHAR), '-', '') < 5
             group by jj.groupId
         `, { type: QueryTypes.SELECT });
-        log.warn(`most late add Indent By Group ==> ${ JSON.stringify(addlateIndentDataByGroup) }`)
+        log.warn(`most late add Indent By Group ==> ${JSON.stringify(addlateIndentDataByGroup)}`)
         //and DATEDIFF(DATE_FORMAT(jt.startDate, '%Y-%m-%d'), DATE_FORMAT(jt.createdAt, '%Y-%m-%d')) < 5
         let groupList = await operationDashboardUtil.getGroupList();
         let addMostLateGroupList = [];
-        for(let item of groupList) {
+        for (let item of groupList) {
             let obj = {
                 total: 0,
                 groupName: item.groupName
             }
-            for(let item2 of addlateIndentDataByGroup){
-                if(item.id == item2.groupId) {
+            for (let item2 of addlateIndentDataByGroup) {
+                if (item.id == item2.groupId) {
                     obj.total = item2.total
                     continue
                 }
@@ -473,7 +474,7 @@ module.exports.getAddlateIndentDataByGroup = async function (req, res) {
         //         addlateIndentDataByGroup.push({ total: 0, groupName: item })
         //     }
         // }
-        log.warn(`late add Indent By Group ==> ${ JSON.stringify(addMostLateGroupList) }`)
+        log.warn(`late add Indent By Group ==> ${JSON.stringify(addMostLateGroupList)}`)
         return Response.success(res, { mostIndent: addMostLateGroupList, dataRage: conditionData.dataRage });
     } catch (error) {
         log.error(error)
@@ -494,12 +495,12 @@ module.exports.getActivityName = async function (req, res) {
                     left join job j on j.id = jt.tripId
                     LEFT JOIN request r ON j.requestId = r.id 
                     where r.additionalRemarks is not null
-            ) jj where 1=1 ${ conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : '' } 
+            ) jj where 1=1 ${conditionData.sqlList.length > 0 ? ' and ' + conditionData.sqlList.join(' and ') : ''} 
             group by jj.additionalRemarks order by total desc
         `, { type: QueryTypes.SELECT });
         activityNameData = activityNameData.map(item => item.additionalRemarks)
         activityNameData = activityNameData.slice(0, 3)
-        log.warn(`activity Name list ==> ${ JSON.stringify(activityNameData) }`)
+        log.warn(`activity Name list ==> ${JSON.stringify(activityNameData)}`)
         return Response.success(res, activityNameData);
     } catch (error) {
         log.error(error)

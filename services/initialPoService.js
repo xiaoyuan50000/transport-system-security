@@ -17,7 +17,7 @@ const { PurchaseOrder, InitialPurchaseOrder } = require('../model/purchaseOrder'
 const { ContractRate } = require('../model/contractRate');
 const conf = require('../conf/conf')
 const _ = require('lodash');
-const { FormatPrice } = require('../util/utils')
+const { FormatPrice, isNotEmptyNull } = require('../util/utils')
 const utils = require('../util/utils');
 
 
@@ -61,15 +61,15 @@ module.exports.InitTable = async function (req, res) {
 
     let filter = ""
     let pageReplacements = []
-    if (serviceProviderId != "" && serviceProviderId != null) {
+    if (isNotEmptyNull(serviceProviderId)) {
         filter += " and b.serviceProviderId = ?"
         pageReplacements.push(serviceProviderId)
     }
-    if (indentId != "" && indentId != null) {
+    if (isNotEmptyNull(indentId)) {
         filter += " and b.requestId like ?"
         pageReplacements.push(`%${indentId}%`)
     }
-    if (creationDate != "" && creationDate != null) {
+    if (isNotEmptyNull(creationDate)) {
         if (creationDate.indexOf('~') != -1) {
             const dates = creationDate.split(' ~ ')
             filter += ` and (b.createdAt >= ? and b.createdAt <= ?)`
@@ -77,7 +77,7 @@ module.exports.InitTable = async function (req, res) {
             pageReplacements.push(dates[1])
         }
     }
-    if (executionDate != "" && executionDate != null) {
+    if (isNotEmptyNull(executionDate)) {
         if (executionDate.indexOf('~') != -1) {
             const dates = executionDate.split(' ~ ')
             filter += ` and (b.executionDate >= ? and b.executionDate <= ?)`
@@ -596,14 +596,8 @@ const CalculateMVByTaskId = async function (taskIdArray, notInitialPO = false) {
 module.exports.CalculateMVByTaskId = CalculateMVByTaskId
 
 module.exports.DownloadInitialPOExcel = async function (req, res) {
-    try {
-        let { taskIds, serviceProviderId, indentId, isPO, monthly } = req.body
-        let taskIdArr = taskIds.split(',')
-        let tsp = await ServiceProvider.findByPk(serviceProviderId)
-        let contractor = tsp.name
 
-        let jobList = await invoiceService.QueryTripDetails(taskIdArr)
-
+    const getDownloadDataList = async function (isPO, taskIdArr) {
         let poList = []
         if (isPO) {
             poList = await PurchaseOrder.findAll({
@@ -622,22 +616,44 @@ module.exports.DownloadInitialPOExcel = async function (req, res) {
                 }
             })
         }
+        return poList
+    }
+
+    const getPeakType = function (chargeType, serviceMode, executionTime, lateTime, peakTime) {
+        let peakType = ""
+        if (chargeType == ChargeType.HOUR || (chargeType == ChargeType.TRIP && serviceMode.toLowerCase() == "1-way")) {
+            let isLate = invoiceService.IsPeak(executionTime, lateTime)
+            if (isLate) {
+                peakType = "Late"
+            } else {
+                peakType = invoiceService.IsPeak(executionTime, peakTime) ? "Peak" : "Non-Peak"
+            }
+        }
+        return peakType
+    }
+
+    const getConcatenate = function (peakType, vehicleType, chargeType) {
+        return peakType == "" ? `${vehicleType} ${chargeType}` : `${vehicleType} ${peakType}, ${chargeType}`
+    }
+
+    try {
+        let { taskIds, serviceProviderId, indentId, isPO, monthly } = req.body
+        let taskIdArr = taskIds.split(',')
+        let tsp = await ServiceProvider.findByPk(serviceProviderId)
+        let contractor = tsp.name
+
+        let jobList = await invoiceService.QueryTripDetails(taskIdArr)
+
+        let poList = await getDownloadDataList(isPO, taskIdArr)
+
         let rows = []
         let [costs, surcharges, totalCosts] = [0, 0, 0]
         for (let row of jobList) {
             let { id, requestId, serviceMode, groupName, pickupDestination, dropoffDestination, executionDate, executionTime, duration,
                 vehicleType, poc, pocNumber, tripRemarks, peakTime, lateTime, chargeType, funding, additionalRemarks, purposeType, remark } = row
 
-            let peakType = ""
-            if (chargeType == ChargeType.HOUR || (chargeType == ChargeType.TRIP && serviceMode.toLowerCase() == "1-way")) {
-                let isLate = invoiceService.IsPeak(executionTime, lateTime)
-                if (isLate) {
-                    peakType = "Late"
-                } else {
-                    peakType = invoiceService.IsPeak(executionTime, peakTime) ? "Peak" : "Non-Peak"
-                }
-            }
-            let concatenate = peakType == "" ? `${vehicleType} ${chargeType}` : `${vehicleType} ${peakType}, ${chargeType}`
+            let peakType = getPeakType(chargeType, serviceMode, executionTime, lateTime, peakTime)
+            let concatenate = getConcatenate(peakType, vehicleType, chargeType)
             let dateReturn = ""
             let timeReturn = ""
             if (duration) {
