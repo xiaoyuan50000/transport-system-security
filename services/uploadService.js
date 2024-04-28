@@ -153,86 +153,97 @@ const GetDatas = async function (indentNos, resultJson, userId) {
             requestData: "",
         }
         let estimatedTripDuration = 0
-        let trips = []
         let tripNo = 1
-        for (let trip of indents) {
-            // valid pickup point 
-            let pickupLocationFilter = allLocation.filter(item => item.locationName == trip.origin)
-            if (pickupLocationFilter.length == 0) {
-                throw `Origin '${trip.origin}' cannot find.`
-            }
-            // valid dropoff point
-            let dropoffLocationFilter = allLocation.filter(item => item.locationName == trip.destination)
-            if (dropoffLocationFilter.length == 0) {
-                throw `Destination '${trip.destination}' cannot find.`
-            }
-            // valid seater
-            let serviceProviderList = await indentService.FilterServiceProvider(trip.seater, serviceModeValue, trip.destination, trip.origin, moment(startDate).format("YYYY-MM-DD"), moment(startDate).format("HH:mm"))
-            if (serviceProviderList.length == 0) {
-                throw `Seater '${trip.seater}' cannot find with service mode '${serviceMode}'.`
-            }
-            let serviceProviderId = null
-            let contractPartNo = null
-            if (serviceProviderList.length == 1) {
-                serviceProviderId = serviceProviderList[0].id
-                contractPartNo = serviceProviderList[0].contractPartNo
-            } else {
-                if (trip.tsp) {
-                    let serviceProvider = serviceProviderList.find(s => s.name == trip.tsp)
-                    if (serviceProvider) {
-                        serviceProviderId = serviceProvider.id
-                        contractPartNo = serviceProvider.contractPartNo
-                    }
-                }
-            }
 
-            let pickupLocation = pickupLocationFilter[0]
-            let dropoffLocation = dropoffLocationFilter[0]
-
-            let startDate = trip.executionDate + " " + trip.startTime
-            let startDateUTC = Utils.FormatToUtcOffset8(startDate)
-            let duration = null
-            let endDate = ""
-            let endDateUTC = ""
-            if (serviceMode.toLowerCase() != "1-way" && serviceMode.toLowerCase() != "ferry service") {
-                endDate = GetXlsxStringDate(trip.endsOn, "YYYY-MM-DD") + " " + formatTime(trip.endTime, "HH:mm:ss")
-                endDateUTC = Utils.FormatToUtcOffset8(endDate)
-                duration = moment(endDate).diff(moment(startDate), 'h')
-                estimatedTripDuration += duration
-            }
-            trips.push({
-                requestId: trip.indentNo,
-                tripNo: `${trip.indentNo}-${Utils.PrefixInteger(tripNo, 3)}`,
-                contractPartNo: contractPartNo,
-                serviceProviderId: serviceProviderId,
-                status: INDENT_STATUS.WAITAPPROVEDRF,
-                pickupDestination: trip.origin,
-                dropoffDestination: trip.destination,
-                vehicleType: trip.seater,
-                noOfVehicle: trip.qty,
-                poc: trip.poc,
-                pocNumber: trip.mobileNo,
-                repeats: "Once",
-                executionDate: trip.executionDate,
-                executionTime: moment(startDate).format("HH:mm"),
-                duration: duration,
-                endorse: 0,
-                approve: 0,
-
-                startDate: startDateUTC,
-                endDate: endDateUTC,
-                taskStatus: TASK_STATUS.UNASSIGNED,
-                success: 0,
-                pickupLocation: pickupLocation,
-                dropoffLocation: dropoffLocation,
-            })
-            tripNo += 1
-        }
+        let trips = await getTrips(indents, allLocation, serviceMode, serviceModeValue, tripNo)
         request.estimatedTripDuration = estimatedTripDuration
 
         indentList.push({ request: request, trips: trips })
     }
     return indentList
+}
+
+const getTrips = async function (indents, allLocation, serviceMode, serviceModeValue, tripNo) {
+    let trips = []
+    for (let trip of indents) {
+        // valid pickup point 
+        let pickupLocationFilter = allLocation.filter(item => item.locationName == trip.origin)
+        if (pickupLocationFilter.length == 0) {
+            throw `Origin '${trip.origin}' cannot find.`
+        }
+        // valid dropoff point
+        let dropoffLocationFilter = allLocation.filter(item => item.locationName == trip.destination)
+        if (dropoffLocationFilter.length == 0) {
+            throw `Destination '${trip.destination}' cannot find.`
+        }
+        let startDate = trip.executionDate + " " + trip.startTime
+        // valid seater
+        let serviceProviderList = await indentService.FilterServiceProvider(trip.seater, serviceModeValue, trip.destination, trip.origin, moment(startDate).format("YYYY-MM-DD"), moment(startDate).format("HH:mm"))
+        if (serviceProviderList.length == 0) {
+            throw `Seater '${trip.seater}' cannot find with service mode '${serviceMode}'.`
+        }
+        let { serviceProviderId, contractPartNo } = getServiceProvider(serviceProviderList, trip)
+
+        let pickupLocation = pickupLocationFilter[0]
+        let dropoffLocation = dropoffLocationFilter[0]
+
+        let startDateUTC = Utils.FormatToUtcOffset8(startDate)
+        let duration = null
+        let endDate = ""
+        let endDateUTC = ""
+        if (serviceMode.toLowerCase() != "1-way" && serviceMode.toLowerCase() != "ferry service") {
+            endDate = GetXlsxStringDate(trip.endsOn, "YYYY-MM-DD") + " " + formatTime(trip.endTime, "HH:mm:ss")
+            endDateUTC = Utils.FormatToUtcOffset8(endDate)
+            duration = moment(endDate).diff(moment(startDate), 'h')
+            estimatedTripDuration += duration
+        }
+        trips.push({
+            requestId: trip.indentNo,
+            tripNo: `${trip.indentNo}-${Utils.PrefixInteger(tripNo, 3)}`,
+            contractPartNo: contractPartNo,
+            serviceProviderId: serviceProviderId,
+            status: INDENT_STATUS.WAITAPPROVEDRF,
+            pickupDestination: trip.origin,
+            dropoffDestination: trip.destination,
+            vehicleType: trip.seater,
+            noOfVehicle: trip.qty,
+            poc: trip.poc,
+            pocNumber: trip.mobileNo,
+            repeats: "Once",
+            executionDate: trip.executionDate,
+            executionTime: moment(startDate).format("HH:mm"),
+            duration: duration,
+            endorse: 0,
+            approve: 0,
+
+            startDate: startDateUTC,
+            endDate: endDateUTC,
+            taskStatus: TASK_STATUS.UNASSIGNED,
+            success: 0,
+            pickupLocation: pickupLocation,
+            dropoffLocation: dropoffLocation,
+        })
+        tripNo += 1
+    }
+    return trips
+}
+
+const getServiceProvider = function (serviceProviderList, trip) {
+    let serviceProviderId = null
+    let contractPartNo = null
+    if (serviceProviderList.length == 1) {
+        serviceProviderId = serviceProviderList[0].id
+        contractPartNo = serviceProviderList[0].contractPartNo
+    } else {
+        if (trip.tsp) {
+            let serviceProvider = serviceProviderList.find(s => s.name == trip.tsp)
+            if (serviceProvider) {
+                serviceProviderId = serviceProvider.id
+                contractPartNo = serviceProvider.contractPartNo
+            }
+        }
+    }
+    return { serviceProviderId, contractPartNo }
 }
 
 const GetAllExcelDatasJSON = function (indents) {
@@ -380,6 +391,97 @@ const TransformDate = function (text, format) {
 
 /* old data */
 module.exports.uploadOldIndentFile = async function (req, res) {
+
+
+    const getTaskDate = function (executionDate, duration, startTime, fmt2) {
+        duration = duration || null
+        executionDate = TransformDate(executionDate, fmt2)
+        let startDate = executionDate + " " + startTime
+        let endDate = ""
+        if (duration) {
+            endDate = moment(startDate).add(duration, 'h').format("YYYY-MM-DD HH:mm")
+        }
+        startDate = Utils.FormatToUtcOffset8(startDate)
+        endDate = Utils.FormatToUtcOffset8(endDate)
+        return { executionDate, duration, startDate, endDate }
+    }
+
+    const setTransformDate = function (data) {
+        let { updateObj, rspDate, cancellationDate, arriveTime, endTime, departTime, taskStatus, fmt1 } = data
+        if (rspDate) {
+            updateObj.tspChangeTime = TransformDate(rspDate, fmt1)
+        }
+        if (cancellationDate) {
+            updateObj.cancellationTime = TransformDate(cancellationDate, fmt1)
+        }
+        if (arriveTime) {
+            updateObj.arrivalTime = TransformDate(arriveTime, fmt1)
+        }
+        if (endTime) {
+            updateObj.endTime = TransformDate(endTime, fmt1)
+        }
+        if (departTime) {
+            updateObj.departTime = TransformDate(departTime, fmt1)
+        }
+        if (taskStatus) {
+            updateObj.taskStatus = taskStatus
+        }
+    }
+
+    const getTaskExist = async function (jobId, trackingId) {
+        let task = await Task2.findOne({ where: { externalJobId: jobId } })
+        if (!task) {
+            task = await Task2.findOne({ where: { trackingId: trackingId } })
+            if (!task) {
+                log.info(`Tracking ID ${trackingId} does not exist.`)
+            }
+        }
+        return task
+    }
+
+    const updateJobAndTask = async function (rowData, job, task, updateObj) {
+        let [pickup, dropoff, startTime, duration, seater, tsp, serviceMode, indentStatus] = rowData
+        let executionDate = updateObj.executionDate
+        let serviceTypeId = job.serviceTypeId
+        let serviceModeList = await ServiceMode.findAll({ where: { service_type_id: serviceTypeId } })
+        let serviceModeObj = serviceModeList.find(item => item.name.toLowerCase() == serviceMode.toLowerCase())
+        let serviceModeId = serviceModeObj?.id ?? null
+        let jobUpdateObj = {
+            serviceModeId: serviceModeId,
+            vehicleType: seater,
+            status: indentStatus,
+        }
+
+        let serviceProvider = await ServiceProvider.findOne({ where: { name: tsp } })
+        let serviceProviderId = null
+        let contractPartNo = null
+        if (serviceProvider) {
+            serviceProviderId = serviceProvider.id
+            let dropoffDestination = task.dropoffDestination
+            let pickupDestination = task.pickupDestination
+            contractPartNo = await requestService.GetContractPartNo(seater, serviceModeId, dropoffDestination, pickupDestination, executionDate, serviceProviderId, startTime)
+            log.info(JSON.stringify({ VehicleType: seater, ServiceModeId: serviceModeId, Dropoff: dropoffDestination, ExecutionDate: executionDate, ServiceProviderId: serviceProviderId, Pickup: pickupDestination, ContractPartNo: contractPartNo }, null, 2))
+            updateObj.contractPartNo = contractPartNo
+            updateObj.serviceProviderId = serviceProviderId
+            updateObj.endorse = 0
+        }
+        await Task2.update(updateObj, { where: { id: task.id } })
+
+        if (Number(job.noOfVehicle) == 1) {
+            jobUpdateObj.pickupDestination = pickup
+            jobUpdateObj.dropoffDestination = dropoff
+            jobUpdateObj.duration = duration
+            jobUpdateObj.executionDate = executionDate
+            jobUpdateObj.executionTime = startTime
+            if (serviceProvider) {
+                jobUpdateObj.contractPartNo = contractPartNo
+                jobUpdateObj.serviceProviderId = serviceProviderId
+            }
+        }
+
+        await Job2.update(jobUpdateObj, { where: { id: job.id } })
+    }
+
     let fmt1 = "YYYY-MM-DD HH:mm"
     let fmt2 = "YYYY-MM-DD"
     let form = formidable({
@@ -409,127 +511,64 @@ module.exports.uploadOldIndentFile = async function (req, res) {
             let data = obj[0].data
             let indentArray = data.slice(1);
 
-            let taskIdArr = []
+
 
             for (let i = 0; i < indentArray.length; i++) {
-                let [indentId, jobId, trackingId, unit, executionDate, pickup, dropoff, startTime, duration, seater, tsp, serviceMode,
-                    indentStatus, taskStatus, arriveTime, departTime, endTime, rspDate, amendmentDate, cancellationDate, createdDate, modifiedDate] = indentArray[i]
-                rspDate = rspDate ?? amendmentDate
+                let [indentId, jobId, trackingId, unit, executionDate, pickup, dropoff, startTime, duration, tsp,
+                    taskStatus, arriveTime, departTime, endTime, rspDate, amendmentDate, cancellationDate] = indentArray[i]
 
-                if (jobId || trackingId) {
-                    jobId = jobId ? jobId.toString() : ""
-                    executionDate = TransformDate(executionDate, fmt2)
-                    duration = duration ?? null
+                rspDate = rspDate || amendmentDate
 
-                    let startDate = executionDate + " " + startTime
-                    let endDate = ""
-                    if (duration) {
-                        endDate = moment(startDate).add(duration, 'h').format("YYYY-MM-DD HH:mm")
-                    }
-                    startDate = Utils.FormatToUtcOffset8(startDate)
-                    endDate = Utils.FormatToUtcOffset8(endDate)
-
-                    let updateObj = {
-                        tspChangeTime: null,
-                        cancellationTime: null,
-                        contractPartNo: null,
-                        serviceProviderId: null,
-                        pickupDestination: pickup,
-                        dropoffDestination: dropoff,
-                        startDate: startDate,
-                        endDate: endDate,
-                        duration: duration,
-                        executionDate: executionDate,
-                        executionTime: startTime,
-                        endorse: 1,
-                    }
-                    if (rspDate) {
-                        updateObj.tspChangeTime = TransformDate(rspDate, fmt1)
-                    }
-                    if (cancellationDate) {
-                        updateObj.cancellationTime = TransformDate(cancellationDate, fmt1)
-                    }
-                    if (arriveTime) {
-                        updateObj.arrivalTime = TransformDate(arriveTime, fmt1)
-                    }
-                    if (endTime) {
-                        updateObj.endTime = TransformDate(endTime, fmt1)
-                    }
-                    if (departTime) {
-                        updateObj.departTime = TransformDate(departTime, fmt1)
-                    }
-                    if (taskStatus) {
-                        updateObj.taskStatus = taskStatus
-                    }
-
-                    if (unit) {
-                        let group = await Group.findOne({ where: { groupName: unit } })
-                        await Request2.update({ groupId: group.id }, { where: { id: indentId } })
-                    }
-                    if (tsp) {
-                        // let task = await Task2.findOne({ where: { [Op.or]: [{ externalJobId: jobId }, { trackingId: trackingId }] } })
-                        let task = await Task2.findOne({ where: { externalJobId: jobId } })
-                        if (!task) {
-                            task = await Task2.findOne({ where: { trackingId: trackingId } })
-                            if (!task) {
-                                log.info(`Tracking ID ${trackingId} does not exist.`)
-                            }
-                        }
-                        if (task) {
-                            let job = await Job2.findByPk(task.tripId)
-                            if (job) {
-                                let serviceTypeId = job.serviceTypeId
-                                let serviceModeList = await ServiceMode.findAll({ where: { service_type_id: serviceTypeId } })
-                                let serviceModeObj = serviceModeList.find(item => item.name.toLowerCase() == serviceMode.toLowerCase())
-                                let serviceModeId = serviceModeObj?.id ?? null
-                                let jobUpdateObj = {
-                                    serviceModeId: serviceModeId,
-                                    vehicleType: seater,
-                                    status: indentStatus,
-                                }
-
-                                let serviceProvider = await ServiceProvider.findOne({ where: { name: tsp } })
-                                let serviceProviderId = null
-                                let contractPartNo = null
-                                if (serviceProvider) {
-                                    serviceProviderId = serviceProvider.id
-                                    let dropoffDestination = task.dropoffDestination
-                                    let pickupDestination = task.pickupDestination
-                                    contractPartNo = await requestService.GetContractPartNo(seater, serviceModeId, dropoffDestination, pickupDestination, executionDate, serviceProviderId, startTime)
-                                    log.info(JSON.stringify({ VehicleType: seater, ServiceModeId: serviceModeId, Dropoff: dropoffDestination, ExecutionDate: executionDate, ServiceProviderId: serviceProviderId, Pickup: pickupDestination, ContractPartNo: contractPartNo }, null, 2))
-                                    updateObj.contractPartNo = contractPartNo
-                                    updateObj.serviceProviderId = serviceProviderId
-                                    updateObj.endorse = 0
-                                }
-                                await Task2.update(updateObj, { where: { id: task.id } })
-
-                                if (Number(job.noOfVehicle) == 1) {
-                                    jobUpdateObj.pickupDestination = pickup
-                                    jobUpdateObj.dropoffDestination = dropoff
-                                    jobUpdateObj.duration = duration
-                                    jobUpdateObj.executionDate = executionDate
-                                    jobUpdateObj.executionTime = startTime
-                                    if (serviceProvider) {
-                                        jobUpdateObj.contractPartNo = contractPartNo
-                                        jobUpdateObj.serviceProviderId = serviceProviderId
-                                    }
-                                }
-                                if (contractPartNo) {
-                                    taskIdArr.push(task.id)
-                                }
-                                await Job2.update(jobUpdateObj, { where: { id: job.id } })
-                            } else {
-                                log.info(`Job does not exist. Id: ${task.tripId}`)
-                            }
-                        } else {
-                            log.info(`Task does not exist. ExternalJobId: ${jobId}`)
-                        }
-                    }
+                if (!jobId && !trackingId) {
+                    continue
                 }
+                jobId = jobId ? jobId.toString() : ""
+
+                let taskDate = getTaskDate(executionDate, duration, startTime, fmt2)
+                executionDate = taskDate.executionDate
+                duration = taskDate.duration
+                startDate = taskDate.startDate
+                endDate = taskDate.endDate
+
+                let updateObj = {
+                    tspChangeTime: null,
+                    cancellationTime: null,
+                    contractPartNo: null,
+                    serviceProviderId: null,
+                    pickupDestination: pickup,
+                    dropoffDestination: dropoff,
+                    startDate: startDate,
+                    endDate: endDate,
+                    duration: duration,
+                    executionDate: executionDate,
+                    executionTime: startTime,
+                    endorse: 1,
+                }
+                setTransformDate({ updateObj, rspDate, cancellationDate, arriveTime, endTime, departTime, taskStatus, fmt1 })
+
+                if (unit) {
+                    let group = await Group.findOne({ where: { groupName: unit } })
+                    await Request2.update({ groupId: group.id }, { where: { id: indentId } })
+                }
+                if (!tsp) {
+                    continue
+                }
+
+                let task = getTaskExist(jobId, trackingId)
+                if (!task) {
+                    log.info(`Task does not exist. ExternalJobId: ${jobId}`)
+                    continue
+                }
+                let job = await Job2.findByPk(task.tripId)
+                if (!job) {
+                    log.info(`Job does not exist. Id: ${task.tripId}`)
+                    continue
+                }
+
+                await updateJobAndTask(rowData, job, task, updateObj)
+
             }
-            // if (taskIdArr.length > 0) {
-            //     await initialPoService.CalculatePOByTaskId(taskIdArr)
-            // }
+
             return Response.success(res, true);
         } catch (err) {
             log.error(err);
@@ -590,6 +629,41 @@ module.exports.newContract = async function (req, res) {
         }
     }
 
+    const getTsp = function (A, serviceProviderName) {
+        if (A) {
+            let tsp = A.split('TSP: ')[1]
+            if (tsp != serviceProviderName) {
+                return tsp
+            }
+        }
+        return ""
+    }
+
+    const getServiceModeAndType = function (B, serviceModeName, serviceTypeName) {
+        let newServiceModeName = ""
+        let newServiceTypeName = ""
+        if (B) {
+            B = B.replace("\r\n", '|').replace("\n", '|')
+            let serviceMode = B.split('|')[0].split('Service Mode: ')[1]
+            let serviceType = B.split('|')[1].split('Service Type: ')[1]
+            if (serviceMode != serviceModeName) {
+                newServiceModeName = serviceMode
+            }
+            if (serviceType != serviceTypeName) {
+                newServiceTypeName = serviceType
+            }
+        }
+        return { newServiceModeName, newServiceTypeName }
+    }
+
+    const isDiffContractName = function (C, contractName) {
+        return C && C != contractName
+    }
+
+    const isDiffEndPoint = function (D, endPoint) {
+        return D && D != endPoint
+    }
+
     let form = formidable({
         encoding: 'utf-8',
         uploadDir: indent_path,
@@ -627,30 +701,27 @@ module.exports.newContract = async function (req, res) {
             let dataArray = []
             for (let row of data) {
                 let [A, B, C, D, E, F, G, H, I, J, K, L, M, N, O] = row
-                if (A) {
-                    let tsp = A.split('TSP: ')[1]
-                    if (tsp != serviceProviderName) {
-                        serviceProviderName = tsp
-                        serviceProviderGroup.push(tsp)
-                    }
+
+                let tsp = getTsp(A, serviceProviderName)
+                if (tsp != "") {
+                    serviceProviderName = tsp
+                    serviceProviderGroup.push(tsp)
                 }
-                if (B) {
-                    B = B.replace("\r\n", '|').replace("\n", '|')
-                    let serviceMode = B.split('|')[0].split('Service Mode: ')[1]
-                    let serviceType = B.split('|')[1].split('Service Type: ')[1]
-                    if (serviceMode != serviceModeName) {
-                        serviceModeName = serviceMode
-                        serviceModeGroup.push(serviceMode)
-                    }
-                    if (serviceType != serviceTypeName) {
-                        serviceTypeName = serviceType
-                        serviceTypeGroup.push(serviceType)
-                    }
+
+                let serviceModeAndType = getServiceModeAndType(B, serviceModeName, serviceTypeName)
+                let { newServiceModeName, newServiceTypeName } = serviceModeAndType
+                if (newServiceModeName != "") {
+                    serviceModeName = newServiceModeName
+                    serviceModeGroup.push(newServiceModeName)
                 }
-                if (C && C != contractName) {
+                if (newServiceTypeName != "") {
+                    serviceTypeName = newServiceTypeName
+                    serviceTypeGroup.push(newServiceTypeName)
+                }
+                if (isDiffContractName(C, contractName)) {
                     contractName = C
                 }
-                if (D && D != endPoint) {
+                if (isDiffEndPoint(D, endPoint)) {
                     endPoint = D
                 }
                 let item = {

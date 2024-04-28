@@ -29,7 +29,33 @@ const BarredDateError = "Sorry, you have been barred from booking urgent indent 
 const urgentIndentTimeList = ["09:30", "12:30", "15:00"]
 const urgentNotificationTitle = "Urgent Notification"
 const resourceList = ["Ford Everest OUV", "Agilis (Auto)", "5 Ton GS (Auto)", "6 Ton GS"]
+
+const getUnitId = function (user) {
+    let roleName = user.roleName
+    if (roleName == ROLE.RQ || roleName == ROLE.UCO) {
+        return user.group || null
+    }
+    return null
+}
+
+
 module.exports.CreateUrgentIndent = async function (req, res) {
+    const getFreeUrgentNum = async function (startTime, groupName, resource1, resource, todayUrgentIndentList, urgentDutyList) {
+        let length = 6
+        let urgentDutyList1 = await AutoMatchDriver.matchUrgentConfig(startTime, groupName, resource1)
+        if (urgentDutyList1.length == 0) {
+            length -= 3
+        }
+        if (urgentDutyList.length > 0) {
+            let usedLength = usedDutyLength(todayUrgentIndentList, resource)
+            length -= usedLength
+        }
+        if (urgentDutyList1.length > 0) {
+            let usedLength = usedDutyLength(todayUrgentIndentList, resource1)
+            length -= usedLength
+        }
+        return length
+    }
     try {
         let { unitId, resource, date, timeStart, timeEnd, reportingLocation, poc, mobileNumber, locationId } = req.body
 
@@ -42,9 +68,7 @@ module.exports.CreateUrgentIndent = async function (req, res) {
         let createdBy = req.body.createdBy
         let user = await requestService.GetUserInfo(createdBy)
         let roleName = user.roleName
-        if (roleName == ROLE.RQ || roleName == ROLE.UCO) {
-            unitId = user.group ? user.group : null
-        }
+        unitId = getUnitId(user)
         let barredDate = await isGroupBarred(unitId)
         if (barredDate) {
             return Response.error(res, BarredDateError + barredDate)
@@ -74,27 +98,12 @@ module.exports.CreateUrgentIndent = async function (req, res) {
         if (resource == resourceList[0]) {
             resource1 = resourceList[2]
         }
-        let length = 6
-        let urgentDutyList1 = await AutoMatchDriver.matchUrgentConfig(startTime, groupName, resource1)
-        if (urgentDutyList1.length == 0) {
-            length -= 3
-        }
-        if (urgentDutyList.length > 0) {
-            let usedLength = usedDutyLength(todayUrgentIndentList, resource)
-            length -= usedLength
-        }
-        if (urgentDutyList1.length > 0) {
-            let usedLength = usedDutyLength(todayUrgentIndentList, resource1)
-            length -= usedLength
-        }
+        let length = await getFreeUrgentNum(startTime, groupName, resource1, resource, todayUrgentIndentList, urgentDutyList)
         if (length <= 0) {
             return Response.error(res, FullyBookedError)
         }
 
-        let resourceArr = [resourceList[2], resourceList[3]]
-        if (resource == resourceList[0]) {
-            resourceArr = [resourceList[0], resourceList[1]]
-        }
+        let resourceArr = getResourceArr(resource)
         // resource already used time
         let vehicleUrgentIndentList = todayUrgentIndentList.filter(o => resourceArr.indexOf(o.vehicleType) != -1)
         let usedUpTimeArr = [...new Set(vehicleUrgentIndentList.map(o => moment(o.startTime).format('HH:mm')))]
@@ -231,10 +240,7 @@ module.exports.CreateUrgentIndent = async function (req, res) {
 
 const AutoMatchDriver = {
     matchUrgentConfig: async function (startTime, groupName, resource) {
-        let resourceArr = [resourceList[2], resourceList[3]]
-        if (resource == resourceList[0]) {
-            resourceArr = [resourceList[0], resourceList[1]]
-        }
+        let resourceArr = getResourceArr(resource)
         let matchUrgentConfigList = await sequelizeDriverObj.query(
             `select a.id, a.configId, a.createdAt, a.status, b.vehicleType, b.vehicleNo, b.driverId, b.hub, b.node, b.unitId as mobiusUnitId, b.purpose from (
                 SELECT
@@ -259,10 +265,7 @@ const AutoMatchDriver = {
     },
     getUrgentDuty: async function (groupName, resource) {
         let today = moment().format('YYYY-MM-DD')
-        let resourceArr = [resourceList[2], resourceList[3]]
-        if (resource == resourceList[0]) {
-            resourceArr = [resourceList[0], resourceList[1]]
-        }
+        let resourceArr = getResourceArr(resource)
         let urgentDutyList = await sequelizeDriverObj.query(
             `select a.id from (
                 SELECT
@@ -686,22 +689,28 @@ const generateAESCode = function (str) {
 // }
 
 module.exports.InitUrgentIndent = async function (req, res) {
+
+    const filterByCurrentPage = function (currentPage) {
+        let filter = ""
+        let replacements = []
+        if (currentPage) {
+            let nowDatetime = moment().format('YYYY-MM-DD HH:mm:ss');
+            if (currentPage == 'past') {
+                filter += ` and date_format(a.endDate, '%Y-%m-%d %H:%i:%s') < ? `
+            } else {
+                filter += ` and date_format(a.endDate, '%Y-%m-%d %H:%i:%s') >= ? `
+            }
+            replacements.push(nowDatetime);
+        }
+        return { filter, replacements }
+    }
+
     let pageNum = Number(req.body.start);
     let pageLength = Number(req.body.length);
     // let nodeList = req.body['nodeList[]']
 
     let { execution_date, created_date, unit, status, indentId, vehicleType, currentPage, hub, node } = req.body
-    let filter = ""
-    let replacements = []
-    if (currentPage) {
-        let nowDatetime = moment().format('YYYY-MM-DD HH:mm:ss');
-        if (currentPage == 'past') {
-            filter += ` and date_format(a.endDate, '%Y-%m-%d %H:%i:%s') < ? `
-        } else {
-            filter += ` and date_format(a.endDate, '%Y-%m-%d %H:%i:%s') >= ? `
-        }
-        replacements.push(nowDatetime);
-    }
+    let { filter, replacements } = filterByCurrentPage(currentPage)
     if (execution_date != "") {
         const dates = execution_date.split(' ~ ')
         if (dates && dates.length > 1) {
@@ -717,7 +726,7 @@ module.exports.InitUrgentIndent = async function (req, res) {
         filter += ` and a.createdAt like ?`
         replacements.push(`${created_date}%`)
     }
-    if (unit != "" && unit != null) {
+    if (Utils.isNotEmptyNull(unit)) {
         filter += ` and a.groupId = ?`
         replacements.push(unit)
     }
@@ -725,19 +734,19 @@ module.exports.InitUrgentIndent = async function (req, res) {
         filter += ` and a.taskStatus = ?`
         replacements.push(status)
     }
-    if (indentId != "" && indentId != null) {
+    if (Utils.isNotEmptyNull(indentId)) {
         filter += ` and a.requestId like ?`
         replacements.push(`%${indentId}%`)
     }
-    if (vehicleType != "" && vehicleType != null) {
+    if (Utils.isNotEmptyNull(vehicleType)) {
         filter += ` and a.vehicleType = ?`
         replacements.push(vehicleType)
     }
-    if (hub != "" && hub != null) {
+    if (Utils.isNotEmptyNull(hub)) {
         filter += ` and a.hub = ?`;
         replacements.push(hub);
     }
-    if (node != "" && node != null) {
+    if (Utils.isNotEmptyNull(node)) {
         filter += ` and a.node = ?`;
         replacements.push(node);
     }
@@ -993,8 +1002,24 @@ const isUrgentStartIn15Min = function (timeStart) {
     }
     return false
 }
+const getResourceArr = function (resource) {
+    if (resource == resourceList[0]) {
+        return [resourceList[0], resourceList[1]]
+    }
+    return [resourceList[2], resourceList[3]]
+}
 
 module.exports.EditUrgentIndent = async function (req, res) {
+
+    const setFirstDriver = function (firstDriver, driverId, vehicleNo, vehicleType) {
+        driverId = firstDriver ? firstDriver.driverId : driverId
+        vehicleNo = firstDriver ? firstDriver.vehicleNo : vehicleNo
+        vehicleType = firstDriver ? firstDriver.vehicleType : vehicleType
+    }
+
+    const isUrgentEdit = function (resourceArr, job, unitId, request, timeStart, task) {
+        return resourceArr.indexOf(job.vehicleType) == -1 || Number(unitId) != Number(request.groupId) || timeStart != moment(task.startDate).format("HH:mm")
+    }
     try {
         let { unitId, resource, date, timeStart, timeEnd, reportingLocation, poc, mobileNumber, locationId, taskId } = req.body
 
@@ -1003,10 +1028,7 @@ module.exports.EditUrgentIndent = async function (req, res) {
         }
         let createdBy = req.body.createdBy
         let user = await requestService.GetUserInfo(createdBy)
-        let roleName = user.roleName
-        if (roleName == ROLE.RQ || roleName == ROLE.UCO) {
-            unitId = user.group ? user.group : null
-        }
+        unitId = getUnitId(user)
         let groupObj = await Group.findByPk(unitId)
         let groupName = groupObj.groupName
 
@@ -1040,12 +1062,9 @@ module.exports.EditUrgentIndent = async function (req, res) {
         log.info(`unitId: ${unitId}, request.groupId: ${request.groupId}`)
         log.info(`timeStart: ${timeStart}, startDate: ${moment(task.startDate).format("HH:mm")}`)
 
-        let resourceArr = [resourceList[2], resourceList[3]]
-        if (resource == resourceList[0]) {
-            resourceArr = [resourceList[0], resourceList[1]]
-        }
+        let resourceArr = getResourceArr(resource)
 
-        if (resourceArr.indexOf(job.vehicleType) == -1 || Number(unitId) != Number(request.groupId) || timeStart != moment(task.startDate).format("HH:mm")) {
+        if (isUrgentEdit(resourceArr, job, unitId, request, timeStart, task)) {
             let urgentDutyList = await AutoMatchDriver.matchUrgentConfig(startTime, groupName, resource)
             if (urgentDutyList.length == 0) {
                 return Response.error(res, NoUrgentConfigError)
@@ -1062,9 +1081,8 @@ module.exports.EditUrgentIndent = async function (req, res) {
 
             firstDriver = matchDriverList[0]
         }
-        driverId = firstDriver ? firstDriver.driverId : driverId
-        vehicleNo = firstDriver ? firstDriver.vehicleNo : vehicleNo
-        vehicleType = firstDriver ? firstDriver.vehicleType : vehicleType
+        setFirstDriver(firstDriver, driverId, vehicleNo, vehicleType)
+
         let driverObj = await GetMobiusDriverInfo(driverId)
         let vehicleObj = await GetMobiusVehicleInfo(vehicleNo)
         let mobiusTask = await GetMobiusUrgentIndent(taskId)
@@ -1130,7 +1148,7 @@ module.exports.EditUrgentIndent = async function (req, res) {
             await requestService.RecordOperationHistory(requestId, tripId, null, createdBy, INDENT_STATUS.APPROVED, OperationAction.EditTrip, "")
         })
 
-        if (resourceArr.indexOf(job.vehicleType) == -1 || Number(unitId) != Number(request.groupId) || timeStart != moment(task.startDate).format("HH:mm")) {
+        if (isUrgentEdit(resourceArr, job, unitId, request, timeStart, task)) {
             let urgentIndentObj = {
                 indentId: taskId,
                 dutyId: firstDriver.id,
@@ -1157,24 +1175,7 @@ module.exports.EditUrgentIndent = async function (req, res) {
                 return Response.error(res, "Edit Failed")
             }
 
-            try {
-                await Utils.SendDataToFirebase([{
-                    purpose: "Urgent Duty",
-                    taskId: "DUTY-" + oldDutyId,
-                    driverId: oldDriverId,
-                    vehicleNumber: oldVehicleNo,
-                }], `Urgent Indent for ${oldStartTime}H has been cancelled.`, urgentNotificationTitle)
-
-                await Utils.SendDataToFirebase([{
-                    purpose: firstDriver.purpose,
-                    taskId: "DUTY-" + firstDriver.id,
-                    driverId: driverId,
-                    vehicleNumber: vehicleNo,
-                }], `Urgent Indent for ${moment(startTime).format("HHmm")}H received.`, urgentNotificationTitle)
-            } catch (ex) {
-                logError.error(`TaskId: DUTY-${firstDriver.id} send firebase failed`)
-                logError.error(ex)
-            }
+            await sendFirebaseByChangeUrgentIndent({ oldDutyId, oldDriverId, oldVehicleNo, oldStartTime, firstDriver, driverId, vehicleNo, startTime })
         } else {
             let urgentIndentObj = {
                 indentId: taskId,
@@ -1197,6 +1198,28 @@ module.exports.EditUrgentIndent = async function (req, res) {
     } catch (ex) {
         logError.error(ex)
         return Response.error(res, "Edit Failed")
+    }
+}
+
+const sendFirebaseByChangeUrgentIndent = async function (data) {
+    try {
+        let { oldDutyId, oldDriverId, oldVehicleNo, oldStartTime, firstDriver, driverId, vehicleNo, startTime } = data
+        await Utils.SendDataToFirebase([{
+            purpose: "Urgent Duty",
+            taskId: "DUTY-" + oldDutyId,
+            driverId: oldDriverId,
+            vehicleNumber: oldVehicleNo,
+        }], `Urgent Indent for ${oldStartTime}H has been cancelled.`, urgentNotificationTitle)
+
+        await Utils.SendDataToFirebase([{
+            purpose: firstDriver.purpose,
+            taskId: "DUTY-" + firstDriver.id,
+            driverId: driverId,
+            vehicleNumber: vehicleNo,
+        }], `Urgent Indent for ${moment(startTime).format("HHmm")}H received.`, urgentNotificationTitle)
+    } catch (ex) {
+        logError.error(`TaskId: DUTY-${firstDriver.id} send firebase failed`)
+        logError.error(ex)
     }
 }
 
@@ -1223,14 +1246,29 @@ const GetMobiusUrgentIndent = async function (taskId) {
 }
 
 const GetUrgentIndentInUse = async function (req, res) {
+
+    const getFreeUrgentNum = async function(groupName, resource1, urgentDutyList, todayUrgentIndentList, resource){
+        let length = 6
+        let urgentDutyList1 = await AutoMatchDriver.getUrgentDuty(groupName, resource1)
+        if (urgentDutyList1.length == 0) {
+            length -= 3
+        }
+        if (urgentDutyList.length > 0) {
+            let usedLength = usedDutyLength(todayUrgentIndentList, resource)
+            length -= usedLength
+        }
+        if (urgentDutyList1.length > 0) {
+            let usedLength = usedDutyLength(todayUrgentIndentList, resource1)
+            length -= usedLength
+        }
+        return length
+    }
+
     try {
         let { unitId, resource, isEdit, taskId } = req.body
         let createdBy = req.body.createdBy
         let user = await requestService.GetUserInfo(createdBy)
-        let roleName = user.roleName
-        if (roleName == ROLE.RQ || roleName == ROLE.UCO) {
-            unitId = user.group ? user.group : null
-        }
+        unitId = getUnitId(user)
         let groupObj = await Group.findByPk(unitId)
         let groupName = groupObj.groupName
 
@@ -1265,28 +1303,12 @@ const GetUrgentIndentInUse = async function (req, res) {
         if (resource == resourceList[0]) {
             resource1 = resourceList[2]
         }
-        let length = 6
-        let urgentDutyList1 = await AutoMatchDriver.getUrgentDuty(groupName, resource1)
-        if (urgentDutyList1.length == 0) {
-            length -= 3
-        }
-        if (urgentDutyList.length > 0) {
-            let usedLength = usedDutyLength(todayUrgentIndentList, resource)
-            length -= usedLength
-        }
-        if (urgentDutyList1.length > 0) {
-            let usedLength = usedDutyLength(todayUrgentIndentList, resource1)
-            length -= usedLength
-        }
-
+        let length = await getFreeUrgentNum(groupName, resource1, urgentDutyList, todayUrgentIndentList, resource)
         if (length <= 0) {
             return Response.success(res, urgentIndentTimeList)
         }
 
-        let resourceArr = [resourceList[2], resourceList[3]]
-        if (resource == resourceList[0]) {
-            resourceArr = [resourceList[0], resourceList[1]]
-        }
+        let resourceArr = getResourceArr(resource)
         // resource already used time
         let vehicleUrgentIndentList = todayUrgentIndentList.filter(o => resourceArr.indexOf(o.vehicleType) != -1)
         if (isEdit) {
@@ -1310,10 +1332,7 @@ module.exports.GetUnitLocation = async function (req, res) {
     let { unitId } = req.body
     let createdBy = req.body.createdBy
     let user = await requestService.GetUserInfo(createdBy)
-    let roleName = user.roleName
-    if (roleName == ROLE.RQ || roleName == ROLE.UCO) {
-        unitId = user.group ? user.group : null
-    }
+    unitId = getUnitId(user)
 
     let group = await Group.findByPk(unitId)
     let locationId = group.locationId
@@ -1402,10 +1421,7 @@ module.exports.ValidCreateUrgentIndentBtn = async function (req, res) {
 }
 
 const usedDutyLength = function (todayUrgentIndentList, resource) {
-    let resourceArr = [resourceList[2], resourceList[3]]
-    if (resource == resourceList[0]) {
-        resourceArr = [resourceList[0], resourceList[1]]
-    }
+    let resourceArr = getResourceArr(resource)
     let nowTime = moment().add(15, 'minute')
     let today = moment().format("YYYY-MM-DD")
     let timeoutLength = 0

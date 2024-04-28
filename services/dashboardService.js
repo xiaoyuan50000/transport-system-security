@@ -734,6 +734,22 @@ const GetUserPerformance = function (result, monthList, userInfo, cvServiceTypeI
         return moment(a).format('MMM')
     })
 
+    const isCancellationWithSurcharge = function (cancellationTime, executionDateTime, surcharge) {
+        if (cancellationTime) {
+            let approveDateDiffHours = moment(executionDateTime).diff(moment(cancellationTime), 's')
+            return approveDateDiffHours < 4 * 3600 && surcharge > 0
+        }
+        return false
+    }
+
+    const isResourceWithAmendmentSurcharge = function (tspChangeTime, executionDateTime, surcharge, editTripIds, tripId) {
+        if (tspChangeTime && editTripIds.includes(tripId)) {
+            let approveDateDiffHours = moment(executionDateTime).diff(moment(tspChangeTime), 's')
+            return approveDateDiffHours < 4 * 3600 && surcharge > 0
+        }
+        return false
+    }
+
     const GetUsersPerformanceIndents = function (datas, editTripIds) {
         let resourceWithLateIndentSurcharge = []
         let resourceWithNoShowIndentSurcharge = []
@@ -761,20 +777,14 @@ const GetUserPerformance = function (result, monthList, userInfo, cvServiceTypeI
                 resourceWithNoShowIndentSurcharge.push(tripId)
             }
 
-            if (cancellationTime) {
-                let approveDateDiffHours = moment(executionDateTime).diff(moment(cancellationTime), 's')
-                if (approveDateDiffHours < 4 * 3600 && surcharge > 0) {
-                    resourceWithCancelledSurcharge.push(id)
-                    cancelledIndents.push(row)
-                }
+            if (isCancellationWithSurcharge(cancellationTime, executionDateTime, surcharge)) {
+                resourceWithCancelledSurcharge.push(id)
+                cancelledIndents.push(row)
             }
 
-            if (tspChangeTime && editTripIds.includes(tripId)) {
-                let approveDateDiffHours = moment(executionDateTime).diff(moment(tspChangeTime), 's')
-                if (approveDateDiffHours < 4 * 3600 && surcharge > 0) {
-                    resourceWithAmendmentSurcharge.push(id)
-                    amendmentIndents.push(row)
-                }
+            if (isResourceWithAmendmentSurcharge(tspChangeTime, executionDateTime, surcharge, editTripIds, tripId)) {
+                resourceWithAmendmentSurcharge.push(id)
+                amendmentIndents.push(row)
             }
         }
         return {

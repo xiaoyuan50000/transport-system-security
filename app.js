@@ -12,6 +12,8 @@ const crypto = require('crypto');
 
 log4js.configure();
 
+
+
 const tokenInterceptor = require('./interceptor/tokenInterceptor');
 const urlInterceptor = require('./interceptor/urlInterceptor');
 const indexRouter = require('./routes/index');
@@ -28,10 +30,12 @@ const home = require('./singpass/home')
 const callback = require('./singpass/callback')
 const mobileCallback = require('./singpass/mobileCallback')
 let ActiveMQ = require('./activemq/activemq.js');
-const cpuRouter = require('./routes/cpu')
+
 
 
 let app = express();
+const cpuRouter = require('./routes/cpu')
+app.use('/cpu', cpuRouter)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -110,7 +114,6 @@ app.use('/provider', providerRouter);
 app.use('/mobileCV', mobileCVRouter);
 app.use('/mobilePOC', mobilePOCRouter);
 app.use('/mobileTO', mobileTORouter);
-app.use('/cpu', cpuRouter)
 
 app.get('/home', home)
 app.get('/callback', callback)

@@ -106,7 +106,7 @@ const loginServer = async function (req, res) {
         res.cookie("token", token, cookieOptions);
 
         let role = await Role.findByPk(user.role)
-        user.roleName = role != null ? role.roleName : ""
+        user.roleName = getRoleName(role)
         let loginTime = new Date()
         await user.update({ times: 0, lastLoginTime: loginTime, token: token })
         await user.save()
@@ -124,6 +124,10 @@ const loginServer = async function (req, res) {
     }
 };
 module.exports.loginServer = loginServer;
+
+const getRoleName = function (role) {
+    return role != null ? role.roleName : ""
+}
 
 const tryTimesExceeded = async function (times, tryTimes, user) {
     if (times == tryTimes) {
