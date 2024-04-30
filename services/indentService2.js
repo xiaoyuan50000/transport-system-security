@@ -43,21 +43,20 @@ const tripCannotCancelStatus = [
 ]
 const reSubmittedDay = conf.ReSubmittedDay
 
-const QueryIndentsByFilter = async function (roleName, action, execution_date,
-    created_date, unit, status, indentId, groupId, vehicleType, userId, pageFlag, pageNum, pageLength, nodeList, sortParams = null) {
-    console.time("QueryIndentsByFilter")
-    let replacements = []
-    let filter = ""
+const haveApprovalPermission = function (action, roleName) {
+    if (action == 2) {
+        return roleName == ROLE.UCO || roleName == ROLE.RF || roleName == ROLE.OCCMgr
+    }
+    return true
+}
 
+const indentFilterByRole = async function (roleName, groupId, userId) {
+    let filter = ""
+    let replacements = []
     if (roleName == ROLE.RQ || roleName == ROLE.UCO) {
         filter += ` and a.groupId = ?`
         replacements.push(groupId)
     }
-    /*else if (roleName == ROLE.TSP) {
-        let user = await User.findByPk(userId)
-        filter += ` and b.serviceProviderId = ? and b.endorse = 1`
-        replacements.push(user.serviceProviderId)
-    }*/
     else if (roleName == ROLE.RF || ROLE.OCC.indexOf(roleName) != -1) {
         let user = await User.findByPk(userId)
         let serviceTypeId = user.serviceTypeId
@@ -71,7 +70,12 @@ const QueryIndentsByFilter = async function (roleName, action, execution_date,
     else {
         filter += ` and a.groupId = 0`
     }
+    return { filter, replacements }
+}
 
+const indentFilterByAction = function (action, roleName) {
+    let filter = ""
+    let replacements = []
     if (action == 2) {
         if (roleName == ROLE.UCO) {
             filter += ` and b.status in (?)`
@@ -79,8 +83,6 @@ const QueryIndentsByFilter = async function (roleName, action, execution_date,
         } else if (roleName == ROLE.RF || roleName == ROLE.OCCMgr) {
             filter += ` and b.status in (?)`
             replacements.push([INDENT_STATUS.WAITAPPROVEDRF])
-        } else {
-            return { result: [], count: 0 }
         }
     } else if (action == 3) {
         filter += ` and TO_DAYS(b.executionDate) = TO_DAYS(NOW())`
@@ -104,15 +106,10 @@ const QueryIndentsByFilter = async function (roleName, action, execution_date,
         filter += ` and st.category = ?`
         replacements.push('Fuel')
     }
+    return { filter, replacements }
+}
 
-    if (indentId != "" && indentId != null) {
-        filter += ` and b.requestId like ?`
-        replacements.push(`%${indentId}%`)
-    }
-    if (created_date != "") {
-        filter += ` and b.createdAt like ?`
-        replacements.push(`${created_date}%`)
-    }
+const getStartAndEndExeDate = function (pageFlag) {
     let startExeDate = null;
     let endExeDate = null;
     let nowDatetime = moment().format(fmt);
@@ -121,6 +118,21 @@ const QueryIndentsByFilter = async function (roleName, action, execution_date,
     } else if (pageFlag == 'past') {
         endExeDate = nowDatetime;
     }
+    return { startExeDate, endExeDate }
+}
+
+const getIndentFilter1 = function (indentId, created_date, startExeDate, endExeDate, execution_date) {
+    let filter = ""
+    let replacements = []
+    if (indentId != "" && indentId != null) {
+        filter += ` and b.requestId like ?`
+        replacements.push(`%${indentId}%`)
+    }
+    if (created_date != "") {
+        filter += ` and b.createdAt like ?`
+        replacements.push(`${created_date}%`)
+    }
+
     if (startExeDate != null) {
         filter += ` and date_format(e.startDate, '%Y-%m-%d %H:%i:%s') >= ? `
         replacements.push(startExeDate)
@@ -140,6 +152,12 @@ const QueryIndentsByFilter = async function (roleName, action, execution_date,
             replacements.push(dates[0])
         }
     }
+    return { filter, replacements }
+}
+
+const getIndentFilter2 = function (status, unit, vehicleType, nodeList) {
+    let filter = ""
+    let replacements = []
     if (status != "") {
         if (status == DRIVER_STATUS.NOSHOWSYSTEM) {
             filter += ` and DATE_FORMAT(e.startDate,'%Y-%m-%d %T') < DATE_FORMAT(now(),'%Y-%m-%d %T') and e.taskStatus = 'assigned' and b.status='approved'`
@@ -156,8 +174,6 @@ const QueryIndentsByFilter = async function (roleName, action, execution_date,
         filter += ` and c.groupName = ?`
         replacements.push(unit)
     }
-
-
     if (vehicleType != "" && vehicleType != null) {
         filter += ` and b.vehicleType = ?`
         replacements.push(vehicleType)
@@ -167,28 +183,66 @@ const QueryIndentsByFilter = async function (roleName, action, execution_date,
         filter += ` and st.category = 'MV' and e.mobiusUnit in (?)`;
         replacements.push(nodeList);
     }
+    return { filter, replacements }
+}
 
+const getOrderBySql = function (sortParams) {
     let orderBySql = ``;
-    if (sortParams) {
-        if (sortParams.exeSort && sortParams.exeSort == 'asc') {
-            orderBySql += ` b.executionDate asc `;
-        } else if (sortParams.exeSort && sortParams.exeSort == 'desc') {
-            orderBySql += ` b.executionDate desc `;
+    if (!sortParams) {
+        return orderBySql
+    }
+
+    if (sortParams.exeSort && sortParams.exeSort == 'asc') {
+        orderBySql += ` b.executionDate asc `;
+    } else if (sortParams.exeSort && sortParams.exeSort == 'desc') {
+        orderBySql += ` b.executionDate desc `;
+    }
+    if (sortParams.createdSort) {
+        if (orderBySql) {
+            orderBySql += ` ,`
         }
-        if (sortParams.createdSort) {
-            if (orderBySql) {
-                orderBySql += ` ,`
-            }
-            if (sortParams.createdSort == 'asc') {
-                orderBySql += ` b.createdAt asc`;
-            } else if (sortParams.createdSort == 'desc') {
-                orderBySql += ` b.createdAt desc`;
-            }
+        if (sortParams.createdSort == 'asc') {
+            orderBySql += ` b.createdAt asc`;
+        } else if (sortParams.createdSort == 'desc') {
+            orderBySql += ` b.createdAt desc`;
         }
     }
     if (orderBySql) {
         orderBySql = ` order by ` + orderBySql;
     }
+    return orderBySql
+}
+
+const QueryIndentsByFilter = async function (roleName, action, execution_date,
+    created_date, unit, status, indentId, groupId, vehicleType, userId, pageFlag, pageNum, pageLength, nodeList, sortParams = null) {
+    console.time("QueryIndentsByFilter")
+    let replacements = []
+    let filter = ""
+
+    if (!haveApprovalPermission(action, roleName)) {
+        return { result: [], count: 0 }
+    }
+
+    let roleFilter = await indentFilterByRole(roleName, groupId, userId)
+    filter += roleFilter.filter
+    replacements.push(...roleFilter.replacements)
+
+    let actionFilter = indentFilterByAction(action, roleName)
+    filter += actionFilter.filter
+    replacements.push(...actionFilter.replacements)
+
+    let { startExeDate, endExeDate } = getStartAndEndExeDate(pageFlag)
+    let indentFilter1 = getIndentFilter1(indentId, created_date, startExeDate, endExeDate, execution_date)
+    filter += indentFilter1.filter
+    replacements.push(...indentFilter1.replacements)
+
+    let indentFilter2 = getIndentFilter2(status, unit, vehicleType, nodeList)
+    filter += indentFilter2.filter
+    replacements.push(...indentFilter2.replacements)
+
+
+
+    let orderBySql = getOrderBySql(sortParams)
     let countAll = 0
     if (pageNum != null && pageLength != null) {
         let { datas, count } = await GetIndentIdByLimit(replacements, filter, pageNum, pageLength)
@@ -298,7 +352,6 @@ module.exports.InitIndentTable = async function (req, res) {
     let { roleName, action, execution_date, created_date, unit, status, indentId, groupId, vehicleType, userId, currentPage, sortParams } = req.body;
     let nodeList = req.body['nodeList[]']
 
-    let now = moment().format(fmt)
     let queryDatas = await QueryIndentsByFilter(roleName, action, execution_date, created_date, unit, status, indentId, groupId, vehicleType, userId, currentPage, pageNum, pageLength, nodeList, sortParams)
     let result = queryDatas.result
     let count = queryDatas.count
@@ -337,90 +390,7 @@ module.exports.InitIndentTable = async function (req, res) {
     let instanceIdList = []
 
     for (let indent of rows) {
-        let tasks = trips.filter(item => item.id == indent.id && item.tripId != null)
-        for (let task of tasks) {
-            task.btns = []
-            let status = task.status ? task.status.toLowerCase() : ""
-            let instanceId = task.instanceId
-
-            if (instanceId && status != TASK_STATUS.CANCELLED
-                && status != DRIVER_STATUS.COMPLETED && status != DRIVER_STATUS.LATE
-                && status != DRIVER_STATUS.NOSHOW) {
-                instanceIdList.push(instanceId)
-            }
-            if (task.loaTagId) {
-                continue
-            }
-
-            let a = moment(task.endorseDate).format(fmt)
-            if (moment(a).isSameOrBefore(moment(now))) {
-                task.isEndorse = true
-            } else {
-                task.isEndorse = false
-            }
-
-
-            let trip = assignedDriverList.find(item => item.id == task.tripId)
-            task.assignedDriver = trip.assignedDriver
-            task.hasTSPCount = trip.hasTSPCount
-            task.completedCount = trip.completedCount
-            task.noshowCount = trip.noshowCount
-            task.lateCount = trip.lateCount
-            task.cancelledCount = trip.cancelledCount
-            task.otherCount = trip.otherCount
-            task.isTripBegin = trip.isTripBegin
-            let selectableTsp = trip.selectableTsp ? trip.selectableTsp.split(',') : []
-
-            // set tsp available
-            task.tspAvailableSelect = null
-            task.tspAvailable = ""
-            if (task.category.toUpperCase() != 'MV') {
-                if (task.hasTSPCount == 0) {
-                    if (status != TASK_STATUS.CANCELLED) {
-                        if ((roleName == ROLE.RF || roleName == ROLE.OCCMgr) && (status == INDENT_STATUS.WAITAPPROVEDRF.toLowerCase() || status == INDENT_STATUS.APPROVED.toLowerCase())) {
-                            task.tspAvailableSelect = serviceProviderList.filter(item => selectableTsp.indexOf(item.id.toString()) != -1)
-                            task.tspAvailableSelect = await MergerWogTSP(task.tspAvailableSelect)
-                        } else {
-                            task.tspAvailable = selectableTsp.length
-                        }
-                    }
-                } else {
-                    let tspAvailableInfo = tspAvailableList.filter(item => item.tripId == task.tripId)
-                    task.tspAvailable = tspAvailableInfo.map(item => `${item.name}: ${item.tspCount}`).join('<br>')
-                }
-            }
-            else {
-                if (status != TASK_STATUS.CANCELLED) {
-                    // let tspAvailableInfo = tspAvailableList.find(item => item.tripId == task.tripId)
-                    // let mobiusUnitId = tspAvailableInfo ? tspAvailableInfo.mobiusUnitId : '';
-                    // if (mobiusUnitId) {
-                    //     let unitStr = []
-                    //     _.forEach(_.countBy(mobiusUnitId.split(',')), function (value, key) {
-                    //         let unit = mobiusSubUnits.find(item => item.id == key)
-                    //         unitStr.push(`${unit.name}: ${value}`)
-                    //     });
-                    //     task.tspAvailable = unitStr.join('<br>')
-                    // } else {
-                    //     task.tspAvailableSelect = mobiusSubUnits
-                    // }
-                    let tspAvailableInfo = mobiusUnitAvailableList.filter(item => item.tripId == task.tripId)
-                    if (tspAvailableInfo.length > 0) {
-                        let unitStr = []
-                        tspAvailableInfo.forEach(row => {
-                            if (row.mobiusUnit) {
-                                let unit = mobiusSubUnits.find(item => item.id == row.mobiusUnit)
-                                unitStr.push(`${unit ? unit.name : "-"}: ${row.tspCount}`)
-                            } else {
-                                unitStr.push(`Unassigned: ${row.tspCount}`)
-                            }
-                        });
-                        task.tspAvailable = unitStr.join('<br>')
-                    } else if (tspAvailableInfo.length == 1 && !tspAvailableInfo[0].mobiusUnit) {
-                        task.tspAvailableSelect = mobiusSubUnits
-                    }
-                }
-            }
-        }
+        let tasks = await setIndentTasks({ trips, indent, instanceIdList, assignedDriverList, serviceProviderList, tspAvailableList, mobiusUnitAvailableList, mobiusSubUnits, roleName })
         indent.trips = tasks
     }
     console.timeEnd('InitIndentTable')
@@ -430,83 +400,205 @@ module.exports.InitIndentTable = async function (req, res) {
     return res.json({ data: rows, recordsFiltered: count, recordsTotal: count })
 }
 
-const GetWorkFlowBtns = async function (rows, instanceIdList, roleName, groupId, assignedLoanMVTripIds) {
+const getTaskStatusLowerCase = function (status) {
+    return status ? status.toLowerCase() : ""
+}
+
+const setIndentTasks = async function (datas) {
+
+
+    const isTaskNotCompleted = function (instanceId, status) {
+        return instanceId
+            && status != TASK_STATUS.CANCELLED.toLowerCase()
+            && status != DRIVER_STATUS.COMPLETED.toLowerCase()
+            && status != DRIVER_STATUS.LATE.toLowerCase()
+            && status != DRIVER_STATUS.NOSHOW.toLowerCase()
+    }
+
+    const getSelectableTsp = function (trip) {
+        return trip.selectableTsp ? trip.selectableTsp.split(',') : []
+    }
+
+    const setTSPAvailable = async function (task, status, roleName, selectableTsp, serviceProviderList, tspAvailableList) {
+        if (task.hasTSPCount != 0) {
+            let tspAvailableInfo = tspAvailableList.filter(item => item.tripId == task.tripId)
+            task.tspAvailable = tspAvailableInfo.map(item => `${item.name}: ${item.tspCount}`).join('<br>')
+            return
+        }
+
+        if (task.hasTSPCount == 0 && status != TASK_STATUS.CANCELLED) {
+            if ((roleName == ROLE.RF || roleName == ROLE.OCCMgr) && (status == INDENT_STATUS.WAITAPPROVEDRF.toLowerCase() || status == INDENT_STATUS.APPROVED.toLowerCase())) {
+                task.tspAvailableSelect = serviceProviderList.filter(item => selectableTsp.indexOf(item.id.toString()) != -1)
+                task.tspAvailableSelect = await MergerWogTSP(task.tspAvailableSelect)
+            } else {
+                task.tspAvailable = selectableTsp.length
+            }
+        }
+    }
+
+    const setMobiusTSPAvailable = function (task, status, mobiusUnitAvailableList, mobiusSubUnits) {
+        if (status != TASK_STATUS.CANCELLED) {
+            let tspAvailableInfo = mobiusUnitAvailableList.filter(item => item.tripId == task.tripId)
+            if (tspAvailableInfo.length > 0) {
+                let unitStr = []
+                tspAvailableInfo.forEach(row => {
+                    if (row.mobiusUnit) {
+                        let unit = mobiusSubUnits.find(item => item.id == row.mobiusUnit)
+                        unitStr.push(`${unit ? unit.name : "-"}: ${row.tspCount}`)
+                    } else {
+                        unitStr.push(`Unassigned: ${row.tspCount}`)
+                    }
+                });
+                task.tspAvailable = unitStr.join('<br>')
+            } else if (tspAvailableInfo.length == 1 && !tspAvailableInfo[0].mobiusUnit) {
+                task.tspAvailableSelect = mobiusSubUnits
+            }
+        }
+    }
+
+    let { trips, indent, instanceIdList, assignedDriverList, serviceProviderList, tspAvailableList, mobiusUnitAvailableList, mobiusSubUnits, roleName } = datas
+    let tasks = trips.filter(item => item.id == indent.id && item.tripId != null)
+    let now = moment().format(fmt)
+
+    for (let task of tasks) {
+        task.btns = []
+        let status = getTaskStatusLowerCase(task.status)
+        let instanceId = task.instanceId
+
+        if (isTaskNotCompleted(instanceId, status)) {
+            instanceIdList.push(instanceId)
+        }
+        if (task.loaTagId) {
+            continue
+        }
+
+        let endorseDate = moment(task.endorseDate).format(fmt)
+        task.isEndorse = moment(endorseDate).isSameOrBefore(moment(now))
+
+
+        let trip = assignedDriverList.find(item => item.id == task.tripId)
+        task.assignedDriver = trip.assignedDriver
+        task.hasTSPCount = trip.hasTSPCount
+        task.completedCount = trip.completedCount
+        task.noshowCount = trip.noshowCount
+        task.lateCount = trip.lateCount
+        task.cancelledCount = trip.cancelledCount
+        task.otherCount = trip.otherCount
+        task.isTripBegin = trip.isTripBegin
+        let selectableTsp = getSelectableTsp(trip)
+
+        // set tsp available
+        task.tspAvailableSelect = null
+        task.tspAvailable = ""
+        if (task.category.toUpperCase() != 'MV') {
+            await setTSPAvailable(task, status, roleName, selectableTsp, serviceProviderList, tspAvailableList)
+        }
+        else {
+            setMobiusTSPAvailable(task, status, mobiusUnitAvailableList, mobiusSubUnits)
+        }
+    }
+    return tasks
+}
+
+const getIfUCOEndorsed = async function (roleName, groupId) {
     let isEndorsed = true
     if (roleName == ROLE.UCO) {
         isEndorsed = await requestService.CheckTaskIsEndorsedByUnitId(groupId)
     }
+    return isEndorsed
+}
 
-    // Get btns from work flow
+const getWorkFlowInstanceIdList = async function (roleName, instanceIdList) {
     let workFlowInstanceIdList = []
     if (instanceIdList.length > 0) {
         workFlowInstanceIdList = await WorkFlow.select(roleName, instanceIdList)
     }
+    return workFlowInstanceIdList
+}
+
+const GetWorkFlowBtns = async function (rows, instanceIdList, roleName, groupId, assignedLoanMVTripIds) {
+    let isEndorsed = await getIfUCOEndorsed(roleName, groupId)
+    // Get btns from work flow
+    let workFlowInstanceIdList = await getWorkFlowInstanceIdList(roleName, instanceIdList)
+
     for (let row of rows) {
-        for (let trip of row.trips) {
-            let status = trip.status ? trip.status.toLowerCase() : ""
-            if (ViewActionRole.indexOf(roleName) != -1) {
-                trip.btns.push("View")
-            }
-            if (roleName == ROLE.UCO && !isEndorsed && trip.category.toUpperCase() != 'MV') {
-                continue
-            }
+        setTripBtns(row.trips, isEndorsed, workFlowInstanceIdList, assignedLoanMVTripIds, roleName)
+    }
+    return rows
+}
 
-            if (roleName == ROLE.RF && trip.isImport) {
-                trip.btns.push("Edit")
-                trip.btns.push("Cancel")
-            } else {
-                if (workFlowInstanceIdList.length > 0) {
-                    let instance = workFlowInstanceIdList.filter(item => item.indentId == trip.tripId)[0]
-                    if (instance && instance.btns) {
-                        trip.btns = trip.btns.concat(instance.btns)
-                        trip.btns = remove(trip.btns, "Cancel")
-                    }
-                }
-                if (status == INDENT_STATUS.APPROVED.toLowerCase() && (roleName == ROLE.RF || ROLE.OCC.indexOf(roleName) != -1)) {
-                    if (trip.btns.indexOf("Edit") == -1) {
-                        trip.btns.push("Edit")
-                    }
-                }
-                if (trip.instanceId) {
-                    trip.btns.push("Cancel")
-                }
-            }
+const setTripBtns = function (trips, isEndorsed, workFlowInstanceIdList, assignedLoanMVTripIds, roleName) {
 
-            if (tripCannotCancelStatus.indexOf(status) != -1 || trip.isTripBegin) {
-                trip.btns = remove(trip.btns, "Edit")
+    const setEditAndCancelBtns = function (trip, roleName, workFlowInstanceIdList, status) {
+        if (roleName == ROLE.RF && trip.isImport) {
+            trip.btns.push("Edit")
+            trip.btns.push("Cancel")
+            return
+        }
+
+        let instance = workFlowInstanceIdList.find(item => item.indentId == trip.tripId)
+        if (instance && instance.btns) {
+            trip.btns = trip.btns.concat(instance.btns)
+            trip.btns = remove(trip.btns, "Cancel")
+        }
+        if (status == INDENT_STATUS.APPROVED.toLowerCase()
+            && (roleName == ROLE.RF || ROLE.OCC.indexOf(roleName) != -1)
+            && trip.btns.indexOf("Edit") == -1) {
+            trip.btns.push("Edit")
+        }
+        if (trip.instanceId) {
+            trip.btns.push("Cancel")
+        }
+    }
+
+    const removeEditAndCancelBtns = function (trip, roleName, status, assignedLoanMVTripIds) {
+        if (tripCannotCancelStatus.indexOf(status) != -1 || trip.isTripBegin) {
+            trip.btns = remove(trip.btns, "Edit")
+            trip.btns = remove(trip.btns, "Cancel")
+        }
+        // UCO approve. RQ,UCO cannot edit and cancel
+        // Status is approved. RQ,UCO cannot edit and cancel
+        if ((status == INDENT_STATUS.WAITAPPROVEDRF.toLowerCase() || status == INDENT_STATUS.APPROVED.toLowerCase()) && (roleName == ROLE.RQ || roleName == ROLE.UCO)) {
+            trip.btns = remove(trip.btns, "Edit")
+            trip.btns = remove(trip.btns, "Cancel")
+        }
+
+        if (roleName == ROLE.TSP) {
+            trip.btns.push('Confirm')
+        }
+
+        // 0714: loan mv trip cannot edit and cancel once assigned
+        if (assignedLoanMVTripIds.indexOf(trip.tripId) != -1) {
+            trip.btns = remove(trip.btns, "Edit")
+            trip.btns = remove(trip.btns, "Cancel")
+        }
+
+        // endtime expired cannot cancel
+        if (trip.duration) {
+            let endTime = moment(`${trip.executionDate} ${trip.executionTime}`).add(trip.duration, 'h')
+            if (moment(endTime).isSameOrBefore(moment())) {
                 trip.btns = remove(trip.btns, "Cancel")
             }
-            // UCO approve. RQ,UCO cannot edit and cancel
-            // Status is approved. RQ,UCO cannot edit and cancel
-            if ((status == INDENT_STATUS.WAITAPPROVEDRF.toLowerCase() || status == INDENT_STATUS.APPROVED.toLowerCase()) && (roleName == ROLE.RQ || roleName == ROLE.UCO)) {
-                trip.btns = remove(trip.btns, "Edit")
+        } else if (trip.periodEndDate) {
+            if (moment(trip.periodEndDate).isSameOrBefore(moment())) {
                 trip.btns = remove(trip.btns, "Cancel")
-            }
-
-            if (roleName == ROLE.TSP) {
-                trip.btns.push('Confirm')
-            }
-
-            // 0714: loan mv trip cannot edit and cancel once assigned
-            if (assignedLoanMVTripIds.indexOf(trip.tripId) != -1) {
-                trip.btns = remove(trip.btns, "Edit")
-                trip.btns = remove(trip.btns, "Cancel")
-            }
-
-            // endtime expired cannot cancel
-            if (trip.duration) {
-                let endTime = moment(`${trip.executionDate} ${trip.executionTime}`).add(trip.duration, 'h')
-                if (moment(endTime).isSameOrBefore(moment())) {
-                    trip.btns = remove(trip.btns, "Cancel")
-                }
-            } else if (trip.periodEndDate) {
-                if (moment(trip.periodEndDate).isSameOrBefore(moment())) {
-                    trip.btns = remove(trip.btns, "Cancel")
-                }
             }
         }
     }
-    return rows
+
+    for (let trip of trips) {
+        let status = getTaskStatusLowerCase(trip.status)
+        if (ViewActionRole.indexOf(roleName) != -1) {
+            trip.btns.push("View")
+        }
+        if (roleName == ROLE.UCO && !isEndorsed && trip.category.toUpperCase() != 'MV') {
+            continue
+        }
+
+        setEditAndCancelBtns(trip, roleName, workFlowInstanceIdList, status)
+
+        removeEditAndCancelBtns(trip, roleName, status, assignedLoanMVTripIds)
+    }
 }
 
 const MergerWogTSP = async function (tspAvailableSelect, currentTspId = null) {
@@ -833,6 +925,61 @@ const FilterServiceProvider = async function (vehicle, serviceModeId, dropoffPoi
 module.exports.FilterServiceProvider = FilterServiceProvider
 
 module.exports.UpdateTSP = async function (req, res) {
+
+    const updateTSPByMV = async function (job, tripId, userId, serviceProviderId, optTime) {
+        let jobs = [job]
+        let tripIds = [tripId]
+        if (job.repeats == "Period" && job.preParkDate) {
+            let job2 = await requestService.GetPeriodAnotherTrip(job)
+            if (job2) {
+                jobs.push(job2)
+                if (job2.status != INDENT_STATUS.APPROVED) {
+                    await WorkFlow.apply(job2.instanceId, 1, "", ROLE.RF)
+                    await requestService.RecordOperationHistory(job2.requestId, job2.id, null, userId, INDENT_STATUS.APPROVED, OperationAction.Approve, "")
+                    await Job2.update({ status: INDENT_STATUS.APPROVED, approve: 1 }, { where: { id: job2.id } })
+                }
+
+                tripIds.push(job2.id)
+            }
+        }
+        let taskList = await Task2.findAll({
+            where: {
+                tripId: {
+                    [Op.in]: tripIds
+                }
+            }
+        })
+        await sequelizeObj.transaction(async (t1) => {
+            for (let task of taskList) {
+                await Task2.update({ notifiedTime: optTime, mobiusUnit: Number(serviceProviderId) }, { where: { id: task.id } })
+                await requestService.RecordOperationHistory(task.requestId, task.tripId, task.id, userId, TASK_STATUS.UNASSIGNED, TASK_STATUS.UNASSIGNED, "")
+            }
+        })
+        if (job.typeOfVehicle != "-" && job.driver == 1) {
+            await requestService.UpdateMVContractNo(jobs)
+        }
+    }
+
+    const updateTSPByCV = async function (job, tripId, userId, serviceProviderId, optTime, unassignedTaskIds) {
+        let taskList = await Task2.findAll({
+            where: {
+                tripId: tripId
+            }
+        })
+
+        let taskIds = []
+        for (let task of taskList) {
+            let result = await requestService.DoUpdateTSPAndApprove(serviceProviderId, optTime, userId, task, job)
+            if (result) {
+                taskIds.push(task.id)
+            } else {
+                unassignedTaskIds.push(task.id)
+            }
+        }
+        // Initial PO
+        await initialPoService.deleteGeneratedInitialPO(taskIds)
+    }
+
     try {
         let { tripId, serviceProviderId, optTime, userId, isCategoryMV } = req.body
         if (!validDateTime(optTime)) {
@@ -847,67 +994,9 @@ module.exports.UpdateTSP = async function (req, res) {
             await Job2.update({ status: INDENT_STATUS.APPROVED, approve: 1 }, { where: { id: tripId } })
         }
         if (isCategoryMV) {
-            let jobs = [job]
-            let tripIds = [tripId]
-            if (job.repeats == "Period" && job.preParkDate) {
-                let job2 = await requestService.GetPeriodAnotherTrip(job)
-                if (job2) {
-                    jobs.push(job2)
-                    if (job2.status != INDENT_STATUS.APPROVED) {
-                        await WorkFlow.apply(job2.instanceId, 1, "", ROLE.RF)
-                        await requestService.RecordOperationHistory(job2.requestId, job2.id, null, userId, INDENT_STATUS.APPROVED, OperationAction.Approve, "")
-                        await Job2.update({ status: INDENT_STATUS.APPROVED, approve: 1 }, { where: { id: job2.id } })
-                    }
-
-                    tripIds.push(job2.id)
-                }
-            }
-            let taskList = await Task2.findAll({
-                where: {
-                    tripId: {
-                        [Op.in]: tripIds
-                    }
-                }
-            })
-            await sequelizeObj.transaction(async (t1) => {
-                for (let task of taskList) {
-                    await Task2.update({ notifiedTime: optTime, mobiusUnit: Number(serviceProviderId) }, { where: { id: task.id } })
-                    await requestService.RecordOperationHistory(task.requestId, task.tripId, task.id, userId, TASK_STATUS.UNASSIGNED, TASK_STATUS.UNASSIGNED, "")
-                }
-            })
-            if (job.typeOfVehicle != "-" && job.driver == 1) {
-                await requestService.UpdateMVContractNo(jobs)
-            }
+            await updateTSPByMV(job, tripId, userId, serviceProviderId, optTime)
         } else {
-            let taskList = await Task2.findAll({
-                where: {
-                    tripId: tripId
-                }
-            })
-
-            let taskIds = []
-            for (let task of taskList) {
-                let result = await requestService.DoUpdateTSPAndApprove(serviceProviderId, optTime, userId, task, job)
-                if (result) {
-                    taskIds.push(task.id)
-                } else {
-                    unassignedTaskIds.push(task.id)
-                }
-            }
-
-            // if (job.repeats == "Period" && job.preParkDate) {
-            //     let job2 = await requestService.GetPeriodAnotherTrip(job)
-            //     let taskList = await Task2.findAll({
-            //         where: {
-            //             tripId: job2.id
-            //         }
-            //     })
-            //     for (let task of taskList) {
-            //         await requestService.DoUpdateTSPAndApprove(serviceProviderId, optTime, userId, task, job2)
-            //     }
-            // }
-            // Initial PO
-            await initialPoService.deleteGeneratedInitialPO(taskIds)
+            await updateTSPByCV(job, tripId, userId, serviceProviderId, optTime, unassignedTaskIds)
         }
         return Response.success(res, unassignedTaskIds.length)
     } catch (ex) {
@@ -946,49 +1035,34 @@ module.exports.GetDriverDetail = async function (req, res) {
 }
 
 const GetActionInfoForJob = async function (drivers) {
+
+    const setTSPSelect = async function (row) {
+        if (row.copyFrom != null && DuplicateTaskStatus.indexOf(row.taskStatus) == -1 && row.serviceProviderId == null) {
+            let tsp = await FilterServiceProvider(row.vehicleType, row.serviceModeId, row.dropoffDestination, row.pickupDestination, row.executionDate, row.executionTime, true)
+            row.tspSelect = await MergerWogTSP(tsp, row.serviceProviderId)
+
+        }
+        else if (DuplicateTaskStatus.indexOf(row.taskStatus) != -1) {
+            row.linkedTask = await GetLinkedTask(row.taskId)
+        } else if (tripCannotCancelStatus.indexOf(row.taskStatus.toLowerCase()) == -1) {
+            let tsp = await FilterServiceProvider(row.vehicleType, row.serviceModeId, row.dropoffDestination, row.pickupDestination, row.executionDate, row.executionTime)
+            row.tspSelect = await MergerWogTSP(tsp, row.serviceProviderId)
+        }
+    }
+
     for (let row of drivers) {
         GetAditionalStatus(row)
         row.tspSelect = null
         row.linkedTask = false
         row.cancel = false
         if (!(row.repeats == "Period" && !row.instanceId) && row.category.toUpperCase() != 'MV') {
-            if (row.copyFrom != null && DuplicateTaskStatus.indexOf(row.taskStatus) == -1 && row.serviceProviderId == null) {
-                let tsp = await FilterServiceProvider(row.vehicleType, row.serviceModeId, row.dropoffDestination, row.pickupDestination, row.executionDate, row.executionTime, true)
-                // let filterDriver = tsp.filter(item => item.driver == row.driver)
-                // row.tspSelect = requestService.RemoveDuplicateServiceProvider(tsp)
-                row.tspSelect = tsp
-                row.tspSelect = await MergerWogTSP(tsp, row.serviceProviderId)
-
-            }
-            else if (DuplicateTaskStatus.indexOf(row.taskStatus) != -1) {
-                let linkedTask = await GetLinkedTask(row.taskId)
-                if (linkedTask) {
-                    // row.tsp = ""
-                    row.linkedTask = true
-                }
-            } else {
-                if (tripCannotCancelStatus.indexOf(row.taskStatus.toLowerCase()) == -1) {
-                    let tsp = await FilterServiceProvider(row.vehicleType, row.serviceModeId, row.dropoffDestination, row.pickupDestination, row.executionDate, row.executionTime)
-                    // let filterDriver = tsp.filter(item => item.driver == row.driver)
-                    // row.tspSelect = requestService.RemoveDuplicateServiceProvider(tsp)
-                    row.tspSelect = tsp
-                    row.tspSelect = await MergerWogTSP(tsp, row.serviceProviderId)
-                }
-            }
-
-            if (tripCannotCancelStatus.indexOf(row.taskStatus.toLowerCase()) == -1) {
-                row.cancel = true
-            }
+            await setTSPSelect(row)
+            row.cancel = tripCannotCancelStatus.indexOf(row.taskStatus.toLowerCase()) == -1
         }
-        if (row.tripStatus == INDENT_STATUS.WAITAPPROVEDUCO || row.tripStatus == INDENT_STATUS.WAITAPPROVEDRF) {
-            row.tspDisable = 1
-        } else {
-            row.tspDisable = 0
-        }
+        row.tspDisable = [INDENT_STATUS.WAITAPPROVEDUCO, INDENT_STATUS.WAITAPPROVEDRF].indexOf(row.tripStatus) != -1
 
         // endtime expired cannot cancel
-        let endTime = row.endDate ? row.endDate : row.startDate
-        if (moment(endTime).isSameOrBefore(moment())) {
+        if (moment(row.endDate || row.startDate).isSameOrBefore(moment())) {
             row.cancel = false
         }
     }
@@ -1010,11 +1084,12 @@ const GetAditionalStatus = function (item) {
 }
 
 const GetLinkedTask = async function (id) {
-    return await Task2.findOne({
+    let task = await Task2.findOne({
         where: {
             copyFrom: id
         }
     })
+    return task != null
 }
 
 module.exports.ViewActionHistory = async function (req, res) {

@@ -155,7 +155,7 @@ const GetDatas = async function (indentNos, resultJson, userId) {
         let estimatedTripDuration = 0
         let tripNo = 1
 
-        let trips = await getTrips(indents, allLocation, serviceMode, serviceModeValue, tripNo)
+        let trips = await getTrips(indents, allLocation, serviceMode, serviceModeValue, tripNo, estimatedTripDuration)
         request.estimatedTripDuration = estimatedTripDuration
 
         indentList.push({ request: request, trips: trips })
@@ -163,7 +163,7 @@ const GetDatas = async function (indentNos, resultJson, userId) {
     return indentList
 }
 
-const getTrips = async function (indents, allLocation, serviceMode, serviceModeValue, tripNo) {
+const getTrips = async function (indents, allLocation, serviceMode, serviceModeValue, tripNo, estimatedTripDuration) {
     let trips = []
     for (let trip of indents) {
         // valid pickup point 
@@ -482,6 +482,13 @@ module.exports.uploadOldIndentFile = async function (req, res) {
         await Job2.update(jobUpdateObj, { where: { id: job.id } })
     }
 
+    const getJobId = function (jobId) {
+        return jobId ? jobId.toString() : ""
+    }
+    const getRspDate = function (rspDate, amendmentDate) {
+        return rspDate || amendmentDate
+    }
+
     let fmt1 = "YYYY-MM-DD HH:mm"
     let fmt2 = "YYYY-MM-DD"
     let form = formidable({
@@ -517,18 +524,18 @@ module.exports.uploadOldIndentFile = async function (req, res) {
                 let [indentId, jobId, trackingId, unit, executionDate, pickup, dropoff, startTime, duration, tsp,
                     taskStatus, arriveTime, departTime, endTime, rspDate, amendmentDate, cancellationDate] = indentArray[i]
 
-                rspDate = rspDate || amendmentDate
+                rspDate = getRspDate(rspDate, amendmentDate)
 
                 if (!jobId && !trackingId) {
                     continue
                 }
-                jobId = jobId ? jobId.toString() : ""
+                jobId = getJobId(jobId)
 
                 let taskDate = getTaskDate(executionDate, duration, startTime, fmt2)
                 executionDate = taskDate.executionDate
                 duration = taskDate.duration
-                startDate = taskDate.startDate
-                endDate = taskDate.endDate
+                let startDate = taskDate.startDate
+                let endDate = taskDate.endDate
 
                 let updateObj = {
                     tspChangeTime: null,

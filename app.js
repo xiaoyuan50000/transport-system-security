@@ -37,6 +37,7 @@ let app = express();
 const cpuRouter = require('./routes/cpu')
 app.use('/cpu', cpuRouter)
 
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.engine('html', ejs.__express);

@@ -1354,8 +1354,9 @@ const DoEditTrip = async function (pickupDestination, pickupNotes, dropoffDestin
 
     }
     else if (roleName == ROLE.UCO) {
-        newStatus = INDENT_STATUS.WAITAPPROVEDRF
-        approved = true
+        // newStatus = INDENT_STATUS.WAITAPPROVEDRF
+        // approved = true
+        newStatus = INDENT_STATUS.WAITAPPROVEDUCO
     }
     else if (roleName == ROLE.RQ) {
         newStatus = INDENT_STATUS.WAITAPPROVEDUCO
@@ -1367,7 +1368,7 @@ const DoEditTrip = async function (pickupDestination, pickupNotes, dropoffDestin
         if (isRFOrOCC(roleName) && newJob.instanceId == null) {
             let instanceId = await WorkFlow.create(roleName, newTripId)
             updateObj.instanceId = instanceId
-        } else {
+        } else if (roleName != ROLE.UCO) {
             await WorkFlow.apply(newJob.instanceId, approved, "", roleName)
         }
     }
@@ -1751,37 +1752,43 @@ module.exports.BulkCancel = async function (req, res) {
 
 
 const DoBulkCancel = async function (trips, roleName, remark, createdBy) {
+
+    const getCancelTrips = async function (trips) {
+        let needCancelTrips = []
+        let checkMVTrips = []
+        for (let trip of trips) {
+            // Period
+            let serviceType = await ServiceType.findByPk(trip.serviceTypeId)
+            if (serviceType.category.toLowerCase() != 'mv') {
+                needCancelTrips.push(trip)
+                continue
+            }
+
+            let trip2 = await GetPeriodAnotherTrip(trip)
+            if (trip.status == INDENT_STATUS.APPROVED && isRFOrOCC(roleName)) {
+                checkMVTrips.push(trip)
+                if (trip2) {
+                    checkMVTrips.push(trip2)
+                }
+            } else {
+                needCancelTrips.push(trip)
+                if (trip2) {
+                    needCancelTrips.push(trip2)
+                }
+            }
+        }
+        return { needCancelTrips, checkMVTrips }
+    }
+
     let cannotCancelTripNos = []
 
     if (trips.length == 0) {
         return cannotCancelTripNos
     }
 
-    let needCancelTrips = []
-    let checkMVTrips = []
     let needDeleteMVTasksId = []
     let needDeleteLoanMVTasksId = []
-    for (let trip of trips) {
-        // Period
-        let serviceType = await ServiceType.findByPk(trip.serviceTypeId)
-        if (serviceType.category.toLowerCase() == 'mv') {
-            if (trip.status == INDENT_STATUS.APPROVED && (roleName == ROLE.RF || ROLE.OCC.indexOf(roleName) != -1)) {
-                let trip2 = await GetPeriodAnotherTrip(trip)
-                checkMVTrips.push(trip)
-                if (trip2) {
-                    checkMVTrips.push(trip2)
-                }
-            } else {
-                let trip2 = await GetPeriodAnotherTrip(trip)
-                needCancelTrips.push(trip)
-                if (trip2) {
-                    needCancelTrips.push(trip2)
-                }
-            }
-        } else {
-            needCancelTrips.push(trip)
-        }
-    }
+    let { needCancelTrips, checkMVTrips } = getCancelTrips(trips)
 
     for (let trip of checkMVTrips) {
         let assignedTasks = await Task2.findAll({
@@ -1790,32 +1797,33 @@ const DoBulkCancel = async function (trips, roleName, remark, createdBy) {
                 tripId: trip.id
             }
         })
-        if (assignedTasks.length > 0) {
-            let strTaskIdArray = assignedTasks.map(a => a.id.toString())
+        if (assignedTasks.length == 0) {
+            continue
+        }
 
-            if (trip.vehicleType != "-" && trip.driver == 1) {
-                let exist = await GetIfDoneCheckListByTaskIdArray(strTaskIdArray)
-                if (exist) {
-                    cannotCancelTripNos.push(trip.tripNo)
-                }
-                else {
-                    needCancelTrips.push(trip)
-                    strTaskIdArray.forEach((value, index) => {
-                        needDeleteMVTasksId.push(trip.referenceId ? "AT-" + value : value)
-                    })
-                }
-            } else {
-            }
-            let exist = await GetIfLoanMVTaskStartByTaskIdArray(strTaskIdArray)
+        let strTaskIdArray = assignedTasks.map(a => a.id.toString())
+
+        if (trip.vehicleType != "-" && trip.driver == 1) {
+            let exist = await GetIfDoneCheckListByTaskIdArray(strTaskIdArray)
             if (exist) {
                 cannotCancelTripNos.push(trip.tripNo)
             }
             else {
                 needCancelTrips.push(trip)
                 strTaskIdArray.forEach((value, index) => {
-                    needDeleteLoanMVTasksId.push(value)
+                    needDeleteMVTasksId.push(trip.referenceId ? "AT-" + value : value)
                 })
             }
+        }
+        let exist = await GetIfLoanMVTaskStartByTaskIdArray(strTaskIdArray)
+        if (exist) {
+            cannotCancelTripNos.push(trip.tripNo)
+        }
+        else {
+            needCancelTrips.push(trip)
+            strTaskIdArray.forEach((value, index) => {
+                needDeleteLoanMVTasksId.push(value)
+            })
         }
     }
 
@@ -1954,10 +1962,20 @@ module.exports.BulkApprove = async function (req, res) {
 }
 
 const DoBulkApprove = async function (trips, roleName, remark, createdBy) {
+
+    const setApplyInstanceId = async function (trip, roleName, updateObj, approved) {
+        if (isRFOrOCC(roleName) && trip.instanceId == null) {
+            let instanceId = await WorkFlow.create(roleName, trip.id)
+            updateObj.instanceId = instanceId
+        } else {
+            await WorkFlow.apply(trip.instanceId, approved, "", roleName)
+        }
+    }
+
     let approve = 0
     let newStatus = ""
     let approved = false
-    if (roleName == ROLE.RF || ROLE.OCC.indexOf(roleName) != -1) {
+    if (isRFOrOCC(roleName)) {
         newStatus = INDENT_STATUS.APPROVED
         approve = 1
     }
@@ -1972,19 +1990,11 @@ const DoBulkApprove = async function (trips, roleName, remark, createdBy) {
 
     for (let trip of trips) {
         let updateObj = { status: newStatus, approve: approve }
-        if ((roleName == ROLE.RF || ROLE.OCC.indexOf(roleName) != -1) && trip.instanceId == null) {
-            let instanceId = await WorkFlow.create(roleName, trip.id)
-            updateObj.instanceId = instanceId
-        } else {
-            await WorkFlow.apply(trip.instanceId, approved, "", roleName)
-        }
+
         await Job2.update(updateObj, { where: { id: trip.id } });
         await RecordOperationHistory(trip.requestId, trip.id, null, createdBy, newStatus, OperationAction.Approve, remark)
 
-        // if (roleName == ROLE.RF || ROLE.OCC.indexOf(roleName) != -1) {
-        //     let taskList = await GetTaskByIdArray([trip.id])
-        //     await DoApprove(taskList, trip)
-        // }
+
 
         let tripIdList = []
         let mv = await IsCategoryMV(trip.serviceType)
@@ -1994,10 +2004,7 @@ const DoBulkApprove = async function (trips, roleName, remark, createdBy) {
         // Period
         if (trip.repeats == "Period" && trip.preParkDate) {
             let trip2 = await GetPeriodAnotherTrip(trip)
-            // if (roleName == ROLE.RF|| ROLE.OCC.indexOf(roleName) != -1) {
-            //     let taskList2 = await GetTaskByIdArray([trip2.id])
-            //     await DoApprove(taskList2, trip2)
-            // }
+            await setApplyInstanceId(trip, roleName, updateObj, approved)
             await Job2.update({ status: newStatus, approve: approve }, { where: { id: trip2.id } });
             await RecordOperationHistory(trip2.requestId, trip2.id, null, createdBy, newStatus, OperationAction.Approve, remark)
 
@@ -2006,7 +2013,7 @@ const DoBulkApprove = async function (trips, roleName, remark, createdBy) {
             }
         }
 
-        if (roleName == ROLE.RF || ROLE.OCC.indexOf(roleName) != -1) {
+        if (isRFOrOCC(roleName)) {
             // send mobius server auto match driver
             await Utils.SendTripToMobiusServer(tripIdList)
         }
@@ -2145,7 +2152,20 @@ const RecordOperationHistory2 = async function (indentId, tripId, taskId, create
 }
 module.exports.RecordOperationHistory2 = RecordOperationHistory2
 
+
 module.exports.EditDriver = async function (req, res) {
+
+    const setSelectableTspStr = async function (executionDate, executionTime, vehicle, task, trip) {
+        let selectableTspStr = null;
+        if (executionTime && executionTime != task.executeTime) {
+            let selectableTspList = await indentService.FilterServiceProvider(vehicle, trip.serviceModeId, trip.dropoffDestination, trip.pickupDestination, executionDate, executionTime)
+            if (selectableTspList && selectableTspList.length > 0) {
+                selectableTspStr = selectableTspList.map(o => o.id).join(",");
+            }
+        }
+        return selectableTspStr
+    }
+
     let { taskId, poc, pocNumber, executionDate, executionTime, duration, newTsp, userId, startDate, endDate } = req.body
     let user = await GetUserInfo(userId)
 
@@ -2182,17 +2202,7 @@ module.exports.EditDriver = async function (req, res) {
     }
 
     //executionTime change, need reload selectableTsp
-    let selectableTspStr = null;
-    if (executionTime && executionTime != task.executeTime) {
-        let selectableTspList = await indentService.FilterServiceProvider(vehicle, trip.serviceModeId, trip.dropoffDestination, trip.pickupDestination, executionDate, executionTime)
-        if (selectableTspList && selectableTspList.length > 0) {
-            let tspIdArray = [];
-            for (let tsp of selectableTspList) {
-                tspIdArray.push(tsp.id);
-            }
-            selectableTspStr = tspIdArray.join(",");
-        }
-    }
+    let selectableTspStr = await setSelectableTspStr(executionDate, executionTime, vehicle, task, trip)
 
     let serviceMode = await ServiceMode.findByPk(trip.serviceModeId)
     let serviceModeVal = serviceMode.value
@@ -2404,47 +2414,49 @@ module.exports.CreateNewIndent = async function (req, res) {
 module.exports.updateMobiusUnit = async function (req, res) {
     let { taskId, mobiusUnit, optTime, userId } = req.body
     let task = await Task2.findByPk(taskId)
-    if (task) {
-        let job = await Job2.findByPk(task.tripId);
-        let jobs = [job]
-        if (job.status != INDENT_STATUS.APPROVED) {
-            await WorkFlow.apply(job.instanceId, 1, "", ROLE.RF)
-            await RecordOperationHistory(job.requestId, job.id, null, userId, INDENT_STATUS.APPROVED, OperationAction.Approve, "")
-            await Job2.update({ status: INDENT_STATUS.APPROVED, approve: 1 }, { where: { id: task.tripId } })
-        }
+    if (!task) {
+        return Response.success(res, true);
+    }
 
-        let tripIds = [task.tripId]
-        if (job.repeats == "Period" && job.preParkDate) {
-            let job2 = await GetPeriodAnotherTrip(job)
-            if (job2) {
-                jobs.push(job2)
-                if (job2.status != INDENT_STATUS.APPROVED) {
-                    await WorkFlow.apply(job2.instanceId, 1, "", ROLE.RF)
-                    await RecordOperationHistory(job2.requestId, job2.id, null, userId, INDENT_STATUS.APPROVED, OperationAction.Approve, "")
-                    await Job2.update({ status: INDENT_STATUS.APPROVED, approve: 1 }, { where: { id: job2.id } })
-                }
+    let job = await Job2.findByPk(task.tripId);
+    let jobs = [job]
+    if (job.status != INDENT_STATUS.APPROVED) {
+        await WorkFlow.apply(job.instanceId, 1, "", ROLE.RF)
+        await RecordOperationHistory(job.requestId, job.id, null, userId, INDENT_STATUS.APPROVED, OperationAction.Approve, "")
+        await Job2.update({ status: INDENT_STATUS.APPROVED, approve: 1 }, { where: { id: task.tripId } })
+    }
 
-                tripIds.push(job2.id)
+    let tripIds = [task.tripId]
+    if (job.repeats == "Period" && job.preParkDate) {
+        let job2 = await GetPeriodAnotherTrip(job)
+        if (job2) {
+            jobs.push(job2)
+            if (job2.status != INDENT_STATUS.APPROVED) {
+                await WorkFlow.apply(job2.instanceId, 1, "", ROLE.RF)
+                await RecordOperationHistory(job2.requestId, job2.id, null, userId, INDENT_STATUS.APPROVED, OperationAction.Approve, "")
+                await Job2.update({ status: INDENT_STATUS.APPROVED, approve: 1 }, { where: { id: job2.id } })
+            }
+
+            tripIds.push(job2.id)
+        }
+    }
+    let taskList = await Task2.findAll({
+        where: {
+            tripId: {
+                [Op.in]: tripIds
             }
         }
-        let taskList = await Task2.findAll({
-            where: {
-                tripId: {
-                    [Op.in]: tripIds
-                }
+    })
+    await sequelizeObj.transaction(async (t1) => {
+        for (let task of taskList) {
+            if (task.taskStatus == 'unassigned') {
+                await Task2.update({ notifiedTime: optTime, mobiusUnit: Number(mobiusUnit) }, { where: { id: task.id } })
+                // await RecordOperationHistory(task.requestId, task.tripId, task.id, userId, TASK_STATUS.UNASSIGNED, TASK_STATUS.UNASSIGNED, "")
             }
-        })
-        await sequelizeObj.transaction(async (t1) => {
-            for (let task of taskList) {
-                if (task.taskStatus == 'unassigned') {
-                    await Task2.update({ notifiedTime: optTime, mobiusUnit: Number(mobiusUnit) }, { where: { id: task.id } })
-                    // await RecordOperationHistory(task.requestId, task.tripId, task.id, userId, TASK_STATUS.UNASSIGNED, TASK_STATUS.UNASSIGNED, "")
-                }
-            }
-        })
-        if (job.typeOfVehicle != "-" && job.driver == 1) {
-            await UpdateMVContractNo(jobs)
         }
+    })
+    if (job.typeOfVehicle != "-" && job.driver == 1) {
+        await UpdateMVContractNo(jobs)
     }
 
     return Response.success(res, true);
@@ -2746,6 +2758,90 @@ module.exports.EditTaskTime = async function (req, res) {
         }
         return status
     }
+
+    const setFerryService = function (arrivalTime, driver, trip, task) {
+        let newDriverStatus = ""
+
+        if (arrivalTime) {
+            //first set arrivalTime
+            if (!task.arrivalTime) {
+                newDriverStatus = DriverComplete(driver, trip, task, task.startDate)
+            }
+            task.set({ arrivalTime: arrivalTime })
+        }
+        return newDriverStatus
+
+    }
+
+    const setDelivery = function (arrivalTime, driver, trip, task, departTime) {
+        let newDriverStatus = ""
+
+        if (arrivalTime) {
+            //first set arrivalTime
+            if (!task.arrivalTime) {
+                newDriverStatus = DRIVER_STATUS.ARRIVED
+            }
+            task.set({ arrivalTime: arrivalTime })
+        }
+        if (departTime) {
+            //first set departTime
+            if (!task.departTime) {
+                newDriverStatus = DriverComplete(driver, trip, task, task.startDate)
+            }
+            task.set({ departTime: departTime })
+        }
+        return newDriverStatus
+
+    }
+
+    const setPickup = function (arrivalTime, driver, trip, task, endTime) {
+        let newDriverStatus = ""
+
+        if (arrivalTime) {
+            //first set arrivalTime
+            if (!task.arrivalTime) {
+                newDriverStatus = DRIVER_STATUS.ARRIVED
+            }
+            task.set({ arrivalTime: arrivalTime })
+        }
+        if (endTime) {
+            //first set endTime
+            if (!task.endTime && endTime) {
+                newDriverStatus = DriverComplete(driver, trip, task, task.endDate)
+            }
+            task.set({ endTime: endTime })
+        }
+        return newDriverStatus
+
+    }
+
+    const setOther = function (data) {
+        let newDriverStatus = ""
+        let { arrivalTime, driver, trip, task, departTime, endTime } = data
+        if (arrivalTime) {
+            //first set arrivalTime
+            if (!task.arrivalTime) {
+                newDriverStatus = DRIVER_STATUS.ARRIVED
+            }
+            task.set({ arrivalTime: arrivalTime })
+        }
+        if (departTime) {
+            //first set departTime
+            if (!task.departTime) {
+                newDriverStatus = DriverComplete(driver, trip, task, task.startDate)
+            }
+            task.set({ departTime: departTime })
+        }
+        if (endTime) {
+            //first set endTime
+            if (!task.endTime && endTime) {
+                newDriverStatus = DriverComplete(driver, trip, task, task.endDate)
+            }
+            task.set({ endTime: endTime })
+        }
+        return newDriverStatus
+    }
+
     let { taskId, taskTime, userId } = req.body
     let task = await Task2.findByPk(taskId)
     let requestId = task.requestId
@@ -2760,67 +2856,13 @@ module.exports.EditTaskTime = async function (req, res) {
     let serviceModeObj = await ServiceMode.findByPk(trip.serviceModeId)
     let serviceModeVal = serviceModeObj.value.toLowerCase()
     if (serviceModeVal == "ferry service") {
-        if (arrivalTime) {
-            //first set arrivalTime
-            if (!task.arrivalTime) {
-                newDriverStatus = DriverComplete(driver, trip, task, task.startDate)
-                task.set({ arrivalTime: arrivalTime })
-            } else {
-                task.set({ arrivalTime: arrivalTime })
-            }
-        }
+        newDriverStatus = setFerryService(arrivalTime, driver, trip, task)
     } else if (serviceModeVal == "delivery") {
-        if (arrivalTime) {
-            //first set arrivalTime
-            if (!task.arrivalTime) {
-                newDriverStatus = DRIVER_STATUS.ARRIVED
-            }
-            task.set({ arrivalTime: arrivalTime })
-        }
-        if (departTime) {
-            //first set departTime
-            if (!task.departTime) {
-                newDriverStatus = DriverComplete(driver, trip, task, task.startDate)
-            }
-            task.set({ departTime: departTime })
-        }
+        newDriverStatus = setDelivery(arrivalTime, driver, trip, task, departTime)
     } else if (serviceModeVal == "pickup") {
-        if (arrivalTime) {
-            //first set arrivalTime
-            if (!task.arrivalTime) {
-                newDriverStatus = DRIVER_STATUS.ARRIVED
-            }
-            task.set({ arrivalTime: arrivalTime })
-        }
-        if (endTime) {
-            //first set endTime
-            if (!task.endTime && endTime) {
-                newDriverStatus = DriverComplete(driver, trip, task, task.endDate)
-            }
-            task.set({ endTime: endTime })
-        }
+        newDriverStatus = setPickup(arrivalTime, driver, trip, task, endTime)
     } else {
-        if (arrivalTime) {
-            //first set arrivalTime
-            if (!task.arrivalTime) {
-                newDriverStatus = DRIVER_STATUS.ARRIVED
-            }
-            task.set({ arrivalTime: arrivalTime })
-        }
-        if (departTime) {
-            //first set departTime
-            if (!task.departTime) {
-                newDriverStatus = DriverComplete(driver, trip, task, task.startDate)
-            }
-            task.set({ departTime: departTime })
-        }
-        if (endTime) {
-            //first set endTime
-            if (!task.endTime && endTime) {
-                newDriverStatus = DriverComplete(driver, trip, task, task.endDate)
-            }
-            task.set({ endTime: endTime })
-        }
+        newDriverStatus = setOther({ arrivalTime, driver, trip, task, departTime, endTime })
     }
     if (newDriverStatus) {
         if (driver) {
@@ -3052,7 +3094,7 @@ module.exports.CreateIndentByTemplate = async function (req, res) {
         let indentId = req.body.indentId
         let tripList = req.body.tripList
         let CMMVList = tripList.filter(o => o.category.toLowerCase() != 'fuel')
-        let FuelList = tripList.filter(o => o.category.toLowerCase() == 'fuel')
+        // let FuelList = tripList.filter(o => o.category.toLowerCase() == 'fuel')
         let user = await GetUserInfo(createdBy)
         let roleName = user.roleName
 
@@ -3087,19 +3129,7 @@ module.exports.CreateIndentByTemplate = async function (req, res) {
                 repeats, repeatsOn, executionDate, executionTime, endsOn, periodStartDate, periodEndDate, duration, serviceProvider, user, driver, tripRemarks,
                 serviceMode, serviceType, preParkDate)
 
-            let mv = await IsCategoryMV(serviceType)
-            if (mv) {
-                let jobs = await Job2.findAll({ where: { requestId: indentId, tripNo: tripNo } })
-                if (typeOfVehicle != "-" && driver == 1) {
-                    await UpdateMVContractNo(jobs)
-                }
-
-                if (user.roleName == ROLE.RF || ROLE.OCC.indexOf(user.roleName) != -1) {
-                    // send mobius server auto match driver
-                    let tripIdList = jobs.map(o => o.id)
-                    await Utils.SendTripToMobiusServer(tripIdList)
-                }
-            }
+            await updateMVIndentByTemplate(serviceType, indentId, tripNo, typeOfVehicle, driver, user)
         }
         // await createFuelIndentByTemplate(indentId, createdBy, roleName, FuelList)
         await UpdateIndentInfo(indentId)
@@ -3107,6 +3137,22 @@ module.exports.CreateIndentByTemplate = async function (req, res) {
     } catch (ex) {
         log.error(ex)
         return Response.error(res, "Create Template Indent Failed.")
+    }
+}
+
+const updateMVIndentByTemplate = async function (serviceType, indentId, tripNo, typeOfVehicle, driver, user) {
+    let mv = await IsCategoryMV(serviceType)
+    if (mv) {
+        let jobs = await Job2.findAll({ where: { requestId: indentId, tripNo: tripNo } })
+        if (typeOfVehicle != "-" && driver == 1) {
+            await UpdateMVContractNo(jobs)
+        }
+
+        if (user.roleName == ROLE.RF || ROLE.OCC.indexOf(user.roleName) != -1) {
+            // send mobius server auto match driver
+            let tripIdList = jobs.map(o => o.id)
+            await Utils.SendTripToMobiusServer(tripIdList)
+        }
     }
 }
 

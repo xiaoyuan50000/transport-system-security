@@ -64,28 +64,30 @@ const GetContractRateField = function (contractRate) {
         excessPerTripPrice: Utils.AESDecrypt(contractRate.excessPerTripPrice),
     }
 }
-
+const getApprovalTime = function (cancellationTime, tspChangeTime) {
+    return cancellationTime || tspChangeTime
+}
+const isApprovalDateHoursLess48 = function (approveDateDiffHours) {
+    return approveDateDiffHours <= 48 * 3600 && approveDateDiffHours > 24 * 3600
+}
+const isApprovalDateHoursLess24 = function (approveDateDiffHours) {
+    return approveDateDiffHours <= 24 * 3600 && approveDateDiffHours > 12 * 3600
+}
+const isApprovalDateHoursLess12 = function (approveDateDiffHours) {
+    return approveDateDiffHours <= 12 * 3600 && approveDateDiffHours >= 4 * 3600
+}
 // surcharge 24 - 48: 24 < execution time - approve time < 48 
 // surcharge 12 - 24: 12 < execution time - approve time < 24 
 // surcharge < 12: execution time - approve time < 12
 const CalculateSurcharge = function ({ executionDateTime, cancellationTime, tspChangeTime, departTime, totalCost,
     surchargeLessThen48, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen4, surchargeDepart, chargeType }) {
 
-    const isApprovalDateHoursLess48 = function (approveDateDiffHours) {
-        return approveDateDiffHours <= 48 * 3600 && approveDateDiffHours > 24 * 3600
-    }
-    const isApprovalDateHoursLess24 = function (approveDateDiffHours) {
-        return approveDateDiffHours <= 24 * 3600 && approveDateDiffHours > 12 * 3600
-    }
-    const isApprovalDateHoursLess12 = function (approveDateDiffHours) {
-        return approveDateDiffHours <= 12 * 3600 && approveDateDiffHours >= 4 * 3600
-    }
     const isApprovalDateHoursLess4 = function (approveDateDiffHours, chargeType) {
         return approveDateDiffHours < 4 * 3600 && (chargeType == ChargeType.OTHOURLY || chargeType == ChargeType.OTBLOCK || chargeType == ChargeType.BLOCKDAILY)
     }
 
     let [surchargeLessThen48Cost, surchargeGenter12Cost, surchargeLess12Cost, surchargeLess4Cost, surchargeDepartCost, total] = [0, 0, 0, 0, 0, totalCost]
-    let approveDateDiffHours = moment(executionDateTime).diff(moment(cancellationTime || tspChangeTime), 's')
+    let approveDateDiffHours = moment(executionDateTime).diff(moment(getApprovalTime(cancellationTime, tspChangeTime)), 's')
     if (isApprovalDateHoursLess48(approveDateDiffHours)) {
         surchargeLessThen48Cost = surchargeLessThen48 * total
     }
@@ -113,11 +115,479 @@ const CalculateSurcharge = function ({ executionDateTime, cancellationTime, tspC
     return { surchargeLessThen48Cost, surchargeGenter12Cost, surchargeLess12Cost, surchargeLess4Cost, surchargeDepartCost, total }
 }
 
+const getFormateDateTime = function (date, fmt) {
+    return date ? moment(date).format(fmt) : ""
+}
+
+const getTrueFalse = function (data) {
+    return data == 1
+}
+
+const getDuration = function (duration) {
+    return duration ? Number(duration) : 0
+}
+
+const setChargeTypeTripHourAndOT = function (row, contractRateList, detail) {
+
+    const getChargeTypeTripCheapest = function (row, detail, hourlyPrice, dailyPrice, weeklyPrice, monthlyPrice) {
+        let { startTime, endTime } = GetStartEndTime(row)
+        let duration = Math.ceil(moment(endTime).diff(moment(startTime), 's') / 3600)
+        // Calculate the cheapest price
+        let cheapestTotalPrice = hourlyPrice * duration
+        if (dailyPrice) {
+            let dayCount = Math.ceil(duration / 24)
+            let dailyTotalPrice = dayCount * dailyPrice
+            if (cheapestTotalPrice > dailyTotalPrice) {
+                cheapestTotalPrice = dailyTotalPrice
+            }
+            detail.dailyBasePrice = dailyPrice + `(${dayCount}D)`
+        }
+        if (weeklyPrice) {
+            let weekCount = Math.ceil(duration / 24 / 7)
+            let weeklyTotalPrice = weekCount * weeklyPrice
+            if (cheapestTotalPrice > weeklyTotalPrice) {
+                cheapestTotalPrice = weeklyTotalPrice
+            }
+            detail.weeklyBasePrice = weeklyPrice + `(${weekCount}W)`
+        }
+        if (monthlyPrice) {
+            let monthCount = Math.ceil(duration / 24 / 30)
+            let weeklyTotalPrice = monthCount * monthlyPrice
+            if (cheapestTotalPrice > weeklyTotalPrice) {
+                cheapestTotalPrice = monthlyPrice
+            }
+            detail.monthlyBasePrice = monthlyPrice + `(${monthCount}M)`
+        }
+        return cheapestTotalPrice
+    }
+
+    const setChargeTypeTrip = function (row, detail, contractRate) {
+        let { executionTime, peakTime, lateTime, weekend, isDriver } = row
+        let {
+            price, isWeekend, hasDriver, isPeak, isLate, hourlyPrice, dailyPrice, weeklyPrice, monthlyPrice
+        } = contractRate
+
+        let { total, late, peak } = GetTripPriceCalculation({ price, isWeekend, hasDriver, isPeak, isLate, executionTime, peakTime, lateTime, weekend, isDriver })
+
+        if (hourlyPrice == 0 && dailyPrice == 0 && weeklyPrice == 0 && monthlyPrice == 0) {
+            detail.isLate = late
+            detail.isPeak = peak
+            detail.tripPrice = price
+            detail.total = total
+        } else {
+            // Calculate the cheapest price
+            let cheapestTotalPrice = getChargeTypeTripCheapest(row, detail, hourlyPrice, dailyPrice, weeklyPrice, monthlyPrice)
+            detail.total = cheapestTotalPrice
+        }
+    }
+
+    const setChargeTypeOT = function (row, detail, contractRate) {
+        let {
+            blockPrice, blockHourly, OTHourly, OTBlockPrice, blockPeriod, OTBlockPeriod
+        } = contractRate
+
+        let { startTime, endTime } = GetStartEndTime(row)
+        if (startTime && endTime) {
+            detail.block = blockPrice
+            detail.blockPeriod = blockPeriod
+            let sDiff = moment(endTime).diff(moment(startTime), 's')
+            let totalDuration = Math.ceil(sDiff / 3600)
+
+            let startDate = moment(startTime).format("YYYY-MM-DD")
+            let time = moment(startTime).format("HH:mm")
+
+            let time1 = availableTime.split('-')[1] // 18:01 - 07:59
+            let timeDiff = moment(time, 'HH:mm').diff(moment(time1, 'HH:mm'), 's') // 2022-11-12 21:00 - 2022-11-12 23:00 ||  2022-11-12 04:00 - 2022-11-12 23:00
+            if (timeDiff > 0) {
+                startDate = moment(startDate).add(1, 'd').format("YYYY-MM-DD")
+            }
+            let otTime = Math.ceil(moment(endTime).diff(moment(startDate + ' ' + time1), 's') / 3600) // 2022-11-12 23:00 - 2022-11-13 07:59 ||  2022-11-12 23:00 - 2022-11-12 07:59
+            if (otTime <= 0) {
+                otTime = 0
+            }
+            if (totalDuration > blockPeriod) {
+                let afterTime = totalDuration - blockPeriod - otTime
+                if (afterTime > 0) {
+                    detail.afterBlock = afterTime * blockHourly
+                    detail.blockHourly = `${blockHourly}(${afterTime}hr)`
+                }
+            }
+            if (chargeType == ChargeType.OTHOURLY) {
+                detail.otBlock = otTime * OTHourly
+                detail.otBlockHourly = `${OTHourly}(${otTime}hr)`
+            } else {
+                detail.otBlock = Math.ceil(otTime / OTBlockPeriod) * OTBlockPrice
+                detail.otBlockPeriod = OTBlockPeriod
+                detail.otBlockPrice = `${OTBlockPrice}(${otTime}hr)`
+            }
+            detail.blockPrice = `${blockPrice}(${totalDuration}hr)`
+            detail.total = detail.block + detail.afterBlock + detail.otBlock
+        }
+    }
+
+    let { executionDate, executionTime, peakTime, lateTime, availableTime,
+        chargeType, weekend, isDriver, tspChangeTime, cancellationTime, departTime } = row
+    let executionDateTime = `${executionDate} ${executionTime}`
+
+    let contractRate = GetContractRateField(contractRateList[0])
+    let {
+        price, isWeekend, hasDriver, isPeak, isLate,
+        surchargeLessThen4, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen48, surchargeDepart
+    } = contractRate
+
+    if (chargeType == ChargeType.HOUR) {
+        let { total, late, peak } = GetTripPriceCalculation({ price, isWeekend, hasDriver, isPeak, isLate, executionTime, peakTime, lateTime, weekend, isDriver })
+        let { startTime, endTime } = GetStartEndTime(row)
+        let duration = Math.ceil(moment(endTime).diff(moment(startTime), 's') / 3600)
+        detail.isLate = late
+        detail.isPeak = peak
+        detail.hourlyPrice = price
+        detail.total = total * duration
+    } else if (chargeType == ChargeType.TRIP) {
+        setChargeTypeTrip(row, detail, contractRate)
+    } else if (chargeType == ChargeType.OTHOURLY || chargeType == ChargeType.OTBLOCK) {
+        setChargeTypeOT(row, detail, contractRate)
+    }
+
+    let totalCost = detail.total
+    let surcharge = CalculateSurcharge({
+        executionDateTime, cancellationTime, tspChangeTime, departTime, totalCost,
+        surchargeLessThen48, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen4, surchargeDepart, chargeType
+    })
+    detail.surchargeLessThen48 = surcharge.surchargeLessThen48Cost
+    detail.surchargeGenter12 = surcharge.surchargeGenter12Cost
+    detail.surchargeLess12 = surcharge.surchargeLess12Cost
+    detail.surchargeLess4 = surcharge.surchargeLess4Cost
+    detail.surchargeDepart = surcharge.surchargeDepartCost
+    detail.total = surcharge.total
+}
+
+const setChargeTypeMix = function (row, contractRateList, detail) {
+
+
+    const getSurcharge = function (surcharge, price) {
+        return surcharge <= 1 ? (price * surcharge) : surcharge
+    }
+
+    let { executionDate, executionTime, weekend, isDriver, tspChangeTime, cancellationTime } = row
+
+    let executionDateTime = `${executionDate} ${executionTime}`
+    let {
+        base: dailyBasePrice, total: dailyTotal,
+        transCost: dailyTransCost, surchargeLessThen4: dailySurchargeLessThen4,
+        surchargeLessThen48: dailySurchargeLessThen48, surchargeGenterThen12: dailySurchargeGenterThen12,
+        surchargeLessThen12: dailySurchargeLessThen12, surchargeDepart: dailySurchargeDepart, exist: dailyExist,
+        transCostSurchargeLessThen4: dailyTransCostSurchargeLessThen4
+    } = GetContractRateByChargeType(contractRateList, ChargeType.DAILY, weekend, isDriver)
+
+    let {
+        base: weeklyBasePrice, total: weeklyTotal, surchargeLessThen4: weeklySurchargeLessThen4,
+        surchargeLessThen48: weeklySurchargeLessThen48, surchargeGenterThen12: weeklySurchargeGenterThen12,
+        surchargeLessThen12: weeklySurchargeLessThen12, surchargeDepart: weeklySurchargeDepart, exist: weeklyExist
+    } = GetContractRateByChargeType(contractRateList, ChargeType.WEEKLY, weekend, isDriver)
+
+    let {
+        base: monthlyBasePrice, total: monthlyTotal, surchargeLessThen4: monthlySurchargeLessThen4,
+        surchargeLessThen48: monthlySurchargeLessThen48, surchargeGenterThen12: monthlySurchargeGenterThen12,
+        surchargeLessThen12: monthlySurchargeLessThen12, surchargeDepart: monthlySurchargeDepart, exist: monthlyExist
+    } = GetContractRateByChargeType(contractRateList, ChargeType.MONTHLY, weekend, isDriver)
+
+    let {
+        base: yearlyBasePrice, total: yearlyTotal, surchargeLessThen4: yearlySurchargeLessThen4,
+        surchargeLessThen48: yearlySurchargeLessThen48, surchargeGenterThen12: yearlySurchargeGenterThen12,
+        surchargeLessThen12: yearlySurchargeLessThen12, surchargeDepart: yearlySurchargeDepart, exist: yearlyExist
+    } = GetContractRateByChargeType(contractRateList, ChargeType.YEARLY, weekend, isDriver)
+
+    let s1 = new Set([dailySurchargeLessThen48, weeklySurchargeLessThen48, monthlySurchargeLessThen48, yearlySurchargeLessThen48])
+    let s2 = new Set([dailySurchargeGenterThen12, weeklySurchargeGenterThen12, monthlySurchargeGenterThen12, yearlySurchargeGenterThen12])
+    let s3 = new Set([dailySurchargeLessThen12, weeklySurchargeLessThen12, monthlySurchargeLessThen12, yearlySurchargeLessThen12])
+    let s4 = new Set([dailySurchargeDepart, weeklySurchargeDepart, monthlySurchargeDepart, yearlySurchargeDepart])
+    let setArr = [s1, s2, s3, s4]
+    setArr.forEach(item => {
+        item.delete(0)
+        item.add(0)
+    })
+    let surchargeLessThen48 = [...s1][0]
+    let surchargeGenterThen12 = [...s2][0]
+    let surchargeLessThen12 = [...s3][0]
+    let surchargeDepart = [...s4][0]
+
+    let day = 1
+    if (row.endDate) {
+        day = Math.ceil(moment(row.endDate, 'YYYY-MM-DD HH:mm').diff(moment(row.startDate, 'YYYY-MM-DD HH:mm'), 's') / 3600 / 24)
+    }
+
+    let [yearCount, monthCount, weekCount, dayCount] = [...GetYYMMWWDD(day, dailyExist, weeklyExist, monthlyExist, yearlyExist)]
+    let total = yearCount * yearlyTotal
+        + monthCount * monthlyTotal
+        + weekCount * weeklyTotal
+        + dayCount * dailyTotal
+
+    let approveDateDiffHours = moment(executionDateTime).diff(moment(getApprovalTime(cancellationTime, tspChangeTime)), 's')
+    if (isApprovalDateHoursLess48(approveDateDiffHours)) {
+        detail.surchargeLessThen48 = surchargeLessThen48 * total
+    }
+    else if (isApprovalDateHoursLess24(approveDateDiffHours)) {
+        detail.surchargeGenter12 = surchargeGenterThen12 * total
+    }
+    else if (isApprovalDateHoursLess12(approveDateDiffHours)) {
+        detail.surchargeLess12 = surchargeLessThen12 * total
+    }
+    else if (approveDateDiffHours < 4 * 3600) {
+        detail.surchargeLess4 = yearCount * getSurcharge(yearlySurchargeLessThen4, yearlyBasePrice)
+            + monthCount * getSurcharge(monthlySurchargeLessThen4, monthlyBasePrice)
+            + weekCount * getSurcharge(weeklySurchargeLessThen4, weeklyBasePrice)
+            + dayCount * getSurcharge(dailySurchargeLessThen4, dailyBasePrice)
+
+        detail.transCostSurchargeLessThen4 = getSurcharge(dailyTransCostSurchargeLessThen4, dailyTransCost)
+    }
+    detail.total = total
+    detail.transCost = dailyTransCost
+    // If cancel before indent 24hr, no trip or hourly fee, only surcharge fee
+    if (cancellationTime && moment(executionDateTime).diff(moment(cancellationTime), 's') > 24 * 3600) {
+        detail.total = 0
+        detail.transCost = 0
+        dailyBasePrice = 0
+        weeklyBasePrice = 0
+        monthlyBasePrice = 0
+        yearlyBasePrice = 0
+    }
+    // surcharge depart
+    if (row.departTime) {
+        let departDiffTime = moment(row.departTime).diff(executionDateTime, 's') - 30 * 60
+        if (departDiffTime >= 0) {
+            let blocks = Math.ceil(departDiffTime / (15 * 60))
+            detail.surchargeDepart = surchargeDepart * detail.total * blocks
+        }
+    }
+
+    detail.total = detail.total + detail.transCost
+    detail.dailyBasePrice = dailyBasePrice == 0 ? "" : dailyBasePrice + `(${dayCount}D)`
+    detail.weeklyBasePrice = weeklyBasePrice == 0 ? "" : weeklyBasePrice + `(${weekCount}W)`
+    detail.monthlyBasePrice = monthlyBasePrice == 0 ? "" : monthlyBasePrice + `(${monthCount}M)`
+    detail.yearlyBasePrice = yearlyBasePrice == 0 ? "" : yearlyBasePrice + `(${yearCount}Y)`
+}
+
+const setChargeTypeDalyTrip = async function (row, contractRateList, detail) {
+    let { executionDate, executionTime, chargeType, tspChangeTime, cancellationTime, departTime } = row
+
+    let executionDateTime = `${executionDate} ${executionTime}`
+
+    let { tripPerDay, perTripPrice, excessPerTripPrice, contractPartNo } = contractRateList[0]
+    let tasks = await Task2.findAll({
+        where: {
+            executionDate: row.executionDate,
+            contractPartNo: contractPartNo
+        },
+        order: [['id', 'asc']]
+    })
+    let length = tasks.length
+    let tripPerDayArr = tripPerDay.split(',')
+    let priceIdx = tripPerDayArr.findIndex(item => length <= Number(item))
+    if (priceIdx == -1) {
+        priceIdx = tripPerDayArr.length - 1
+    }
+
+    let perTripPriceArr = perTripPrice.split(',')
+    let price = Number(perTripPriceArr[priceIdx])
+    let idx = tasks.findIndex(item => item.id == row.taskId) + 1
+    if (idx > Number(tripPerDayArr[tripPerDayArr.length - 1])) {
+        price = Number(excessPerTripPrice)
+    }
+    detail.tripPrice = price
+    detail.total = price
+
+    let { surchargeLessThen4, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen48, surchargeDepart } = GetContractRateField(contractRateList[0])
+
+    let totalCost = detail.total
+    let surcharge = CalculateSurcharge({
+        executionDateTime, cancellationTime, tspChangeTime, departTime, totalCost,
+        surchargeLessThen48, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen4, surchargeDepart, chargeType
+    })
+    detail.surchargeLessThen48 = surcharge.surchargeLessThen48Cost
+    detail.surchargeGenter12 = surcharge.surchargeGenter12Cost
+    detail.surchargeLess12 = surcharge.surchargeLess12Cost
+    detail.surchargeLess4 = surcharge.surchargeLess4Cost
+    detail.surchargeDepart = surcharge.surchargeDepartCost
+    detail.total = surcharge.total
+}
+
+const setChargeTypeBlockDaily = function (row, contractRateList, chargeType, detail) {
+    let { startTime, endTime } = GetStartEndTime(row)
+    if (!(startTime && endTime)) {
+        return
+    }
+    if (contractRateList.length == 1) {
+        let contractRate = contractRateList[0]
+        let { blockPrice, blockHourly, OTHourly, OTBlockPrice, blockPeriod, OTBlockPeriod, dailyPrice } = GetContractRateField(contractRate)
+
+        let [dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0];
+        let newStartTime;
+        ({ count: dailyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(startTime, endTime, 'd'));
+        let surplusHr = GetSurplusHrDuration(newStartTime, endTime);
+
+        let hasMinimumHrLimit = dailyCount > 0 ? 0 : 1;
+        ({ ot_hourly, block_hourly, blockCount, otblockCount } = GetBLOCKDAILYHourly(availableTime, endTime, moment(newStartTime).format('HH:mm'), blockPeriod, OTBlockPeriod, surplusHr, hasMinimumHrLimit));
+        log.info(`(Orion) -> ChargeType: ${chargeType},
+                            dailyCount: ${dailyCount}, 
+                            ot_hourly: ${ot_hourly}, 
+                            block_hourly: ${block_hourly}, 
+                            blockCount: ${blockCount}, 
+                            otblockCount: ${otblockCount}`)
+        // Cheapest
+        if (dailyPrice <= blockHourly * block_hourly + OTHourly * ot_hourly + blockPrice * blockCount + OTBlockPrice * otblockCount) {
+            dailyCount += 1
+            let [ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0]
+        }
+        log.info(`(Cheapest) -> ChargeType: ${chargeType},
+                                dailyCount: ${dailyCount}, 
+                                ot_hourly: ${ot_hourly}, 
+                                block_hourly: ${block_hourly}, 
+                                blockCount: ${blockCount}, 
+                                otblockCount: ${otblockCount}`)
+
+        detail.blockPeriod = blockPeriod
+        detail.otBlockPeriod = OTBlockPeriod
+        detail.blockPrice = `${blockPrice}(${blockCount})`
+        detail.otBlockPrice = `${OTBlockPrice}(${otblockCount})`
+        detail.blockHourly = `${blockHourly}(${block_hourly}hr)`
+        detail.otBlockHourly = `${OTHourly}(${ot_hourly}hr)`
+        detail.dailyBasePrice = `${dailyPrice}(${dailyCount}d)`
+        detail.total = dailyPrice * dailyCount
+            + blockHourly * block_hourly
+            + OTHourly * ot_hourly
+            + blockPrice * blockCount
+            + OTBlockPrice * otblockCount
+
+    } else if (contractRateList.length == 2) {
+        contractRateList = contractRateList.sort((a, b) => Number(a.blockPrice) < Number(b.blockPrice))
+        let index = 0
+        let approveDateDiffHours = moment(executionDateTime).diff(moment(tspChangeTime), 's')
+        if (approveDateDiffHours < 4 * 3600) {
+            index = 1
+        }
+        let { blockPrice, blockHourly, OTHourly, OTBlockPrice, blockPeriod, OTBlockPeriod, dailyPrice, monthlyPrice } = GetContractRateField(contractRateList[index])
+
+        let [monthlyCount, dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0, 0];
+        let newStartTime;
+        ({ count: monthlyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(startTime, endTime, 'M'));
+        ({ count: dailyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(newStartTime, endTime, 'd'));
+        let surplusHr = GetSurplusHrDuration(newStartTime, endTime);
+        ({ ot_hourly, block_hourly, blockCount, otblockCount } = GetBLOCKDAILYHourly(availableTime, endTime, moment(newStartTime).format('HH:mm'), blockPeriod, OTBlockPeriod, surplusHr, 0));
+
+        log.info(`(Orion) -> ChargeType: ${chargeType},
+                            monthlyCount: ${monthlyCount}, 
+                            dailyCount: ${dailyCount}, 
+                            ot_hourly: ${ot_hourly}, 
+                            block_hourly: ${block_hourly}, 
+                            blockCount: ${blockCount}, 
+                            otblockCount: ${otblockCount}`)
+
+        let dailyCost = dailyPrice * dailyCount
+        let hourlyCost = blockHourly * block_hourly + OTHourly * ot_hourly + blockPrice * blockCount + OTBlockPrice * otblockCount
+
+        if (monthlyPrice <= dailyCost + hourlyCost) {
+            monthlyCount += 1
+            let [dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0]
+        } else if (dailyPrice <= hourlyCost) {
+            dailyCount += 1
+            let [ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0]
+        }
+        log.info(`(Cheapest) -> ChargeType: ${chargeType},
+                                monthlyCount: ${monthlyCount}, 
+                                dailyCount: ${dailyCount}, 
+                                ot_hourly: ${ot_hourly}, 
+                                block_hourly: ${block_hourly}, 
+                                blockCount: ${blockCount}, 
+                                otblockCount: ${otblockCount}`)
+
+        detail.blockPeriod = blockPeriod
+        detail.otBlockPeriod = OTBlockPeriod
+        detail.blockPrice = `${blockPrice}(${blockCount})`
+        detail.otBlockPrice = `${OTBlockPrice}(${otblockCount})`
+        detail.blockHourly = `${blockHourly}(${block_hourly}hr)`
+        detail.otBlockHourly = `${OTHourly}(${ot_hourly}hr)`
+        detail.dailyBasePrice = `${dailyPrice}(${dailyCount}d)`
+        detail.monthlyBasePrice = `${monthlyPrice}(${monthlyCount}M)`
+        detail.total = monthlyPrice * monthlyCount
+            + dailyPrice * dailyCount
+            + blockHourly * block_hourly
+            + OTHourly * ot_hourly
+            + blockPrice * blockCount
+            + OTBlockPrice * otblockCount
+    }
+}
+const setChargeTypeBlockDailyMix = function (row, contractRateList, chargeType, detail) {
+    let { startTime, endTime } = GetStartEndTime(row)
+    if (startTime && endTime) {
+        let contractRate = contractRateList[0]
+        let { blockPrice, blockHourly, OTHourly, OTBlockPrice, blockPeriod, OTBlockPeriod, dailyPrice, weeklyPrice, monthlyPrice, transCost } = GetContractRateField(contractRate)
+
+        let [monthlyCount, weeklyCount, dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0, 0, 0]
+        let newStartTime;
+
+        ({ count: monthlyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(startTime, endTime, 'M'));
+        ({ count: weeklyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(newStartTime, endTime, 'w'));
+        ({ count: dailyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(newStartTime, endTime, 'd'));
+        let surplusHr = GetSurplusHrDuration(newStartTime, endTime);
+        ({ ot_hourly, block_hourly, blockCount, otblockCount } = GetBLOCKDAILYHourly(availableTime, endTime, moment(newStartTime).format('HH:mm'), blockPeriod, OTBlockPeriod, surplusHr, 0));
+        log.info(`(Orion) -> ChargeType: ${chargeType},
+                            monthlyCount: ${monthlyCount}, 
+                            weeklyCount: ${weeklyCount}, 
+                            dailyCount: ${dailyCount}, 
+                            ot_hourly: ${ot_hourly}, 
+                            block_hourly: ${block_hourly}, 
+                            blockCount: ${blockCount}, 
+                            otblockCount: ${otblockCount}`)
+        // Cheapest
+        let weeklyCost = weeklyPrice * dailyCount
+        let dailyCost = dailyPrice * weeklyCount
+        let hourlyCost = blockHourly * block_hourly + OTHourly * ot_hourly + blockPrice * blockCount + OTBlockPrice * otblockCount
+        if (monthlyPrice <= weeklyCost + dailyCost + hourlyCost) {
+            monthlyCount += 1
+            let [weeklyCount, dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0, 0]
+        } else if (weeklyPrice <= dailyCost + hourlyCost) {
+            weeklyCount += 1
+            let [dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0]
+        } else if (dailyPrice <= hourlyCost) {
+            dailyCount += 1
+            let [ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0]
+        }
+        log.info(`(Cheapest) -> ChargeType: ${chargeType},
+                            monthlyCount: ${monthlyCount}, 
+                            weeklyCount: ${weeklyCount}, 
+                            dailyCount: ${dailyCount}, 
+                            ot_hourly: ${ot_hourly}, 
+                            block_hourly: ${block_hourly}, 
+                            blockCount: ${blockCount}, 
+                            otblockCount: ${otblockCount}`)
+
+        detail.blockPeriod = blockPeriod
+        detail.otBlockPeriod = OTBlockPeriod
+        detail.blockPrice = `${blockPrice}(${blockCount})`
+        detail.otBlockPrice = `${OTBlockPrice}(${otblockCount})`
+        detail.blockHourly = `${blockHourly}(${block_hourly}hr)`
+        detail.otBlockHourly = `${OTHourly}(${ot_hourly}hr)`
+        detail.dailyBasePrice = `${dailyPrice}(${dailyCount}d)`
+        detail.weeklyBasePrice = `${weeklyPrice}(${weeklyCount}w)`
+        detail.monthlyBasePrice = `${monthlyPrice}(${monthlyCount}M)`
+        detail.transCost = transCost
+        detail.total = monthlyPrice * monthlyCount
+            + weeklyPrice * weeklyCount
+            + dailyPrice * dailyCount
+            + blockHourly * block_hourly
+            + OTHourly * ot_hourly
+            + blockPrice * blockCount
+            + OTBlockPrice * otblockCount
+            + transCost
+    }
+}
+
 const GetPODetails = async function (row, contractRateList) {
     log.info(JSON.stringify(contractRateList, null, 2))
 
-    let { executionDate, executionTime, peakTime, lateTime, availableTime,
-        chargeType, weekend, isDriver, tspChangeTime, cancellationTime,
+    let { executionDate, executionTime, peakTime, lateTime,
+        chargeType, weekend, isDriver, cancellationTime,
         arrivalTime, departTime, endTime } = row
 
     let executionDateTime = `${executionDate} ${executionTime}`
@@ -133,15 +603,15 @@ const GetPODetails = async function (row, contractRateList) {
         createTime: moment(row.createdAt).format(fmtHms),
         approveDate: moment(row.tspChangeTime).format(fmtYMD),
         approveTime: moment(row.tspChangeTime).format(fmtHms),
-        cancelledDate: cancellationTime ? moment(cancellationTime).format(fmtYMD) : "",
-        cancelledTime: cancellationTime ? moment(cancellationTime).format(fmtHms) : "",
-        executionDate: moment(executionDateTime).format(fmtYMDHms),
+        cancelledDate: getFormateDateTime(cancellationTime, fmtYMD),
+        cancelledTime: getFormateDateTime(cancellationTime, fmtHms),
+        executionDate: getFormateDateTime(executionDateTime, fmtYMDHms),
         linkedJob: "",
-        arriveTime: arrivalTime ? moment(arrivalTime).format(fmtYMDHms) : "",
-        departTime: departTime ? moment(departTime).format(fmtYMDHms) : "",
-        endTime: endTime ? moment(endTime).format(fmtYMDHms) : "",
-        isDriver: row.isDriver == 1 ? true : false,
-        weekend: row.weekend == 1 ? true : false,
+        arriveTime: getFormateDateTime(arrivalTime, fmtYMDHms),
+        departTime: getFormateDateTime(departTime, fmtYMDHms),
+        endTime: getFormateDateTime(endTime, fmtYMDHms),
+        isDriver: getTrueFalse(row.isDriver),
+        weekend: getTrueFalse(row.weekend),
         chargeType: row.chargeType,
         status: row.taskStatus,
         surchargeLess4: 0,
@@ -149,7 +619,7 @@ const GetPODetails = async function (row, contractRateList) {
         surchargeGenter12: 0,
         surchargeLessThen48: 0,
         surchargeDepart: 0,
-        duration: row.duration ? Number(row.duration) : 0,
+        duration: getDuration(row.duration),
         block: 0,
         afterBlock: 0,
         otBlock: 0,
@@ -173,413 +643,19 @@ const GetPODetails = async function (row, contractRateList) {
     }
 
     if ([ChargeType.HOUR, ChargeType.TRIP, ChargeType.OTBLOCK, ChargeType.OTHOURLY].indexOf(chargeType) != -1) {
-        let {
-            price, isWeekend, hasDriver, isPeak, isLate, blockPrice, blockHourly, OTHourly, OTBlockPrice,
-            surchargeLessThen4, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen48,
-            surchargeDepart, blockPeriod, OTBlockPeriod, hourlyPrice, dailyPrice, weeklyPrice, monthlyPrice
-        } = GetContractRateField(contractRateList[0])
-
-        if (chargeType == ChargeType.HOUR) {
-            let { total, late, peak } = GetTripPriceCalculation({ price, isWeekend, hasDriver, isPeak, isLate, executionTime, peakTime, lateTime, weekend, isDriver })
-            let { startTime, endTime } = GetStartEndTime(row)
-            let duration = Math.ceil(moment(endTime).diff(moment(startTime), 's') / 3600)
-            detail.isLate = late
-            detail.isPeak = peak
-            detail.hourlyPrice = price
-            detail.total = total * duration
-        } else if (chargeType == ChargeType.TRIP) {
-            let { total, late, peak } = GetTripPriceCalculation({ price, isWeekend, hasDriver, isPeak, isLate, executionTime, peakTime, lateTime, weekend, isDriver })
-            if (hourlyPrice == 0 && dailyPrice == 0 && weeklyPrice == 0 && monthlyPrice == 0) {
-                detail.isLate = late
-                detail.isPeak = peak
-                detail.tripPrice = price
-                detail.total = total
-            } else {
-                let { startTime, endTime } = GetStartEndTime(row)
-                let duration = Math.ceil(moment(endTime).diff(moment(startTime), 's') / 3600)
-                // Calculate the cheapest price
-                let cheapestTotalPrice = hourlyPrice * duration
-                if (dailyPrice) {
-                    let dayCount = Math.ceil(duration / 24)
-                    let dailyTotalPrice = dayCount * dailyPrice
-                    if (cheapestTotalPrice > dailyTotalPrice) {
-                        cheapestTotalPrice = dailyTotalPrice
-                    }
-                    detail.dailyBasePrice = dailyPrice + `(${dayCount}D)`
-                }
-                if (weeklyPrice) {
-                    let weekCount = Math.ceil(duration / 24 / 7)
-                    let weeklyTotalPrice = weekCount * weeklyPrice
-                    if (cheapestTotalPrice > weeklyTotalPrice) {
-                        cheapestTotalPrice = weeklyTotalPrice
-                    }
-                    detail.weeklyBasePrice = weeklyPrice + `(${weekCount}W)`
-                }
-                if (monthlyPrice) {
-                    let monthCount = Math.ceil(duration / 24 / 30)
-                    let weeklyTotalPrice = monthCount * monthlyPrice
-                    if (cheapestTotalPrice > weeklyTotalPrice) {
-                        cheapestTotalPrice = monthlyPrice
-                    }
-                    detail.monthlyBasePrice = monthlyPrice + `(${monthCount}M)`
-                }
-                detail.total = cheapestTotalPrice
-            }
-        } else if (chargeType == ChargeType.OTHOURLY || chargeType == ChargeType.OTBLOCK) {
-            let { startTime, endTime } = GetStartEndTime(row)
-            if (startTime && endTime) {
-                detail.block = blockPrice
-                detail.blockPeriod = blockPeriod
-                let sDiff = moment(endTime).diff(moment(startTime), 's')
-                let totalDuration = Math.ceil(sDiff / 3600)
-
-                let startDate = moment(startTime).format("YYYY-MM-DD")
-                let time = moment(startTime).format("HH:mm")
-
-                let time1 = availableTime.split('-')[1] // 18:01 - 07:59
-                let timeDiff = moment(time, 'HH:mm').diff(moment(time1, 'HH:mm'), 's') // 2022-11-12 21:00 - 2022-11-12 23:00 ||  2022-11-12 04:00 - 2022-11-12 23:00
-                if (timeDiff > 0) {
-                    startDate = moment(startDate).add(1, 'd').format("YYYY-MM-DD")
-                }
-                let otTime = Math.ceil(moment(endTime).diff(moment(startDate + ' ' + time1), 's') / 3600) // 2022-11-12 23:00 - 2022-11-13 07:59 ||  2022-11-12 23:00 - 2022-11-12 07:59
-                if (otTime <= 0) {
-                    otTime = 0
-                }
-                if (totalDuration > blockPeriod) {
-                    let afterTime = totalDuration - blockPeriod - otTime
-                    if (afterTime > 0) {
-                        detail.afterBlock = afterTime * blockHourly
-                        detail.blockHourly = `${blockHourly}(${afterTime}hr)`
-                    }
-                }
-                if (chargeType == ChargeType.OTHOURLY) {
-                    detail.otBlock = otTime * OTHourly
-                    detail.otBlockHourly = `${OTHourly}(${otTime}hr)`
-                } else {
-                    detail.otBlock = Math.ceil(otTime / OTBlockPeriod) * OTBlockPrice
-                    detail.otBlockPeriod = OTBlockPeriod
-                    detail.otBlockPrice = `${OTBlockPrice}(${otTime}hr)`
-                }
-                detail.blockPrice = `${blockPrice}(${totalDuration}hr)`
-                detail.total = detail.block + detail.afterBlock + detail.otBlock
-            }
-        }
-
-        let totalCost = detail.total
-        let surcharge = CalculateSurcharge({
-            executionDateTime, cancellationTime, tspChangeTime, departTime, totalCost,
-            surchargeLessThen48, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen4, surchargeDepart, chargeType
-        })
-        detail.surchargeLessThen48 = surcharge.surchargeLessThen48Cost
-        detail.surchargeGenter12 = surcharge.surchargeGenter12Cost
-        detail.surchargeLess12 = surcharge.surchargeLess12Cost
-        detail.surchargeLess4 = surcharge.surchargeLess4Cost
-        detail.surchargeDepart = surcharge.surchargeDepartCost
-        detail.total = surcharge.total
+        setChargeTypeTripHourAndOT(row, contractRateList, detail)
     }
     else if (ChargeType.MIX == chargeType) {
-        let {
-            base: dailyBasePrice, total: dailyTotal,
-            transCost: dailyTransCost, surchargeLessThen4: dailySurchargeLessThen4,
-            surchargeLessThen48: dailySurchargeLessThen48, surchargeGenterThen12: dailySurchargeGenterThen12,
-            surchargeLessThen12: dailySurchargeLessThen12, surchargeDepart: dailySurchargeDepart, exist: dailyExist,
-            transCostSurchargeLessThen4: dailyTransCostSurchargeLessThen4
-        } = GetContractRateByChargeType(contractRateList, ChargeType.DAILY, weekend, isDriver)
-
-        let {
-            base: weeklyBasePrice, total: weeklyTotal, surchargeLessThen4: weeklySurchargeLessThen4,
-            surchargeLessThen48: weeklySurchargeLessThen48, surchargeGenterThen12: weeklySurchargeGenterThen12,
-            surchargeLessThen12: weeklySurchargeLessThen12, surchargeDepart: weeklySurchargeDepart, exist: weeklyExist
-        } = GetContractRateByChargeType(contractRateList, ChargeType.WEEKLY, weekend, isDriver)
-
-        let {
-            base: monthlyBasePrice, total: monthlyTotal, surchargeLessThen4: monthlySurchargeLessThen4,
-            surchargeLessThen48: monthlySurchargeLessThen48, surchargeGenterThen12: monthlySurchargeGenterThen12,
-            surchargeLessThen12: monthlySurchargeLessThen12, surchargeDepart: monthlySurchargeDepart, exist: monthlyExist
-        } = GetContractRateByChargeType(contractRateList, ChargeType.MONTHLY, weekend, isDriver)
-
-        let {
-            base: yearlyBasePrice, total: yearlyTotal, surchargeLessThen4: yearlySurchargeLessThen4,
-            surchargeLessThen48: yearlySurchargeLessThen48, surchargeGenterThen12: yearlySurchargeGenterThen12,
-            surchargeLessThen12: yearlySurchargeLessThen12, surchargeDepart: yearlySurchargeDepart, exist: yearlyExist
-        } = GetContractRateByChargeType(contractRateList, ChargeType.YEARLY, weekend, isDriver)
-
-        let s1 = new Set([dailySurchargeLessThen48, weeklySurchargeLessThen48, monthlySurchargeLessThen48, yearlySurchargeLessThen48])
-        let s2 = new Set([dailySurchargeGenterThen12, weeklySurchargeGenterThen12, monthlySurchargeGenterThen12, yearlySurchargeGenterThen12])
-        let s3 = new Set([dailySurchargeLessThen12, weeklySurchargeLessThen12, monthlySurchargeLessThen12, yearlySurchargeLessThen12])
-        let s4 = new Set([dailySurchargeDepart, weeklySurchargeDepart, monthlySurchargeDepart, yearlySurchargeDepart])
-        let setArr = [s1, s2, s3, s4]
-        setArr.forEach(item => {
-            item.delete(0)
-            item.add(0)
-        })
-        let surchargeLessThen48 = [...s1][0]
-        let surchargeGenterThen12 = [...s2][0]
-        let surchargeLessThen12 = [...s3][0]
-        let surchargeDepart = [...s4][0]
-
-        let day = 1
-        if (row.endDate) {
-            day = Math.ceil(moment(row.endDate, 'YYYY-MM-DD HH:mm').diff(moment(row.startDate, 'YYYY-MM-DD HH:mm'), 's') / 3600 / 24)
-        }
-
-        let [yearCount, monthCount, weekCount, dayCount] = [...GetYYMMWWDD(day, dailyExist, weeklyExist, monthlyExist, yearlyExist)]
-        let total = yearCount * yearlyTotal
-            + monthCount * monthlyTotal
-            + weekCount * weeklyTotal
-            + dayCount * dailyTotal
-
-        let approveDateDiffHours = moment(executionDateTime).diff(moment(cancellationTime ?? tspChangeTime), 's')
-        if (approveDateDiffHours <= 48 * 3600 && approveDateDiffHours > 24 * 3600) {
-            detail.surchargeLessThen48 = surchargeLessThen48 * total
-        }
-        else if (approveDateDiffHours <= 24 * 3600 && approveDateDiffHours > 12 * 3600) {
-            detail.surchargeGenter12 = surchargeGenterThen12 * total
-        }
-        else if (approveDateDiffHours <= 12 * 3600 && approveDateDiffHours >= 4 * 3600) {
-            detail.surchargeLess12 = surchargeLessThen12 * total
-        }
-        else if (approveDateDiffHours < 4 * 3600) {
-            detail.surchargeLess4 = yearCount * (yearlySurchargeLessThen4 <= 1 ? (yearlyBasePrice * yearlySurchargeLessThen4) : yearlySurchargeLessThen4)
-                + monthCount * (monthlySurchargeLessThen4 <= 1 ? (monthlyBasePrice * monthlySurchargeLessThen4) : monthlySurchargeLessThen4)
-                + weekCount * (weeklySurchargeLessThen4 <= 1 ? (weeklyBasePrice * weeklySurchargeLessThen4) : weeklySurchargeLessThen4)
-                + dayCount * (dailySurchargeLessThen4 <= 1 ? (dailyBasePrice * dailySurchargeLessThen4) : dailySurchargeLessThen4)
-
-            detail.transCostSurchargeLessThen4 = dailyTransCostSurchargeLessThen4 <= 1 ? (dailyTransCost * dailyTransCostSurchargeLessThen4) : dailyTransCostSurchargeLessThen4
-        }
-        detail.total = total
-        detail.transCost = dailyTransCost
-        // If cancel before indent 24hr, no trip or hourly fee, only surcharge fee
-        if (cancellationTime && moment(executionDateTime).diff(moment(cancellationTime), 's') > 24 * 3600) {
-            detail.total = 0
-            detail.transCost = 0
-            dailyBasePrice = 0
-            weeklyBasePrice = 0
-            monthlyBasePrice = 0
-            yearlyBasePrice = 0
-        }
-        // surcharge depart
-        if (row.departTime) {
-            let departDiffTime = moment(row.departTime).diff(executionDateTime, 's') - 30 * 60
-            if (departDiffTime >= 0) {
-                let blocks = Math.ceil(departDiffTime / (15 * 60))
-                detail.surchargeDepart = surchargeDepart * detail.total * blocks
-            }
-        }
-
-        detail.total = detail.total + detail.transCost
-        detail.dailyBasePrice = dailyBasePrice == 0 ? "" : dailyBasePrice + `(${dayCount}D)`
-        detail.weeklyBasePrice = weeklyBasePrice == 0 ? "" : weeklyBasePrice + `(${weekCount}W)`
-        detail.monthlyBasePrice = monthlyBasePrice == 0 ? "" : monthlyBasePrice + `(${monthCount}M)`
-        detail.yearlyBasePrice = yearlyBasePrice == 0 ? "" : yearlyBasePrice + `(${yearCount}Y)`
+        setChargeTypeMix(row, contractRateList, detail)
     }
     else if (ChargeType.DAILYTRIP == chargeType) {
-        let { tripPerDay, perTripPrice, excessPerTripPrice, contractPartNo } = contractRateList[0]
-        let tasks = await Task2.findAll({
-            where: {
-                executionDate: row.executionDate,
-                contractPartNo: contractPartNo
-            },
-            order: [['id', 'asc']]
-        })
-        let length = tasks.length
-        let tripPerDayArr = tripPerDay.split(',')
-        let priceIdx = tripPerDayArr.findIndex(item => length <= Number(item))
-        if (priceIdx == -1) {
-            priceIdx = tripPerDayArr.length - 1
-        }
-
-        let perTripPriceArr = perTripPrice.split(',')
-        let price = Number(perTripPriceArr[priceIdx])
-        let idx = tasks.findIndex(item => item.id == row.taskId) + 1
-        if (idx > Number(tripPerDayArr[tripPerDayArr.length - 1])) {
-            price = Number(excessPerTripPrice)
-        }
-        detail.tripPrice = price
-        detail.total = price
-
-        let { surchargeLessThen4, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen48, surchargeDepart } = GetContractRateField(contractRateList[0])
-
-        let totalCost = detail.total
-        let surcharge = CalculateSurcharge({
-            executionDateTime, cancellationTime, tspChangeTime, departTime, totalCost,
-            surchargeLessThen48, surchargeGenterThen12, surchargeLessThen12, surchargeLessThen4, surchargeDepart, chargeType
-        })
-        detail.surchargeLessThen48 = surcharge.surchargeLessThen48Cost
-        detail.surchargeGenter12 = surcharge.surchargeGenter12Cost
-        detail.surchargeLess12 = surcharge.surchargeLess12Cost
-        detail.surchargeLess4 = surcharge.surchargeLess4Cost
-        detail.surchargeDepart = surcharge.surchargeDepartCost
-        detail.total = surcharge.total
+        await setChargeTypeDalyTrip(row, contractRateList, detail)
     }
     else if (ChargeType.BLOCKDAILY == chargeType) {
-        let { startTime, endTime } = GetStartEndTime(row)
-        if (startTime && endTime) {
-            if (contractRateList.length == 1) {
-                let contractRate = contractRateList[0]
-                let { blockPrice, blockHourly, OTHourly, OTBlockPrice, blockPeriod, OTBlockPeriod, dailyPrice } = GetContractRateField(contractRate)
-
-                let [dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0];
-                let newStartTime;
-                ({ count: dailyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(startTime, endTime, 'd'));
-                let surplusHr = GetSurplusHrDuration(newStartTime, endTime);
-
-                let hasMinimumHrLimit = dailyCount > 0 ? 0 : 1;
-                ({ ot_hourly, block_hourly, blockCount, otblockCount } = GetBLOCKDAILYHourly(availableTime, endTime, moment(newStartTime).format('HH:mm'), blockPeriod, OTBlockPeriod, surplusHr, hasMinimumHrLimit));
-                log.info(`(Orion) -> ChargeType: ${chargeType},
-                                    dailyCount: ${dailyCount}, 
-                                    ot_hourly: ${ot_hourly}, 
-                                    block_hourly: ${block_hourly}, 
-                                    blockCount: ${blockCount}, 
-                                    otblockCount: ${otblockCount}`)
-                // Cheapest
-                if (dailyPrice <= blockHourly * block_hourly + OTHourly * ot_hourly + blockPrice * blockCount + OTBlockPrice * otblockCount) {
-                    dailyCount += 1
-                    let [ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0]
-                }
-                log.info(`(Cheapest) -> ChargeType: ${chargeType},
-                                        dailyCount: ${dailyCount}, 
-                                        ot_hourly: ${ot_hourly}, 
-                                        block_hourly: ${block_hourly}, 
-                                        blockCount: ${blockCount}, 
-                                        otblockCount: ${otblockCount}`)
-
-                detail.blockPeriod = blockPeriod
-                detail.otBlockPeriod = OTBlockPeriod
-                detail.blockPrice = `${blockPrice}(${blockCount})`
-                detail.otBlockPrice = `${OTBlockPrice}(${otblockCount})`
-                detail.blockHourly = `${blockHourly}(${block_hourly}hr)`
-                detail.otBlockHourly = `${OTHourly}(${ot_hourly}hr)`
-                detail.dailyBasePrice = `${dailyPrice}(${dailyCount}d)`
-                detail.total = dailyPrice * dailyCount
-                    + blockHourly * block_hourly
-                    + OTHourly * ot_hourly
-                    + blockPrice * blockCount
-                    + OTBlockPrice * otblockCount
-
-            } else if (contractRateList.length == 2) {
-                contractRateList = contractRateList.sort((a, b) => Number(a.blockPrice) < Number(b.blockPrice))
-                let index = 0
-                let approveDateDiffHours = moment(executionDateTime).diff(moment(tspChangeTime), 's')
-                if (approveDateDiffHours < 4 * 3600) {
-                    index = 1
-                }
-                let { blockPrice, blockHourly, OTHourly, OTBlockPrice, blockPeriod, OTBlockPeriod, dailyPrice, monthlyPrice } = GetContractRateField(contractRateList[index])
-
-                let [monthlyCount, dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0, 0];
-                let newStartTime;
-                ({ count: monthlyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(startTime, endTime, 'M'));
-                ({ count: dailyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(newStartTime, endTime, 'd'));
-                let surplusHr = GetSurplusHrDuration(newStartTime, endTime);
-                ({ ot_hourly, block_hourly, blockCount, otblockCount } = GetBLOCKDAILYHourly(availableTime, endTime, moment(newStartTime).format('HH:mm'), blockPeriod, OTBlockPeriod, surplusHr, 0));
-
-                log.info(`(Orion) -> ChargeType: ${chargeType},
-                                    monthlyCount: ${monthlyCount}, 
-                                    dailyCount: ${dailyCount}, 
-                                    ot_hourly: ${ot_hourly}, 
-                                    block_hourly: ${block_hourly}, 
-                                    blockCount: ${blockCount}, 
-                                    otblockCount: ${otblockCount}`)
-
-                let dailyCost = dailyPrice * dailyCount
-                let hourlyCost = blockHourly * block_hourly + OTHourly * ot_hourly + blockPrice * blockCount + OTBlockPrice * otblockCount
-
-                if (monthlyPrice <= dailyCost + hourlyCost) {
-                    monthlyCount += 1
-                    let [dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0]
-                } else if (dailyPrice <= hourlyCost) {
-                    dailyCount += 1
-                    let [ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0]
-                }
-                log.info(`(Cheapest) -> ChargeType: ${chargeType},
-                                        monthlyCount: ${monthlyCount}, 
-                                        dailyCount: ${dailyCount}, 
-                                        ot_hourly: ${ot_hourly}, 
-                                        block_hourly: ${block_hourly}, 
-                                        blockCount: ${blockCount}, 
-                                        otblockCount: ${otblockCount}`)
-
-                detail.blockPeriod = blockPeriod
-                detail.otBlockPeriod = OTBlockPeriod
-                detail.blockPrice = `${blockPrice}(${blockCount})`
-                detail.otBlockPrice = `${OTBlockPrice}(${otblockCount})`
-                detail.blockHourly = `${blockHourly}(${block_hourly}hr)`
-                detail.otBlockHourly = `${OTHourly}(${ot_hourly}hr)`
-                detail.dailyBasePrice = `${dailyPrice}(${dailyCount}d)`
-                detail.monthlyBasePrice = `${monthlyPrice}(${monthlyCount}M)`
-                detail.total = monthlyPrice * monthlyCount
-                    + dailyPrice * dailyCount
-                    + blockHourly * block_hourly
-                    + OTHourly * ot_hourly
-                    + blockPrice * blockCount
-                    + OTBlockPrice * otblockCount
-            }
-        }
+        setChargeTypeBlockDaily(row, contractRateList, chargeType, detail)
     }
     else if (ChargeType.BLOCKDAILYMIX == chargeType) {
-        let { startTime, endTime } = GetStartEndTime(row)
-        if (startTime && endTime) {
-            let contractRate = contractRateList[0]
-            let { blockPrice, blockHourly, OTHourly, OTBlockPrice, blockPeriod, OTBlockPeriod, dailyPrice, weeklyPrice, monthlyPrice, transCost } = GetContractRateField(contractRate)
-
-            let [monthlyCount, weeklyCount, dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0, 0, 0]
-            let newStartTime;
-
-            ({ count: monthlyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(startTime, endTime, 'M'));
-            ({ count: weeklyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(newStartTime, endTime, 'w'));
-            ({ count: dailyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(newStartTime, endTime, 'd'));
-            let surplusHr = GetSurplusHrDuration(newStartTime, endTime);
-            ({ ot_hourly, block_hourly, blockCount, otblockCount } = GetBLOCKDAILYHourly(availableTime, endTime, moment(newStartTime).format('HH:mm'), blockPeriod, OTBlockPeriod, surplusHr, 0));
-            log.info(`(Orion) -> ChargeType: ${chargeType},
-                                monthlyCount: ${monthlyCount}, 
-                                weeklyCount: ${weeklyCount}, 
-                                dailyCount: ${dailyCount}, 
-                                ot_hourly: ${ot_hourly}, 
-                                block_hourly: ${block_hourly}, 
-                                blockCount: ${blockCount}, 
-                                otblockCount: ${otblockCount}`)
-            // Cheapest
-            let weeklyCost = weeklyPrice * dailyCount
-            let dailyCost = dailyPrice * weeklyCount
-            let hourlyCost = blockHourly * block_hourly + OTHourly * ot_hourly + blockPrice * blockCount + OTBlockPrice * otblockCount
-            if (monthlyPrice <= weeklyCost + dailyCost + hourlyCost) {
-                monthlyCount += 1
-                let [weeklyCount, dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0, 0]
-            } else if (weeklyPrice <= dailyCost + hourlyCost) {
-                weeklyCount += 1
-                let [dailyCount, ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0, 0]
-            } else if (dailyPrice <= hourlyCost) {
-                dailyCount += 1
-                let [ot_hourly, block_hourly, blockCount, otblockCount] = [0, 0, 0, 0]
-            }
-            log.info(`(Cheapest) -> ChargeType: ${chargeType},
-                                monthlyCount: ${monthlyCount}, 
-                                weeklyCount: ${weeklyCount}, 
-                                dailyCount: ${dailyCount}, 
-                                ot_hourly: ${ot_hourly}, 
-                                block_hourly: ${block_hourly}, 
-                                blockCount: ${blockCount}, 
-                                otblockCount: ${otblockCount}`)
-
-            detail.blockPeriod = blockPeriod
-            detail.otBlockPeriod = OTBlockPeriod
-            detail.blockPrice = `${blockPrice}(${blockCount})`
-            detail.otBlockPrice = `${OTBlockPrice}(${otblockCount})`
-            detail.blockHourly = `${blockHourly}(${block_hourly}hr)`
-            detail.otBlockHourly = `${OTHourly}(${ot_hourly}hr)`
-            detail.dailyBasePrice = `${dailyPrice}(${dailyCount}d)`
-            detail.weeklyBasePrice = `${weeklyPrice}(${weeklyCount}w)`
-            detail.monthlyBasePrice = `${monthlyPrice}(${monthlyCount}M)`
-            detail.transCost = transCost
-            detail.total = monthlyPrice * monthlyCount
-                + weeklyPrice * weeklyCount
-                + dailyPrice * dailyCount
-                + blockHourly * block_hourly
-                + OTHourly * ot_hourly
-                + blockPrice * blockCount
-                + OTBlockPrice * otblockCount
-                + transCost
-        }
+        setChargeTypeBlockDailyMix(row, contractRateList, chargeType, detail)
     }
     else if (ChargeType.MONTHLY == chargeType) {
         let { startTime, endTime } = GetStartEndTime(row)
@@ -588,9 +664,7 @@ const GetPODetails = async function (row, contractRateList) {
         let monthlyCount = 0;
         let newStartTime;
         ({ count: monthlyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(startTime, endTime, 'M'));
-        if (newStartTime != endTime) {
-            monthlyCount += 1
-        }
+        monthlyCount += isAddOne(newStartTime, endTime)
         detail.monthlyBasePrice = `${price}(${monthlyCount}M)`
         detail.total = price * monthlyCount
     }
@@ -624,9 +698,8 @@ const GetPODetails = async function (row, contractRateList) {
         let yearlyCount = 0;
         let newStartTime;
         ({ count: yearlyCount, surplusTime: newStartTime } = GetDateCountAndSurplusTime(startTime, endTime, 'Y'));
-        if (newStartTime != endTime) {
-            yearlyCount += 1
-        }
+        yearlyCount += isAddOne(newStartTime, endTime)
+
         detail.yearlyBasePrice = `${price}(${yearlyCount}Y)`
         detail.total = price * yearlyCount
     }
@@ -634,6 +707,12 @@ const GetPODetails = async function (row, contractRateList) {
 }
 module.exports.GetPODetails = GetPODetails
 
+const isAddOne = function (newStartTime, endTime) {
+    if (newStartTime != endTime) {
+        return 1
+    }
+    return 0
+}
 
 const GetDailyPrice = function (startTime, endTime, price, dailyDaytime, halfDayMorning, halfDayAfternoon, total) {
     // 2023-09-04 18:01 ~ 2023-09-05 08:00

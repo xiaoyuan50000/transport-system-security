@@ -2,7 +2,7 @@
  * DB
  */
 module.exports.dbConf = {
-    host: '192.168.1.18',
+    host: '192.168.1.5',
 	// host: '192.168.1.11',
     user: 'root',
     password: 'root',
