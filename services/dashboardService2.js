@@ -272,13 +272,18 @@ module.exports.GetDashboardDatas = async function (req, res) {
     }
 
     if (isNotEmptyNull(tsp)) {
-        taskFilter += ` and a.serviceProviderId = ${tsp}`
+        taskFilter += ` and a.serviceProviderId = ?`
+        replacements.push(tsp)
     }
     if (isNotEmptyNull(month)) {
-        taskFilter += ` and MONTH(a.executionDate) = ${month}`
+        taskFilter += ` and MONTH(a.executionDate) = ?`
+        replacements.push(month)
+
     }
     if (isNotEmptyNull(year)) {
-        taskFilter += ` and YEAR(a.executionDate) = ${year}`
+        taskFilter += ` and YEAR(a.executionDate) = ?`
+        replacements.push(year)
+
     }
 
     let idResult = await sequelizeObj.query(

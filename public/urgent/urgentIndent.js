@@ -1,4 +1,5 @@
 let table;
+let currentSelectedTask = null
 
 let urgentDriverModal = document.getElementById('urgentDriverModal');
 let selectTaskId;

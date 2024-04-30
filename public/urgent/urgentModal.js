@@ -7,7 +7,6 @@ let mobileNumberElem = $('#urgentModal input[name="mobileNumber"]')
 let dateElem = $('#urgentModal span[name="date"]')
 let timeElem = $('#urgentModal #time-select button')
 let timeList = ["09:30", "12:30", "15:00"]
-let currentSelectedTask = null
 $(async function () {
     // reportingLocationList = await axios.post("/getDestination").then(res => {
     //     let datas = res.data.data

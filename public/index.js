@@ -5,19 +5,19 @@ if (userinfo != "") {
 }
 var user = localStorage.getItem("user")
 //var user = JSON.parse(localStorage.getItem("user"))
-var isPreviewClick = localStorage.getItem("previewClick")
-var previewDialog
-var announcementDialog
-var editAnnouncementDialog
+let isPreviewClick = localStorage.getItem("previewClick")
+let previewDialog
+let announcementDialog
+let editAnnouncementDialog
 var publidHolidays = []
-var occ = ["OCC Mgr"]
+let occ = ["OCC Mgr"]
 const bsCollapse = new bootstrap.Collapse('#navbarSupportedContent', {
     toggle: false
 })
 
 $(async function () {
     user = await getDecodeAESCode(user)
-    var isFirstLogin = user.isFirstLogin
+    let isFirstLogin = user.isFirstLogin
     setUserName();
     $(".navbar-nav .nav-item").on('click', function () {
         let target = $(this).data("target");

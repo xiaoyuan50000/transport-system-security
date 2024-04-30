@@ -4,7 +4,7 @@ var changeDateFormat = function (date) {
         return date
     }
     let dateArr = date.split(" ")
-    var dateParts = dateArr[0].split('/');
+    let dateParts = dateArr[0].split('/');
     let output = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`
     if (dateArr.length > 1) {
         output = `${output} ${dateArr[1]}`
@@ -31,7 +31,7 @@ var changeDateFormatDMY = function (date) {
         return date
     }
     let dateArr = date.split(" ")
-    var dateParts = dateArr[0].split('-');
+    let dateParts = dateArr[0].split('-');
     let output = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`
     if (dateArr.length > 1) {
         output = `${output} ${dateArr[1]}`

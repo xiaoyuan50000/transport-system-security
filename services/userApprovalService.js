@@ -172,7 +172,7 @@ module.exports.InitRejectedUsers = async function (req, res) {
         }
     )
     for (let user of users) {
-        const userInfo = getUserInfo(user)
+        const userInfo = getUserInfo(user, roleList, userList)
         user.cvRoleName = userInfo.cvRoleName
         user.cvRejectByName = userInfo.cvRejectByName
         user.nric = userInfo.nric

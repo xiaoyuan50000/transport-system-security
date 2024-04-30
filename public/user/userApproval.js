@@ -1,3 +1,4 @@
+let table1;
 $(function () {
     $("ul.nav a").on("click", function () {
         $("ul.nav a").removeClass("active")
@@ -27,7 +28,7 @@ const InitPendingApprovalNumber = async function () {
 const initApprovalUserTable = function () {
     cleanDataTable()
 
-    table = $('.user-table').DataTable({
+    table1 = $('.user-table').DataTable({
         "ordering": false,
         "searching": false,
         "paging": true,
@@ -114,7 +115,7 @@ const initApprovalUserTable = function () {
 const initRejectedUserTable = function () {
     cleanDataTable()
 
-    table = $('.user-table').DataTable({
+    table1 = $('.user-table').DataTable({
         "ordering": false,
         "searching": false,
         "paging": true,
@@ -199,7 +200,7 @@ const initRejectedUserTable = function () {
 }
 
 const userApprove = function (e) {
-    let row = table.row($(e).data("row")).data();
+    let row = table1.row($(e).data("row")).data();
     let username = row.fullName;
     let userBaseId = row.id;
 
@@ -208,7 +209,7 @@ const userApprove = function (e) {
             if (res.data.code == 0) {
                 top.simplyError(res.data.msg)
             } else {
-                table.ajax.reload(null, false)
+                table1.ajax.reload(null, false)
                 InitPendingApprovalNumber()
             }
         })
@@ -216,7 +217,7 @@ const userApprove = function (e) {
 }
 
 const userReject = function (e) {
-    let row = table.row($(e).data("row")).data();
+    let row = table1.row($(e).data("row")).data();
     let username = row.fullName;
     let userBaseId = row.id;
 
@@ -245,7 +246,7 @@ const userReject = function (e) {
                 if (res.data.code == 0) {
                     top.simplyError(res.data.msg)
                 } else {
-                    table.ajax.reload(null, false)
+                    table1.ajax.reload(null, false)
                     InitPendingApprovalNumber()
                 }
             })

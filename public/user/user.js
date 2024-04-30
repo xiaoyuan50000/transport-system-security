@@ -213,6 +213,10 @@ const cleanDataTable = function () {
         table.destroy();
         $('.user-table').empty();
     }
+    if (table1) {
+        table1.destroy();
+        $('.user-table').empty();
+    }
 }
 
 const initUserTable = function () {
