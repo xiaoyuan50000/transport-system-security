@@ -16,7 +16,7 @@ const { QueryTypes } = require('sequelize');
 
 
 const cookieOptions = {
-    httpOnly: false,
+    httpOnly: true,
     secure: false,
     path: "/",
     sameSite: "Strict"
