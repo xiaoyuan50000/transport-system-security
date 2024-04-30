@@ -220,7 +220,7 @@ function initData(){
                 </div>
             </div>
         </div>`
-            $(".credit-foot").append(html)
+            $(".credit-foot").append(DOMPurify.sanitize(html))
         })
     })
 }

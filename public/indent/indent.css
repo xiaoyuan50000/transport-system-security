@@ -167,14 +167,14 @@ html {
 
 
 td.details-control {
-    background: url('/images/indent/expand.svg') no-repeat center center;
+    background: url('/images/indent/expand.svg') no-repeat center center !important;
     cursor: pointer;
     width: 1% !important;
 
 }
 
 tr.shown td.details-control {
-    background: url('/images/indent/collapse.svg') no-repeat center center;
+    background: url('/images/indent/collapse.svg') no-repeat center center !important;
 }
 
 
@@ -253,13 +253,20 @@ tr.shown td.details-control {
 
 .indent-table tbody tr.odd,
 .indent-table tbody tr.even {
-    background: #D4E9E9;
-    border-color: #fff;
+    background: #D4E9E9 !important;
+    border-color: #fff !important;
 }
 
+
+.indent-table tbody tr.odd td:nth-child(1),
+.indent-table tbody tr.odd td:nth-child(3),
+.indent-table tbody tr.odd td:nth-child(4),
+.indent-table tbody tr.even td:nth-child(1),
+.indent-table tbody tr.even td:nth-child(3),
+.indent-table tbody tr.even td:nth-child(4),
 .indent-table tbody tr.odd td:nth-last-child(1),
 .indent-table tbody tr.even td:nth-last-child(1) {
-    background: #D4E9E9 !important;
+    background-color: #D4E9E9 !important;
     border-color: #D4E9E9 !important;
 }
 

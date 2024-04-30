@@ -84,7 +84,7 @@ const initIndentFlowPage = function (flowDataList) {
     }
     indentFlowHtml += `</table>`;
     $(".indent-flow-div").empty();
-    $(".indent-flow-div").append(indentFlowHtml);
+    $(".indent-flow-div").append(DOMPurify.sanitize(indentFlowHtml));
 };
 
 
@@ -156,7 +156,7 @@ const initDriverFlowPage = function (flowDataList) {
         sn += 1;
     }
 
-    $(".driver-flow-div").append(driverDetailHtml);
+    $(".driver-flow-div").append(DOMPurify.sanitize(driverDetailHtml));
 
     $(".driver-flow-div").find(".info-nav").on('click', function () {
         let isDown = $(this).hasClass("down");

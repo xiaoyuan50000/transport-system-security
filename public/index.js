@@ -86,7 +86,7 @@ function setUserName() {
         return
     }
 
-    $("#username").html(user.username + ` (${user.roleName})`);
+    $("#username").html(DOMPurify.sanitize(user.username + ` (${user.roleName})`));
     let phone24hBtn = `<li class="phone24h btn-phone24h">
             <a class="dropdown-item" href="#" data-target="-1"><img src="../images/phone24h.svg">Announcement</a>
             </li>`
@@ -346,7 +346,7 @@ const showPreviewDialog = function () {
 
             let content = await readAnnouncement();
             content = content.replace(/\r?\n/g, "<br />");
-            $("#announcement").html(content);
+            $("#announcement").html(DOMPurify.sanitize(content));
         }
     });
 }
@@ -401,7 +401,7 @@ const showEditAnnouncementDialog = function () {
         onContentReady: async function () {
             let content = await readAnnouncement();
             $("#text-announcement").val(content)
-            $("#preview").html(content.replace(/\r?\n/g, "<br />"))
+            $("#preview").html(DOMPurify.sanitize(content.replace(/\r?\n/g, "<br />")))
             this.$content.find('#close-announcement').on('click', function (e) {
                 editAnnouncementDialog.close()
             });
@@ -502,7 +502,7 @@ if (user.roleName == "RA" || user.roleName == "CM" || user.roleName == "RF") {
                     </div>
                 </div>`
         }
-        $(".toast-container").append(html)
+        $(".toast-container").append(DOMPurify.sanitize(html))
         if (html != "") {
             $("#notification-count").show()
         }

@@ -50,27 +50,6 @@
 			</div>
 		</div>
 		<%- include('../indent/serviceProviderTemplate.html') -%>
-		<!-- <script>
-			const GetAll = async function(sortBy, sort){
-				await axios.post('/getAllServiceProvider',{sortBy: sortBy, sort:sort}).then(res=>{
-					$("#service-provider-content").empty()
-					for(var item of res.data.data){
-						let html = $("#serviceProviderHtml").html()
-						.replace("{{NO.}}", item.name)
-						.replace("{{price}}", item.perTrip)
-						.replace("{{vehicleType}}", item.typeOfVehicle)
-						.replace("{{contractRateId}}", item.id)
-						.replace("{{isSelected}}", "")
-						.replace("{{category}}", item.category.substr(item.category.length - 1, 1))
-						$("#service-provider-content").append(html)
-					}
-				})
-			}
-			$(".order-price").on("click",function(){
-				let order = $(this).data("order")
-				GetAll("perTrip", order)
-			})
-			GetAll()
-		</script> -->
+		
 	</body>
 </html>

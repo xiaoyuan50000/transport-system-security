@@ -29,7 +29,7 @@ $(function () {
         for(let item of node) {
             optionHtml1 += `<option value=${item.subUnit}>${item.subUnit}</option>`;
         }
-        $("#nodeSelect").append(optionHtml1);
+        $("#nodeSelect").append(top.DOMPurify.sanitize(optionHtml1));
         table.ajax.reload(null, true);
     })
 

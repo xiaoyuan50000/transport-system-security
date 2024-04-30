@@ -55,7 +55,7 @@ const InitGroups = async function (defaultVal) {
         for (let item of datas) {
             data += `<option value="${item.id}">${item.groupName}</option>`
         }
-        $("#groupSelectId").append(data)
+        $("#groupSelectId").append(DOMPurify.sanitize(data))
 
         if (defaultVal) {
             $("#base-task-form #groupSelectId").val(defaultVal)
@@ -76,7 +76,7 @@ const initPurposeMode = async function (defaultVal) {
         for (let item of datas) {
             data += `<option value="${item.name}">${item.name}</option>`
         }
-        $("#purposeType").append(data);
+        $("#purposeType").append(DOMPurify.sanitize(data));
         if (defaultVal) {
             $("#purposeType").val(defaultVal);
         }

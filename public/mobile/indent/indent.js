@@ -873,7 +873,7 @@ const initIndentStatus = function () {
         for (let item of datas) {
             data += `<option value="${item}">${item}</option>`
         }
-        $("#indent-status").append(data)
+        $("#indent-status").append(DOMPurify.sanitize(data))
     })
 }
 
@@ -940,7 +940,7 @@ const initGroupSelector = function () {
             for (let item of groups) {
                 groupOptsHtml += `<option value="${item.id}">${item.groupName}</option>`;
             }
-            $("#group").append(groupOptsHtml);
+            $("#group").append(DOMPurify.sanitize(groupOptsHtml));
         }
     })
 }

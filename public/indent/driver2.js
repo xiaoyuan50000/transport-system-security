@@ -618,7 +618,7 @@ const doneEditTaskTime = function (editData, elem) {
                 if (needChangeTsp === true) {
                     elem.find(".sp-div").show();
                     elem.find("#serviceProvider").empty()
-                    elem.find("#serviceProvider").append(data)
+                    elem.find("#serviceProvider").append(top.DOMPurify.sanitize(data))
                 }
             }
         })

@@ -81,7 +81,7 @@ const InitFilter = async function () {
         data += `<option value="Completed">Completed</option>`
         data += `<option value="Late Trip">Late Trip</option>`
         data += `<option value="No Show">No Show</option>`
-        $("#indent-status").append(data)
+        $("#indent-status").append(top.DOMPurify.sanitize(data))
     } else {
         await axios.post("/getIndentStatus").then(res => {
             let datas = res.data.data
@@ -90,16 +90,16 @@ const InitFilter = async function () {
             for (let item of datas) {
                 data += `<option value="${item}">${item}</option>`
             }
-            $("#indent-status").append(data)
+            $("#indent-status").append(top.DOMPurify.sanitize(data))
         })
     }
 
     // init vehicle type
     let vehicleTypeSelect = await InitVehicleType()
     $("#indent-vehicle-type").empty();
-    $("#indent-vehicle-type").append(`<option value="">Resource: All</option>`)
+    $("#indent-vehicle-type").append(top.DOMPurify.sanitize(`<option value="">Resource: All</option>`))
     for (let item of vehicleTypeSelect) {
-        $("#indent-vehicle-type").append(`<option value="${item.typeOfVehicle}">${item.typeOfVehicle}</option>`)
+        $("#indent-vehicle-type").append(top.DOMPurify.sanitize(`<option value="${item.typeOfVehicle}">${item.typeOfVehicle}</option>`))
     }
 }
 
@@ -137,14 +137,14 @@ const InitUnitSearch = function () {
         // reset
         $(e).next().find(".form-search-select").empty()
         for (let item of unitDatas) {
-            $(e).next().find(".form-search-select").append(`<li data-id="${item.id}">${item.groupName}</li>`)
+            $(e).next().find(".form-search-select").append(top.DOMPurify.sanitize(`<li data-id="${item.id}">${item.groupName}</li>`))
         }
     }
 
     const InsertFilterOption = function (element, filterUnits) {
         $(element).next().empty()
         for (let item of filterUnits) {
-            $(element).next().append(`<li data-id="${item.id}">${item.groupName}</li>`)
+            $(element).next().append(top.DOMPurify.sanitize(`<li data-id="${item.id}">${item.groupName}</li>`))
         }
     }
 }

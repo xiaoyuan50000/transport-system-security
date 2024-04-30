@@ -27,7 +27,7 @@ const StopRefreshIndent = function () {
     console.log("Stop refresh page")
 }
 
-StartRefreshIndent()
+// StartRefreshIndent()
 
 $(window).on("scroll",function () {
     $(".paginate_button > a").trigger("blur");

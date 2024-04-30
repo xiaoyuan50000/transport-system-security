@@ -132,7 +132,7 @@ const InitGroups = async function (defaultVal) {
         for (let item of datas) {
             data += `<option value="${item.id}">${item.groupName}</option>`
         }
-        $("#groupSelectId").append(data)
+        $("#groupSelectId").append(DOMPurify.sanitize(data))
 
         if (defaultVal) {
             $("#base-task-form #groupSelectId").val(defaultVal)

@@ -325,7 +325,7 @@ const initServiceType = async function (groupId, defaultVal) {
                 currentCategory = item.category;
             }
         }
-        $("#serviceType").append(data);
+        $("#serviceType").append(DOMPurify.sanitize(data));
         if (defaultVal) {
             $("#serviceType").val(defaultVal);
         }
@@ -355,7 +355,7 @@ const changeCategory = function () {
                     serviceTypeHtml += `<option value="${item.id}" category="${item.category}">${item.name}</option>`
                 }
             }
-            $('#serviceType').append(serviceTypeHtml);
+            $('#serviceType').append(DOMPurify.sanitize(serviceTypeHtml));
         }
 
         let recurring = $("#repeats").val();
@@ -386,7 +386,7 @@ const initServiceMode = async function (serviceTypeId, defaultVal) {
                 currentServiceModeId = item.id;
             }
         }
-        $("#serviceMode").append(data);
+        $("#serviceMode").append(DOMPurify.sanitize(data));
         if (defaultVal) {
             $("#serviceMode").val(defaultVal);
         }
@@ -406,7 +406,7 @@ const InitRecurring = async function (defaultVal) {
         for (let item of datas) {
             data += `<option value="${item.value}">${item.value}</option>`
         }
-        $("#repeats").append(data);
+        $("#repeats").append(DOMPurify.sanitize(data));
         if (defaultVal) {
             $("#repeats").val(defaultVal);
         }
@@ -432,8 +432,8 @@ const InitDestinations = async function () {
             for (let item of datas) {
                 destination += `<option value="${item.locationName}" name="${item.locationName}" data-id="${item.id}" data-secured="${item.secured}">${item.locationName}</option>`
             }
-            $("#pickupDestination").append(destination);
-            $("#dropoffDestination").append(destination);
+            $("#pickupDestination").append(DOMPurify.sanitize(destination));
+            $("#dropoffDestination").append(DOMPurify.sanitize(destination));
         }
 
         return datas;
@@ -458,7 +458,7 @@ const GetTypeOfVehicle = async function () {
                 $("#typeOfVehicle").append(`<option value="-">-</option>`)
             }
             for (let item of typeList) {
-                $("#typeOfVehicle").append(`<option value="${item.typeOfVehicle}">${item.typeOfVehicle}</option>`)
+                $("#typeOfVehicle").append(DOMPurify.sanitize(`<option value="${item.typeOfVehicle}">${item.typeOfVehicle}</option>`))
             }
         }
     })
@@ -866,7 +866,7 @@ const submitAddTrip = function (data, requestId, currentPurposeType, driver) {
 
 const showSuccessPage = function (createType, eleId) {
     if (createType == 'CreateIndent') {
-        $('.success-msg-div').append(`<label>&nbsp&nbsp&nbsp&nbspActivity &lt` + eleId + `&gt has been created successfully.</label>`);
+        $('.success-msg-div').append(DOMPurify.sanitize(`<label>&nbsp&nbsp&nbsp&nbspActivity &lt` + eleId + `&gt has been created successfully.</label>`));
     } else {
         $('.success-msg-div').append(`<label>&nbsp&nbsp&nbsp&nbspTrip has bean created successfully.</label>`);
     }

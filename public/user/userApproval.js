@@ -20,7 +20,7 @@ const InitPendingApprovalNumber = async function () {
     if (["RF", "CM", "RA"].indexOf(top.user.roleName) != -1) {
         await axios.post("/getPendingApprovalNumber").then(res => {
             let number = res.data.data
-            $("#pending-action-count").html(number)
+            $("#pending-action-count").html(top.DOMPurify.sanitize(number))
         })
     }
 }

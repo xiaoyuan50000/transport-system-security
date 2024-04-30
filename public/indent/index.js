@@ -27,8 +27,8 @@ $(function () {
                 optionHtml1 += `<option value=${item.id}>${item.subUnit}</option>`;
             }
         }
-        $("#hubSelect").append(optionHtml);
-        $("#nodeSelect").append(optionHtml1);
+        $("#hubSelect").append(top.DOMPurify.sanitize(optionHtml));
+        $("#nodeSelect").append(top.DOMPurify.sanitize(optionHtml1));
     })
 
     $("#hubSelect").on("change", function () {
@@ -42,7 +42,7 @@ $(function () {
         for(let item of node) {
             optionHtml1 += `<option value=${item.id}>${item.subUnit}</option>`;
         }
-        $("#nodeSelect").append(optionHtml1);
+        $("#nodeSelect").append(top.DOMPurify.sanitize(optionHtml1));
         table.ajax.reload(null, true);
     })
 

@@ -245,9 +245,9 @@ let ChatUtil = function () {
 		$('#chat-modal').modal('show');
 		if (Array.isArray(targetUser)) {
 			let memberName = targetUser.map(user => user.username + `(${user.roleName})`).join(',&nbsp;&nbsp;')
-			$('#chat-modal').find('.modal-title').html(`Room Chat <p class="text-primary fs-6 fst-italic fw-bold">${memberName}</p>`);
+			$('#chat-modal').find('.modal-title').html(top.DOMPurify.sanitize(`Room Chat <p class="text-primary fs-6 fst-italic fw-bold">${memberName}</p>`));
 		} else {
-			$('#chat-modal').find('.modal-title').html(targetUser.username + ` <p class="text-primary fs-6 fst-italic fw-bold">${targetUser.roleName}</p>`);
+			$('#chat-modal').find('.modal-title').html(top.DOMPurify.sanitize(targetUser.username + ` <p class="text-primary fs-6 fst-italic fw-bold">${targetUser.roleName}</p>`));
 		}
 		$('#chat-modal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
 			console.log('Chat module closed.')
@@ -457,7 +457,7 @@ let ChatUtil = function () {
 				return html;
 			}
 			let html = generateChannelHtml(user, index)
-			$('.contact-list').append(html)
+			$('.contact-list').append(top.DOMPurify.sanitize(html))
 		}
 
 		$('.contact-list').empty();

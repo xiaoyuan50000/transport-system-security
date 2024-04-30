@@ -391,7 +391,7 @@ const DestinationSearchKeyUp = function (e) {
     const InsertFilterOption = function (element, filterDestination) {
         $(element).next().empty()
         for (let item of filterDestination) {
-            $(element).next().append(`<li data-secured="${item.secured}" data-id="${item.id}" onmousedown="DestinationOnMouseDown(this)">${item.locationName}</li>`)
+            $(element).next().append(top.DOMPurify.sanitize(`<li data-secured="${item.secured}" data-id="${item.id}" onmousedown="DestinationOnMouseDown(this)">${item.locationName}</li>`))
         }
     }
     let val = $(e).val()
@@ -406,7 +406,7 @@ const DestinationOnFocus = function (e) {
     // reset
     $(e).next().find(".form-search-select").empty()
     for (let item of destinations) {
-        $(e).next().find(".form-search-select").append(`<li data-secured="${item.secured}" data-id="${item.id}" onmousedown="DestinationOnMouseDown(this)">${item.locationName}</li>`)
+        $(e).next().find(".form-search-select").append(top.DOMPurify.sanitize(`<li data-secured="${item.secured}" data-id="${item.id}" onmousedown="DestinationOnMouseDown(this)">${item.locationName}</li>`))
     }
 }
 
@@ -433,7 +433,7 @@ const PolPointSearchKeyUp = function (e) {
     const InsertFilterOption = function (element, filterDestination) {
         $(element).next().empty()
         for (let item of filterDestination) {
-            $(element).next().append(`<li data-id="${item.id}" onmousedown="PolPointOnMouseDown(this)">${item.locationName}</li>`)
+            $(element).next().append(top.DOMPurify.sanitize(`<li data-id="${item.id}" onmousedown="PolPointOnMouseDown(this)">${item.locationName}</li>`))
         }
     }
     let val = $(e).val()
@@ -448,7 +448,7 @@ const PolPointOnFocus = function (e) {
     // reset
     $(e).next().find(".form-search-select").empty()
     for (let item of polPoints) {
-        $(e).next().find(".form-search-select").append(`<li data-id="${item.id}" onmousedown="PolPointOnMouseDown(this)">${item.locationName}</li>`)
+        $(e).next().find(".form-search-select").append(top.DOMPurify.sanitize(`<li data-id="${item.id}" onmousedown="PolPointOnMouseDown(this)">${item.locationName}</li>`))
     }
 }
 
@@ -502,7 +502,7 @@ const InitVehicleByServiceModeId = async function (serviceModeId) {
         $("#typeOfVehicle").append(`<option value="-">-</option>`)
     }
     for (let item of vehicleTypeSelect) {
-        $("#typeOfVehicle").append(`<option value="${item.typeOfVehicle}">${item.typeOfVehicle}</option>`)
+        $("#typeOfVehicle").append(top.DOMPurify.sanitize(`<option value="${item.typeOfVehicle}">${item.typeOfVehicle}</option>`))
     }
 }
 
@@ -534,7 +534,7 @@ const InitRecurring = async function () {
         for (let item of datas) {
             data += `<option value="${item.value}">${item.value}</option>`
         }
-        $("#repeats").append(data)
+        $("#repeats").append(top.DOMPurify.sanitize(data))
         if (optLength == 1) {
             $("#repeats").val(datas[0].value);
             ChangeRepeats(datas[0].value)
@@ -587,7 +587,7 @@ const initServiceType = async function (groupId) {
             <label class="form-check-label" for="${id}">${category}</label>
         </div></div>`
         }
-        $categoryRadio.append(`<div class="row h-100 align-items-center">${html}</div>`)
+        $categoryRadio.append(top.DOMPurify.sanitize(`<div class="row h-100 align-items-center">${html}</div>`))
         $ServiceType.empty()
         $("#serviceMode").empty()
     })
@@ -608,7 +608,7 @@ const filterCategory = function (category) {
     for (let item of filterServiceTypeList) {
         data += `<option value="${item.id}" data-category="${item.category}">${item.name}</option>`
     }
-    $ServiceType.append(data)
+    $ServiceType.append(top.DOMPurify.sanitize(data))
     $("#serviceMode").empty()
 
     // if (category == "MV") {
@@ -642,7 +642,7 @@ const initServiceMode = async function (serviceTypeId) {
         for (let item of datas) {
             data += `<option value="${item.id}" data-value="${item.value}" data-minHour="${item.minDur}">${item.name}</option>`
         }
-        $("#serviceMode").append(data);
+        $("#serviceMode").append(top.DOMPurify.sanitize(data));
     })
 }
 
@@ -654,7 +654,7 @@ const initPurposeMode = async function () {
         for (let item of datas) {
             data += `<option value="${item.name}" data-unit="${item.groupId}">${item.name}</option>`
         }
-        $PurposeType.append(data);
+        $PurposeType.append(top.DOMPurify.sanitize(data));
     })
 };
 
@@ -1172,8 +1172,8 @@ const CreateIndentAndTrip = function () {
 }
 const ShowNextTrip = function (indentId) {
     const tripBtnId = Date.now()
-    $("body").append(`<button class="hidden" id="Trip-${tripBtnId}" data-bs-toggle="modal" data-bs-action="next-trip" data-bs-target="#tripModal" 
-        data-bs-indent="${indentId}"></button>`)
+    $("body").append(top.DOMPurify.sanitize(`<button class="hidden" id="Trip-${tripBtnId}" data-bs-toggle="modal" data-bs-action="next-trip" data-bs-target="#tripModal" 
+        data-bs-indent="${indentId}"></button>`))
     $(`#Trip-${tripBtnId}`).trigger("click")
     $(`#Trip-${tripBtnId}`).remove()
 }
@@ -1188,10 +1188,10 @@ const DuplicateTrip = function (tripId, indentId) {
     tripModal.hide()
     setTimeout(() => {
         const tripBtnId = Date.now()
-        $("body").append(`
+        $("body").append(top.DOMPurify.sanitize(`
             <button id="Trip-${tripBtnId}" data-bs-toggle="modal" data-bs-action="duplicate-trip" 
                 data-bs-target="#tripModal" data-bs-trip="${tripId}" data-bs-indent="${indentId}">123</button>
-        `)
+        `))
         $(`#Trip-${tripBtnId}`).trigger("click")
         $(`#Trip-${tripBtnId}`).remove()
     }, 500)

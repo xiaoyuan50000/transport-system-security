@@ -78,7 +78,7 @@ const InitCategory = async function () {
             <label class="form-check-label" for="${id}">${category}</label>
         </div></div>`
         }
-        $("#template-indent-category-radio").append(`<div class="row h-100 align-items-center">${html}</div>`)
+        $("#template-indent-category-radio").append(top.DOMPurify.sanitize(`<div class="row h-100 align-items-center">${html}</div>`))
         templateResourceTypeElem.empty()
         templateServiceModeElem.empty()
     })
@@ -100,7 +100,7 @@ const changeTemplateCategory = function (e) {
     for (let item of filterServiceTypeList) {
         data += `<option value="${item.id}" data-category="${item.category}">${item.name}</option>`
     }
-    templateResourceTypeElem.append(data)
+    templateResourceTypeElem.append(top.DOMPurify.sanitize(data))
     templateServiceModeElem.empty()
 }
 
@@ -116,7 +116,7 @@ const initTemplateServiceMode = async function (serviceTypeId) {
         for (let item of datas) {
             data += `<option value="${item.id}" data-value="${item.value}" data-minHour="${item.minDur}">${item.name}</option>`
         }
-        templateServiceModeElem.append(data);
+        templateServiceModeElem.append(top.DOMPurify.sanitize(data));
     })
 }
 
@@ -124,13 +124,13 @@ const changeTemplateServiceMode = async function (serviceModeId) {
     // init resource
     let vehicleTypeSelect = await InitVehicleType(serviceModeId)
     templateResourceElem.empty();
-    templateResourceElem.append(`<option value=""></option>`)
+    templateResourceElem.append(top.DOMPurify.sanitize(`<option value=""></option>`))
 
     if ($(`#template-indent-category-radio input[type=radio][value="MV"]`).prop("checked")) {
-        templateResourceElem.append(`<option value="-">-</option>`)
+        templateResourceElem.append(top.DOMPurify.sanitize(`<option value="-">-</option>`))
     }
     for (let item of vehicleTypeSelect) {
-        templateResourceElem.append(`<option value="${item.typeOfVehicle}">${item.typeOfVehicle}</option>`)
+        templateResourceElem.append(top.DOMPurify.sanitize(`<option value="${item.typeOfVehicle}">${item.typeOfVehicle}</option>`))
     }
 
     // init recurring

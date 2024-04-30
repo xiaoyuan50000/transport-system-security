@@ -76,12 +76,12 @@ const getServiceMode = async function () {
         datas.forEach((data, index) => {
             let name = data.name
             let id = data.id
-            $(".service-mode-checkbox").append(`<div class="form-check form-check-inline">
+            $(".service-mode-checkbox").append(top.DOMPurify.sanitize(`<div class="form-check form-check-inline">
                 <input class="form-check-input" type="checkbox" data-value="${id}" id="service-mode-${index}">
                 <label class="form-check-label checkbox-mt" for="service-mode-${index}">
                     ${name}
                 </label>
-            </div>`)
+            </div>`))
 
         });
     })

@@ -181,11 +181,11 @@ const GetTodayIndentsCount = async function () {
     await axios.post("/indent/getPendingMyActionAndTodayActionCount", {
         roleName: roleName,
     }).then(res => {
-        $("#all-trips-count").html(res.data.allCount)
-        $("#today-indent-count").html(res.data.todayCount)
-        $("#pending-action-count").html(res.data.pendingMyActionCount)
-        $("#reEdit-indent-count").html(res.data.reEditCount)
-        $("#fuel-indent-count").html(res.data.fuelCount)
+        $("#all-trips-count").html(top.DOMPurify.sanitize(res.data.allCount))
+        $("#today-indent-count").html(top.DOMPurify.sanitize(res.data.todayCount))
+        $("#pending-action-count").html(top.DOMPurify.sanitize(res.data.pendingMyActionCount))
+        $("#reEdit-indent-count").html(top.DOMPurify.sanitize(res.data.reEditCount))
+        $("#fuel-indent-count").html(top.DOMPurify.sanitize(res.data.fuelCount))
     })
 }
 

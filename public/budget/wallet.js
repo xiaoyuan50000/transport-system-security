@@ -173,7 +173,7 @@ const ShowWalletDetail = function (e) {
 }
 
 const SetWalletDetailVal = function (full) {
-    $("#wallet-detail-name").html(`${full.walletName} (${full.amount})`)
+    $("#wallet-detail-name").html(top.DOMPurify.sanitize(`${full.walletName} (${full.amount})`))
     $("#wallet-detail-actual").html(full.amount - full.spent)
     GetWalletHolding(full.id).then(holding => {
         $("#wallet-detail-holding").html(holding)

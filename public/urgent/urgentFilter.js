@@ -120,14 +120,14 @@ const InitUnitSearch = function () {
         // reset
         $(e).next().find(".form-search-select").empty()
         for (let item of unitDatas) {
-            $(e).next().find(".form-search-select").append(`<li data-id="${item.id}">${item.groupName}</li>`)
+            $(e).next().find(".form-search-select").append(top.DOMPurify.sanitize(`<li data-id="${item.id}">${item.groupName}</li>`))
         }
     }
 
     const InsertFilterOption = function (element, filterUnits) {
         $(element).next().empty()
         for (let item of filterUnits) {
-            $(element).next().append(`<li data-id="${item.id}">${item.groupName}</li>`)
+            $(element).next().append(top.DOMPurify.sanitize(`<li data-id="${item.id}">${item.groupName}</li>`))
         }
     }
 }

@@ -151,7 +151,7 @@ const initDriverData = async function () {
             sn += 1;
         }
 
-        $(".content-div").append(driverDetailHtml);
+        $(".content-div").append(DOMPurify.sanitize(driverDetailHtml));
 
         $(".content-div").find(".info-nav").on('click', function () {
             let isDown = $(this).hasClass("down");

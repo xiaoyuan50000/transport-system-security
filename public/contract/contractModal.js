@@ -133,7 +133,7 @@ const setContractBalance = function (row, balanceContractData) {
             }
             let AnnualTrHtml = $("#AnnualTrHtml").html()
             AnnualTrHtml = AnnualTrHtml.replaceAll("{{id}}", len).replaceAll("{{contract-balance-id}}", item.id)
-            tbody.append(AnnualTrHtml)
+            tbody.append(top.DOMPurify.sanitize(AnnualTrHtml))
 
             if (row.status != "Approved") {
                 InitAnnualStartDate(`annual-start-date-${len}`, len)

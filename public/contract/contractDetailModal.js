@@ -109,13 +109,13 @@ const InitDestinations = async function () {
         $(e).next().css("display", "block")
         $(e).next().find(".form-search-select").empty()
 
-        $(e).next().find(".form-search-select").append(destinations.map(item => `<li>${item}</li>`).join(''))
+        $(e).next().find(".form-search-select").append(top.DOMPurify.sanitize(destinations.map(item => `<li>${item}</li>`).join('')))
 
     }
 
     const InsertFilterOption = function (element, filterDestination) {
         $(element).next().empty()
-        $(element).next().append(filterDestination.map(item => `<li>${item}</li>`).join(''))
+        $(element).next().append(top.DOMPurify.sanitize(filterDestination.map(item => `<li>${item}</li>`).join('')))
     }
 }
 
@@ -126,7 +126,7 @@ const GetContractPartNoByContractNo = async function (val) {
         $(contractPartNoElem).empty()
         if (length > 0) {
             let data = datas.map(item => `<option value="${item.contractPartNo}">${item.contractPartNo}</option>`).join('')
-            $(contractPartNoElem).append(data);
+            $(contractPartNoElem).append(top.DOMPurify.sanitize(data));
         }
         return length
     })

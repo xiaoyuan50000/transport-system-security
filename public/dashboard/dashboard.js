@@ -206,7 +206,7 @@ const YEAR = 3
                         <div class="ms-2"><span>${o.y}</span></div>
                     </div>`
                 }).join("")
-                $("#container-expenditure-contracts-info").html(html)            
+                $("#container-expenditure-contracts-info").html(top.DOMPurify.sanitize(html))
 
                 let yetToFulfilDatas = data.yetToFulfilDatas
                 $("#yet-to-fulfil-total-buses").text(yetToFulfilDatas.totalBuses)

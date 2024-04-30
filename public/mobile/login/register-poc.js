@@ -33,7 +33,7 @@ const initGroupSelect = function() {
             for (let item of res.data.data) {
                 groupOptsHtml += `<option value="${item.id}">${item.groupName}</option>`;
             }
-            $("#group").append(groupOptsHtml);
+            $("#group").append(DOMPurify.sanitize(groupOptsHtml));
         }
     })
 }
