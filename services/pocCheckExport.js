@@ -5,8 +5,7 @@ const fs = require('fs');
 const path = require('path');
 let PizZip = require('pizzip');
 let Docxtemplater = require('docxtemplater');
-let ImageModule = require('../public/javascripts/open-docxtemplater-image-module');
-// let ImageModule = require('open-docxtemplater-image-module');
+let ImageModule = require('open-docxtemplater-image-module');
 const Response = require('../util/response.js');
 const { Task2 } = require('../model/task');
 const { Job2 } = require('../model/job2.js');
@@ -77,7 +76,6 @@ const WriteDataIntoWord = async function (pocCheckData, filename, tripNo) {
             return [200, 150]
         }
     }
-
     let content = fs.readFileSync(path.resolve(pocCheckDownloadFolder, 'templateDocx.docx'), 'binary');
     let zip = new PizZip(content);
     let doc =new Docxtemplater();
