@@ -391,7 +391,7 @@ const DestinationSearchKeyUp = function (e) {
     const InsertFilterOption = function (element, filterDestination) {
         $(element).next().empty()
         for (let item of filterDestination) {
-            $(element).next().append(top.DOMPurify.sanitize(`<li data-secured="${item.secured}" data-id="${item.id}" onmousedown="DestinationOnMouseDown(this)">${item.locationName}</li>`))
+            $(element).next().append(`<li data-secured="${item.secured}" data-id="${item.id}" onmousedown="DestinationOnMouseDown(this)">${item.locationName}</li>`)
         }
     }
     let val = $(e).val()
@@ -406,7 +406,7 @@ const DestinationOnFocus = function (e) {
     // reset
     $(e).next().find(".form-search-select").empty()
     for (let item of destinations) {
-        $(e).next().find(".form-search-select").append(top.DOMPurify.sanitize(`<li data-secured="${item.secured}" data-id="${item.id}" onmousedown="DestinationOnMouseDown(this)">${item.locationName}</li>`))
+        $(e).next().find(".form-search-select").append(`<li data-secured="${item.secured}" data-id="${item.id}" onmousedown="DestinationOnMouseDown(this)">${item.locationName}</li>`)
     }
 }
 
@@ -433,7 +433,7 @@ const PolPointSearchKeyUp = function (e) {
     const InsertFilterOption = function (element, filterDestination) {
         $(element).next().empty()
         for (let item of filterDestination) {
-            $(element).next().append(top.DOMPurify.sanitize(`<li data-id="${item.id}" onmousedown="PolPointOnMouseDown(this)">${item.locationName}</li>`))
+            $(element).next().append(`<li data-id="${item.id}" onmousedown="PolPointOnMouseDown(this)">${item.locationName}</li>`)
         }
     }
     let val = $(e).val()
@@ -448,7 +448,7 @@ const PolPointOnFocus = function (e) {
     // reset
     $(e).next().find(".form-search-select").empty()
     for (let item of polPoints) {
-        $(e).next().find(".form-search-select").append(top.DOMPurify.sanitize(`<li data-id="${item.id}" onmousedown="PolPointOnMouseDown(this)">${item.locationName}</li>`))
+        $(e).next().find(".form-search-select").append(`<li data-id="${item.id}" onmousedown="PolPointOnMouseDown(this)">${item.locationName}</li>`)
     }
 }
 
@@ -587,7 +587,7 @@ const initServiceType = async function (groupId) {
             <label class="form-check-label" for="${id}">${category}</label>
         </div></div>`
         }
-        $categoryRadio.append(top.DOMPurify.sanitize(`<div class="row h-100 align-items-center">${html}</div>`))
+        $categoryRadio.append(`<div class="row h-100 align-items-center">${html}</div>`)
         $ServiceType.empty()
         $("#serviceMode").empty()
     })

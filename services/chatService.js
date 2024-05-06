@@ -180,11 +180,11 @@ module.exports.uploadChatAudio = async function (req, res) {
 	let chatUploadPath = path.join('./', 'public/chat/upload/');
 	if (!fs.existsSync(chatUploadPath)) fs.mkdirSync(chatUploadPath);
 
-	const safeFileName = utils.getSafeFileName(fileName);
-	const filePath = path.join(chatUploadPath, safeFileName);
+	const filePath = path.join(chatUploadPath, fileName);
+	const safeFileName = utils.getSafeFileName(filePath);
 
 	let dataBuffer = Buffer.from(base64Data, 'base64');
-	await fs.writeFileSync(filePath, dataBuffer)
+	await fs.writeFileSync(safeFileName, dataBuffer)
 
 	let message = {
 		fromUser: currentUser.id,
@@ -206,7 +206,8 @@ module.exports.uploadChatAudio = async function (req, res) {
 
 module.exports.downloadChatFile = async function (req, res) {
 	let chatUploadPath = path.join('./', 'public/chat/upload/');
-	res.download(chatUploadPath + req.query.fileName, req.query.fileName);
+	const filepath = utils.getSafeFileName(chatUploadPath + req.query.fileName);
+	res.download(filepath, req.query.fileName);
 }
 
 // module.exports.getAudioByName = async function (req, res) {

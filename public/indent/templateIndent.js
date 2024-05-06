@@ -78,7 +78,7 @@ const InitCategory = async function () {
             <label class="form-check-label" for="${id}">${category}</label>
         </div></div>`
         }
-        $("#template-indent-category-radio").append(top.DOMPurify.sanitize(`<div class="row h-100 align-items-center">${html}</div>`))
+        $("#template-indent-category-radio").append(`<div class="row h-100 align-items-center">${html}</div>`)
         templateResourceTypeElem.empty()
         templateServiceModeElem.empty()
     })

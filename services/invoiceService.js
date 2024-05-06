@@ -1011,11 +1011,11 @@ module.exports.DownloadFile = function (req, res) {
     if (!filename) {
         return Response.error(res, 'Download error, no filename!')
     }
-    const safeFilename = Utils.getSafeFileName(filename)
-    let rs = fs.createReadStream(path.join('./public/download/invoice/', safeFilename));
+    const safeFilename = Utils.getSafeFileName(path.join('./public/download/invoice/', filename))
+    let rs = fs.createReadStream(safeFilename);
     res.writeHead(200, {
         'Content-Type': 'application/force-download',
-        'Content-Disposition': 'attachment; filename=' + safeFilename
+        'Content-Disposition': 'attachment; filename=' + filename
     });
     rs.pipe(res);
 }

@@ -720,7 +720,8 @@ module.exports.DownloadInitialPOExcel = async function (req, res) {
                 data: [title, ...rows, ...statistics]
             }
         ]);
-        fs.writeFileSync(path.join('./public/download/invoice/', filename), buffer, { 'flag': 'w' });
+        let filePath = utils.getSafeFileName(path.join('./public/download/invoice/', filename))
+        fs.writeFileSync(filePath, buffer, { 'flag': 'w' });
         return res.json({ data: filename })
     } catch (ex) {
         log.error(ex)

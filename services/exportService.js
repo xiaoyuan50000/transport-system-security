@@ -40,9 +40,9 @@ module.exports.ExportIndentToExcel = async function (req, res) {
 module.exports.DownloadIndent = async function (req, res) {
     let { filename } = req.query
 
-	filename = utils.getSafeFileName(filename);
+	let filepath = utils.getSafeFileName(folder + filename);
 
-    let rs = fs.createReadStream(folder + filename);
+    let rs = fs.createReadStream(filepath);
     res.writeHead(200, {
         'Content-Type': 'application/force-download',
         'Content-Disposition': 'attachment; filename=' + filename
@@ -167,6 +167,7 @@ const WriteDataIntoExcel = function (datas, path) {
             data: datas
         }
     ]);
+    path = utils.getSafeFileName(path);
     fs.writeFileSync(path, buffer, { 'flag': 'w' });
 }
 

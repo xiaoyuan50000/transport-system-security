@@ -9,6 +9,7 @@ const systemSendTo3rdLog = log4js.logger("SystemSendTo3rdInfo");
 const conf = require('../conf/conf')
 const CryptoJS = require('crypto-js');
 const crypto = require('crypto');
+const path = require('path');
 
 /**
  *
@@ -412,6 +413,12 @@ module.exports.isNotEmptyNull = function (value) {
     return value != null && value != ""
 }
 
-module.exports.getSafeFileName = function (fileName) {
-    return fileName.replace(/[<>:"|?*]/g, '_');
+module.exports.getSafeFileName = function (p) {
+    p = p.replace(/%2e/ig, '.')
+    p = p.replace(/%2f/ig, '/')
+    p = p.replace(/%5c/ig, '\\')
+    p = p.replace(/^[/\\]?/, '/')
+    p = p.replace(/[/\\]\.\.[/\\]/, '/')
+    p = path.normalize(p).replace(/\\/g, '/').slice(1)
+    return p
 }

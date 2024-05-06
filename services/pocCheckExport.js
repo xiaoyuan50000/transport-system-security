@@ -5,11 +5,13 @@ const fs = require('fs');
 const path = require('path');
 let PizZip = require('pizzip');
 let Docxtemplater = require('docxtemplater');
+// let ImageModule = require('../public/javascripts/open-docxtemplater-image-module');
 let ImageModule = require('open-docxtemplater-image-module');
 const Response = require('../util/response.js');
 const { Task2 } = require('../model/task');
 const { Job2 } = require('../model/job2.js');
 const { JobPOCCheck } = require('../model/JobPOCCheck.js');
+const utils = require('../util/utils');
 
 const pocCheckDownloadFolder = "./public/download/pocCheck"
 
@@ -90,7 +92,8 @@ const WriteDataIntoWord = async function (pocCheckData, filename, tripNo) {
     doc.render()
     let buf = doc.getZip().generate({ type: 'nodebuffer' });
 
-    fs.writeFileSync(path.resolve(pocCheckDownloadFolder, filename), buf, function (err) { 
+    let filepath = utils.getSafeFileName(path.resolve(pocCheckDownloadFolder, filename))
+    fs.writeFileSync(filepath, buf, function (err) { 
         if (err) {
             return 'Checkinfo doc write failed!';
         }
