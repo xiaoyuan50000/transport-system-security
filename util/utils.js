@@ -10,6 +10,7 @@ const conf = require('../conf/conf')
 const CryptoJS = require('crypto-js');
 const crypto = require('crypto');
 const path = require('path');
+const systemConf = require('../conf/systemConf');
 
 /**
  *
@@ -356,7 +357,7 @@ module.exports.FormatPrice = function (number) {
 }
 
 const decodeAESCode = function (str) {
-    const deciper = crypto.createDecipheriv('aes128', '0123456789abcdef', '0123456789abcdef');
+    const deciper = crypto.createDecipheriv('aes128', systemConf.aesKey, systemConf.aesIv);
     let descrped = deciper.update(str, 'hex', 'utf8');
     descrped += deciper.final('utf8')
     return descrped;
@@ -367,7 +368,7 @@ const generateAESCode = function (str) {
     if (!str) {
         return "";
     }
-    const ciper = crypto.createCipheriv('aes128', '0123456789abcdef', '0123456789abcdef');
+    const ciper = crypto.createCipheriv('aes128', systemConf.aesKey, systemConf.aesIv);
     let returnStr = ciper.update(str, 'utf8', 'hex');
     returnStr += ciper.final('hex');
     return returnStr;

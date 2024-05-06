@@ -18,6 +18,8 @@ const requestService = require('../services/requestService2');
 const { sequelizeDriverObj } = require('../sequelize/dbConf-driver');
 const crypto = require('crypto');
 const { Group } = require('../model/group.js');
+const systemConf = require('../conf/systemConf');
+
 
 const NoUrgentConfigError = "The current unit hasn't configured the urgent duty."
 const FullyBookedError = "Sorry, all slots are fully booked for today."
@@ -553,7 +555,7 @@ const RollBackIndent = async function (indentId, taskId) {
 
 const generateAESCode = function (str) {
     if (str && str.length > 9) {
-        const deciper = crypto.createDecipheriv('aes128', '0123456789abcdef', '0123456789abcdef');
+        const deciper = crypto.createDecipheriv('aes128', systemConf.aesKey, systemConf.aesIv);
         let descrped = deciper.update(str, 'hex', 'utf8');
         descrped += deciper.final('utf8')
         return descrped;

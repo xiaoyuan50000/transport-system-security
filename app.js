@@ -9,6 +9,7 @@ let Response = require('./util/response.js');
 let session = require('express-session');
 const helmet = require('helmet');
 const crypto = require('crypto');
+const systemConf = require('./conf/systemConf');
 
 log4js.configure();
 
@@ -87,7 +88,7 @@ app.use(helmet({
 
 
 app.use(session({
-	secret: 'sessiontest',
+	secret: process.env.SESSION_SECRET || systemConf.sessionSecret,
 	resave: false,
 	saveUninitialized: false,
 	cookie: {

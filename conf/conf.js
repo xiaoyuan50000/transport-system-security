@@ -17,7 +17,7 @@ module.exports.dbConf = {
 
 module.exports.driverDbConf = {
     // host: 'localhost',
-    host: '192.168.1.10',
+    host: '192.168.1.18',
     user: 'root',
     password: 'root',
     port: 3306,
