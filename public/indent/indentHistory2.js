@@ -147,20 +147,37 @@ const getDriverStatusHtml = function (driverStatus) {
                             <div class="mb-1">
                             <label class="fw-bold">${groupName}${getContactNumber(contactNumber)}</label>
                             </div>`
-        } else if (row.operatorId != -1) {
+        } else if (row.action == "assigned" && row.operatorId == null) {
+            let mvUserInfo = JSON.parse(row.remark)
             details = `<div class="mb-1">
-                                    <label class="fw-bold">${username}${getRole(role)}</label>
-                                </div>
-                                <div class="mb-1">
-                                <label class="fw-bold">${groupName}${getContactNumber(contactNumber)}</label>
-                                </div>
-                                <div class="mb-1">
-                            <label class="fw-bold">${getEmail(row.email)}</label>
-                            </div>`
+                        <label class="fw-bold">${mvUserInfo.fullName}(${mvUserInfo.userType})</label>
+                    </div>
+                    <div class="mb-1">
+                    <label class="fw-bold">${mvUserInfo.hub}(${mvUserInfo.contactNumber})</label>
+                    </div>
+                    <div class="mb-1">
+                <label class="fw-bold">${mvUserInfo.email}</label>
+                </div>`
+            remark = ""
+        } else if (row.operatorId == -1) {
+            details = `<div class="mb-1">
+                    <label class="fw-bold">Third party</label>
+                </div>`
+        } else if (row.operatorId != null && row.operatorId != 0) {
+            details = `<div class="mb-1">
+                                <label class="fw-bold">${username}${getRole(role)}</label>
+                            </div>
+                            <div class="mb-1">
+                            <label class="fw-bold">${groupName}${getContactNumber(contactNumber)}</label>
+                            </div>
+                            <div class="mb-1">
+                        <label class="fw-bold">${getEmail(row.email)}</label>
+                        </div>`
         } else {
             details = `<div class="mb-1">
-                                    <label class="fw-bold">Third party</label>
-                                </div>`
+                            <label class="fw-bold">${remark}</label>
+                        </div>`
+            remark = ""
         }
 
         statusFlow += `<li class="mt-2 custom-timeline-item custom-timeline-item-${itemClass}">

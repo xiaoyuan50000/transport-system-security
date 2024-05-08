@@ -98,6 +98,9 @@ let table;
                             }
                         },
                         {
+                            "data": "surchargeAmounts", "title": "Surcharge Total Amount($)"
+                        },
+                        {
                             "data": "amounts", "title": "Total Amount($)"
                         },
                         {

@@ -232,7 +232,15 @@ const GetPOTableDetails = async function (pageResult, isMonthly) {
         row.noOfGeneratedTrips = POList.length
         row.generatedTime = POList.length > 0 ? POList[0].generatedTime : ""
         row.amounts = _.sumBy(POList, (o) => { return Number(o.total) })
-
+        row.surchargeAmounts = _.sumBy(POList, (o) => { 
+            return Number(o.surchargeLessThen48)
+            +Number(o.surchargeGenterThen12)
+            +Number(o.surchargeLessThen12) 
+            +Number(o.surchargeLessThen4) 
+            +Number(o.surchargeDepart) 
+            +Number(o.transCostSurchargeLessThen4) 
+        })
+        
         let initialPOList = []
         if (!isMonthly) {
             initialPOList = await sequelizeObj.query(
@@ -242,7 +250,7 @@ const GetPOTableDetails = async function (pageResult, isMonthly) {
                     type: QueryTypes.SELECT,
                 }
             );
-            setIamounts(initialPOList)
+            setIamounts(initialPOList, row)
         }
 
         let result = await sequelizeObj.query(
@@ -319,6 +327,8 @@ const GetPOTableDetails = async function (pageResult, isMonthly) {
         }
         row.details = POList
         row.amounts = FormatPrice(row.amounts)
+        row.surchargeAmounts = FormatPrice(row.surchargeAmounts)
+
     }
     return pageResult
 }
@@ -327,7 +337,7 @@ const getInitialTotal = function (initialPOList, item) {
     return initialPOTask ? initialPOTask.total : 0
 }
 
-const setIamounts = function (initialPOList) {
+const setIamounts = function (initialPOList, row) {
     if (initialPOList.length > 0) {
         let iamounts = _.sumBy(initialPOList, (o) => { return Number(o.total) })
         row.iamounts = FormatPrice(iamounts)
