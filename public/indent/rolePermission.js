@@ -97,7 +97,7 @@ const InitUnitSelect = async function () {
 if ((roleName == "RF" || occ.indexOf(roleName) != -1) && !isOpen) {
     $("#new-indent-div").append(`<div class="float-end">
         <input type="file" class="custom-file-input d-none" required>
-        <button class="btn btn-system me-3 new-indent-btn" id="upload">Import Indent</button>
+        <button class="btn btn-system me-3 new-indent-btn" id="upload">Import ATMS</button>
     </div>`);
     $("#upload").on("click", function () {
         $('.custom-file-input').trigger('click');

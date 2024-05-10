@@ -198,9 +198,9 @@ const QueryAndFilterJobList = async function (reqParams) {
     let allField = `SELECT
     b.id as taskId,  a.pocCheckStatus,
     e.\`name\` as tsp, a.tripNo, b.tripId, a.\`status\` as tripStatus,b.notifiedTime, b.tspChangeTime,b.notifiedTime, b.cancellationTime,
-    a.vehicleType, b.externalTaskId, b.externalJobId, b.requestId, b.taskStatus, b.startDate, b.endDate,
+    a.vehicleType, b.externalTaskId, b.externalJobId, b.requestId, b.taskStatus, b.startDate, b.endDate, b.mobileStartTime,
     b.arrivalTime, b.departTime, b.endTime, b.copyFrom, b.duration, b.executionDate, b.executionTime,
-    b.poc, b.pocNumber, a.serviceModeId, sm.name as serviceModeName, sm.value as serviceMode, a.pickupDestination, a.dropoffDestination, 
+    b.poc, b.pocNumber, a.serviceModeId, sm.name as serviceModeName, sm.value as serviceMode, a.pickupDestination, a.dropoffDestination, a.driver as hasDriver,
     b.serviceProviderId, b.contractPartNo,
     a.driver, a.serviceTypeId,st.category, st.disableWallet, a.repeats, a.instanceId, f.groupId,g.groupName, b.endorse, b.noMoreArbitrate, 
     IFNULL(pst.isMandatory,0) as isMandatory, b.poNumber, ms.id AS messageId, b.funding, b.mobiusUnit, b.walletId, w.walletName `

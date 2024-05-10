@@ -1058,11 +1058,14 @@ const GetActionInfoForJob = async function (drivers) {
         if (!(row.repeats == "Period" && !row.instanceId) && row.category.toUpperCase() != 'MV') {
             await setTSPSelect(row)
             row.cancel = tripCannotCancelStatus.indexOf(row.taskStatus.toLowerCase()) == -1
-        }
+        } 
         row.tspDisable = [INDENT_STATUS.WAITAPPROVEDUCO, INDENT_STATUS.WAITAPPROVEDRF].indexOf(row.tripStatus) != -1
-
+        
+        if (row.category.toUpperCase() == 'MV' && row.vehicleType != "-" && row.hasDriver && !row.mobileStartTime && !row.cancellationTime) {
+            row.cancel = true
+        }
         // endtime expired cannot cancel
-        if (moment(row.endDate || row.startDate).isSameOrBefore(moment())) {
+        else if (moment(row.endDate || row.startDate).isSameOrBefore(moment())) {
             row.cancel = false
         }
     }

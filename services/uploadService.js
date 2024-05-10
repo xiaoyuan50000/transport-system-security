@@ -31,6 +31,65 @@ const utils = require('../util/utils');
 
 const indent_path = conf.upload_indent_path;
 
+// change import indent to import ATMS #20240509
+// module.exports.uploadJobFile = async function (req, res) {
+//     if (!fs.existsSync(indent_path)) {
+//         fs.mkdir(path.resolve(indent_path), { recursive: true }, (err) => {
+//             if (err) {
+//                 return Response.error(res, err.message);
+//             }
+//         });
+//     }
+
+//     let form = formidable({
+//         encoding: 'utf-8',
+//         uploadDir: indent_path,
+//         keepExtensions: false,
+//         maxFileSize: 1024 * 1024 * 1024,
+//     });
+
+//     form.parse(req, (err, fields, files) => {
+//         try {
+//             let filename = fields.filename;
+//             let userId = req.body.userId;
+//             if (!filename) {
+//                 return Response.error(res, 'Upload error! Filename is empty!');
+//             }
+//             filename = utils.getSafeFileName(filename)
+//             let extension = filename.substring(filename.lastIndexOf('.') + 1);
+//             if (extension !== 'xlsx') {
+//                 return Response.error(res, 'The file type must be xlsx.');
+//             }
+//             let oldPath = path.join(process.cwd(), files.file.path);
+//             let newPath = path.join(process.cwd(), indent_path, filename);
+
+//             fs.renameSync(oldPath, newPath);
+
+//             readExcel(newPath, async (titles, indents) => {
+//                 if (!ValidExcelTitles(titles)) {
+//                     return Response.error(res, "Upload failed. Invalid Excel.");
+//                 }
+//                 try {
+//                     let { indentNos, resultJson } = GetAllExcelDatasJSON(indents)
+//                     let indentList = await GetDatas(indentNos, resultJson, userId)
+//                     await CreateIndents(indentList, userId)
+//                     return Response.success(res);
+//                 } catch (err) {
+//                     log.error(err);
+//                     return Response.error(res, "Upload failed. " + err);
+//                 }
+//             });
+//         } catch (err) {
+//             log.error(err);
+//             return Response.error(res, err.message);
+//         }
+//     });
+
+//     form.on('error', function (err) {
+//         log.error(err);
+//         return Response.error(res, err.message);
+//     });
+// }
 module.exports.uploadJobFile = async function (req, res) {
     if (!fs.existsSync(indent_path)) {
         fs.mkdir(path.resolve(indent_path), { recursive: true }, (err) => {

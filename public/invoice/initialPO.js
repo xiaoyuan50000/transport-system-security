@@ -170,7 +170,7 @@ let table;
                         "lengthMenu": PageHelper.lengthMenu(),
                         "dom": PageHelper.dom(),
                         "pageLength": PageHelper.pageLength(),
-                        "processing": true,
+                        "processing": false,
                         "destroy": true,
                         "columnDefs": [
                             {

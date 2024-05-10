@@ -25,6 +25,7 @@
     "formidable": "^3.5.1",
     "helmet": "^7.1.0",
     "http-errors": "~2.0.0",
+    "http-proxy-middleware": "^3.0.0",
     "jquery": "^3.7.1",
     "jsonfile": "^6.1.0",
     "jsonwebtoken": "^9.0.2",

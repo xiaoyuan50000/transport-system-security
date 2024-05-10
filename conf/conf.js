@@ -9,7 +9,7 @@ module.exports.dbConf = {
     // port: 6446,
     port: 3306,
     // database: 'tms_test_migrate',
-    database: 'tms3',
+    database: 'tms2',
     timezone: 'GMT%2B8',
     multipleStatements: true,
 	connectionLimit: 2000,
@@ -113,3 +113,5 @@ module.exports.mobius_server_url = 'http://192.168.1.18:5000'
 module.exports.auto_assign = false 
 
 module.exports.view_nric = false
+
+module.exports.atms_server_url = 'http://localhost:5022'

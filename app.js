@@ -10,7 +10,9 @@ let session = require('express-session');
 const helmet = require('helmet');
 const crypto = require('crypto');
 const systemConf = require('./conf/systemConf');
+const conf = require('./conf/conf');
 
+const { createProxyMiddleware } = require('http-proxy-middleware');
 log4js.configure();
 
 
@@ -32,11 +34,23 @@ const callback = require('./singpass/callback')
 const mobileCallback = require('./singpass/mobileCallback')
 let ActiveMQ = require('./activemq/activemq.js');
 
-
-
 let app = express();
 const cpuRouter = require('./routes/cpu')
 app.use('/cpu', cpuRouter)
+
+
+const proxyOptions = {
+	target: conf.atms_server_url,
+	changeOrigin: true,
+	pathRewrite: {
+		'^/atms': '',
+	},
+	onProxyRes: function (proxyRes, req, res) {
+		res.header('Access-Control-Allow-Origin', '*');
+		res.header('Access-Control-Allow-Credentials', true);
+	},
+};
+app.use('/atms', createProxyMiddleware(proxyOptions));
 
 
 // view engine setup

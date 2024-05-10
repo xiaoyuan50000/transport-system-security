@@ -884,12 +884,18 @@ const UpdateOrCancelJobTask = async function (taskList, alreadySendDataTasks, ty
 }
 
 module.exports.EditTrip = async function (req, res) {
+    let editErrorJobHistoryIds = []
+
     try {
         let {
             pickupDestination, pickupNotes, dropoffDestination, dropoffNotes, typeOfVehicle, noOfVehicle, noOfDriver, pocName,
             contactNumber, executionDate, executionTime, duration, tripId, createdBy, serviceProvider, remark,
             periodStartDate, periodEndDate, driver, repeats, tripRemarks, serviceMode, serviceType, preParkDate, additionalRemarks
         } = req.body
+        
+        if (tripRemarks.length > 1100) {
+            return Response.error(res, 'Please make sure the Trip Remarks field length does not exceed 1100.')
+        }
 
         let user = await GetUserInfo(createdBy)
         let roleName = user.roleName
@@ -910,10 +916,13 @@ module.exports.EditTrip = async function (req, res) {
             reEdit = 1
         }
         let serviceTypeObj = await ServiceType.findByPk(serviceType)
-        let { exist, jobHistoryId, alreadySendDataTasks, errorMsg } = await BeforeEditTrip(trip, roleName, serviceTypeObj, createdBy)
+        let jobHistoryDatas = await BeforeEditTrip(trip, roleName, serviceTypeObj, createdBy)
+        let { exist, jobHistoryId, alreadySendDataTasks, errorMsg } = jobHistoryDatas
         if (exist) {
             return Response.error(res, errorMsg)
         }
+        editErrorJobHistoryIds = jobHistoryDatas.jobHistoryIds
+
         let indent = await Request2.findByPk(requestId)
         let serviceProviderId = serviceProvider
 
@@ -961,6 +970,9 @@ module.exports.EditTrip = async function (req, res) {
         return Response.success(res, true)
     } catch (ex) {
         log.error(ex)
+        for (let jobHistoryId of editErrorJobHistoryIds) {
+            await EditErrorRevertHistory(jobHistoryId)
+        }
         return Response.error(res, "Edit failed.")
     }
 }
@@ -1065,7 +1077,7 @@ const BeforeEditTrip = async function (trip, roleName, serviceType, createdBy) {
         let strTaskIdArray = notLoanMVTaskIdArray.map(a => (trip.referenceId ? "AT-" + a.toString() : a.toString()))
         let exist = await GetIfDoneCheckListByTaskIdArray(strTaskIdArray)
         if (exist) {
-            return { exist: 1, jobHistoryId: jobHistoryIds[0], alreadySendDataTasks: alreadySendDataTasks, errorMsg: "Cannot edit. The task has started disabling operations." }
+            return { exist: 1, jobHistoryId: jobHistoryIds[0], alreadySendDataTasks: alreadySendDataTasks, errorMsg: "Cannot edit. The task has started disabling operations.", jobHistoryIds }
         }
         // Add NOTIFICATION
         await SendNotificationAndDelTask(strTaskIdArray, 'edit')
@@ -1075,7 +1087,7 @@ const BeforeEditTrip = async function (trip, roleName, serviceType, createdBy) {
         let strTaskIdArray = loanMVTaskIdArray.map(a => (trip.referenceId ? "AT-" + a.toString() : a.toString()))
         let exist = await GetIfLoanMVTaskStartByTaskIdArray(strTaskIdArray)
         if (exist) {
-            return { exist: 1, jobHistoryId: jobHistoryIds[0], alreadySendDataTasks: alreadySendDataTasks, errorMsg: "Cannot edit. There have been loan for tasks." }
+            return { exist: 1, jobHistoryId: jobHistoryIds[0], alreadySendDataTasks: alreadySendDataTasks, errorMsg: "Cannot edit. There have been loan for tasks.", jobHistoryIds }
         }
 
         await DeleteMobiusLoanTaskByTaskIdArray(strTaskIdArray)
@@ -1110,7 +1122,7 @@ const BeforeEditTrip = async function (trip, roleName, serviceType, createdBy) {
             }
         }
     })
-    return { exist: 0, jobHistoryId: jobHistoryIds[0], alreadySendDataTasks: alreadySendDataTasks }
+    return { exist: 0, jobHistoryId: jobHistoryIds[0], alreadySendDataTasks: alreadySendDataTasks, jobHistoryIds }
 }
 module.exports.BeforeEditTrip = BeforeEditTrip
 
@@ -1512,6 +1524,116 @@ const CopyRecordToHistory = async function (trip, tasks) {
 }
 module.exports.CopyRecordToHistory = CopyRecordToHistory
 
+const EditErrorRevertHistory = async function (jobHistoryId) {
+    let trip = await Job2History.findByPk(jobHistoryId)
+    if (trip != null) {
+        let tripId = trip.jobId
+        let jobTaskHistoryList = await JobTaskHistory2.findAll({
+            where: {
+                jobHistoryId: trip.id
+            }
+        })
+        let taskRecords = jobTaskHistoryList.map(task => {
+            return {
+                id: task.taskId,
+                externalTaskId: task.externalTaskId,
+                externalJobId: task.externalJobId,
+                requestId: task.requestId,
+                tripId: task.tripId,
+                startDate: task.startDate,
+                endDate: task.endDate,
+                pickupDestination: task.pickupDestination,
+                dropoffDestination: task.dropoffDestination,
+                poc: task.poc,
+                pocNumber: task.pocNumber,
+                executionDate: task.executionDate,
+                executionTime: task.executionTime,
+                duration: task.duration,
+                taskStatus: task.taskStatus,
+                driverId: task.driverId,
+                arrivalTime: task.arrivalTime,
+                endTime: task.endTime,
+                departTime: task.departTime,
+                copyFrom: task.copyFrom,
+                success: task.success,
+                guid: task.guid,
+                jobStatus: task.jobStatus,
+                returnData: task.returnData,
+                sendData: task.sendData,
+                trackingId: task.trackingId,
+                createdAt: task.createdAt,
+                updatedAt: task.updatedAt,
+                serviceProviderId: task.serviceProviderId,
+                selectableTsp: task.selectableTsp,
+                contractPartNo: task.contractPartNo,
+                driverNo: task.driverNo,
+                tspChangeTime: task.tspChangeTime,
+                noMoreArbitrate: task.noMoreArbitrate,
+                endorse: task.endorse,
+                cancellationTime: task.cancellationTime,
+                poNumber: task.poNumber,
+                isChange: task.isChange,
+                mobiusUnit: task.mobiusUnit,
+                notifiedTime: task.notifiedTime,
+                funding: task.funding,
+                walletId: task.walletId,
+            }
+        })
+
+        await Task2.destroy({
+            where: {
+                tripId: tripId
+            }
+        })
+        await Task2.bulkCreate(taskRecords)
+
+        await Job2.upsert({
+            id: tripId,
+            requestId: trip.requestId,
+            instanceId: trip.instanceId,
+            contractPartNo: trip.contractPartNo,
+            serviceProviderId: trip.serviceProviderId,
+            status: trip.status,
+            pickupDestination: trip.pickupDestination,
+            pickupNotes: trip.pickupNotes,
+            dropoffDestination: trip.dropoffDestination,
+            dropoffNotes: trip.dropoffNotes,
+            vehicleType: trip.vehicleType,
+            noOfVehicle: trip.noOfVehicle,
+            noOfDriver: trip.noOfDriver,
+            poc: trip.poc,
+            pocNumber: trip.pocNumber,
+            repeats: trip.repeats,
+            executionDate: trip.executionDate,
+            executionTime: trip.executionTime,
+            startsOn: trip.startsOn,
+            endsOn: trip.endsOn,
+            repeatsOn: trip.repeatsOn,
+            duration: trip.duration,
+            endorse: trip.endorse,
+            approve: trip.approve,
+            isImport: trip.isImport,
+            completeCount: trip.completeCount,
+            createdAt: trip.createdAt,
+            updatedAt: trip.updatedAt,
+            tripNo: trip.tripNo,
+            driver: trip.driver,
+            periodStartDate: trip.periodStartDate,
+            periodEndDate: trip.periodEndDate,
+            tripRemarks: trip.tripRemarks,
+            createdBy: trip.createdBy,
+            serviceModeId: trip.serviceModeId,
+            serviceTypeId: trip.serviceTypeId,
+            reEdit: trip.reEdit,
+            pocCheckStatus: trip.pocCheckStatus,
+            quantity: trip.quantity,
+            polPoint: trip.polPoint,
+            loaTagId: trip.loaTagId,
+        })
+    }
+    return trip
+}
+
 const RevertHistory = async function (tripId) {
     let trip = await Job2History.findOne({
         where: { jobId: tripId },
@@ -1833,6 +1955,7 @@ const DoBulkCancel = async function (trips, roleName, remark, createdBy) {
     }
     // Add NOTIFICATION
     await SendNotificationAndDelTask(needDeleteMVTasksId, "cancel")
+    await addMVOperationRecord(createdBy, needDeleteMVTasksId)
     // await MoveMobiusLoanTask(needDeleteLoanMVTasksId, remark)
 
     return cannotCancelTripNos
@@ -1849,7 +1972,7 @@ const SendNotificationAndDelTask = async function (taskIds, type) {
                 await DeleteMobiusTaskByTaskIdArray(taskIds)
             } else if (type == "cancel") {
                 await Utils.SendDataToFirebase(taskList, 'Task cancel!')
-                await UpdateMobiusTaskByTaskIdArray(taskIds)
+                // await UpdateMobiusTaskByTaskIdArray(taskIds)
             }
         }
     }
@@ -2337,8 +2460,13 @@ module.exports.CancelDriver = async function (req, res) {
                     status: INDENT_STATUS.CANCELLED,
                 }, { where: { id: task.tripId } })
             }
-
         })
+
+        if (trip.vehicleType != "-" && trip.driver == 1) {
+            let mvTaskId = trip.referenceId ? "AT-" + taskId : taskId
+            await SendNotificationAndDelTask([mvTaskId], "cancel")
+            await addMVOperationRecord(userId, [mvTaskId])
+        }
     }
 
     let taskId = req.body.taskId
@@ -2355,6 +2483,55 @@ module.exports.CancelDriver = async function (req, res) {
     }
 
     return Response.success(res, true)
+}
+
+const addMVOperationRecord = async function (userId, taskIdList) {
+    let userBaseObj = await sequelizeDriverObj.query(
+        `select id, fullName from user_base where cvUserId = ? limit 1`,
+        {
+            replacements: [userId],
+            type: QueryTypes.SELECT,
+        }
+    )
+
+    let userBaseId = null
+    let userBaseName = null
+    if (userBaseObj.length > 0) {
+        userBaseId = userBaseObj[0].id
+        userBaseName = userBaseObj[0].fullName
+    }
+
+    for (let taskId of taskIdList) {
+        let mvTaskObj = await sequelizeDriverObj.query(
+            `select taskId, driverStatus from task where dataFrom = 'SYSTEM' and taskId = ? limit 1`,
+            {
+                replacements: [taskId],
+                type: QueryTypes.SELECT,
+            }
+        )
+        if (mvTaskObj.length > 0) {
+            let mvTaskId = mvTaskObj[0].taskId
+            let driverStatus = mvTaskObj[0].driverStatus
+            await sequelizeDriverObj.transaction(async (t1) => {
+                await sequelizeDriverObj.query(
+                    `update task set driverStatus = 'Cancelled', vehicleStatus = 'Cancelled', updatedAt = now() where taskId = ?`,
+                    {
+                        replacements: [mvTaskId],
+                        type: QueryTypes.UPDATE,
+                    }
+                )
+                await sequelizeDriverObj.query(
+                    `INSERT INTO operation_record (operatorId, operatorName, operatorType, businessType, businessId, optType, beforeData, afterData, optTime, remarks) 
+                    VALUES 
+                    (?, ?, 'cv', 'mv task', ?, 'cancel task', ?, 'Cancelled', now(), 'system cancels a task.');`,
+                    {
+                        replacements: [userBaseId, userBaseName, mvTaskId, driverStatus],
+                        type: QueryTypes.INSERT,
+                    }
+                )
+            })
+        }
+    }
 }
 
 module.exports.CreateNewIndent = async function (req, res) {

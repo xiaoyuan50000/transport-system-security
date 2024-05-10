@@ -213,6 +213,3 @@ const copyContractPartNo = async function () {
 
 // const migrateService = require('../services/migrateService');
 // migrateService.UpdateSelectableTsp()
-
-// const requestService2 = require('../services/requestService2');
-// requestService2.RevertHistory(1053)
