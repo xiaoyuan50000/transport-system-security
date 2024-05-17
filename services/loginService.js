@@ -249,8 +249,8 @@ module.exports.logoutServer = logoutServer;
 
 module.exports.loginUseSingpass = async function (req, res) {
     let data = req.body.data
-    let loginName = data.split('@')[0]
-    let fullname = data.split('@')[1]
+    let loginName = data.split('***')[0]
+    let fullname = data.split('***')[1]
     let user = await User.findOne({ where: { loginName: loginName, username: fullname } });
     if (!user) {
         user = await User.findOne({ where: { loginName: loginName } });

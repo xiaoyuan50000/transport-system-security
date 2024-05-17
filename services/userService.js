@@ -194,7 +194,7 @@ const doCreateUser = async function (req, res, isPoc) {
         let password = "";
         let isCreate = isCreateOrEdit(id)
 
-        if (isUserNameValid()) {
+        if (isUserNameValid(isPoc, username)) {
             return Response.error(res, "Create user failed! The length of the name must be greater than 3!")
         }
 

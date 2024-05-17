@@ -57,13 +57,13 @@ async function index(req, res) {
       await user.save()
       return res.render('callbackMobile', {
         code: 1,
-        nric: loginName + "@" + name,
+        nric: loginName + "***" + name,
         msg: 'success'
       })
     } else {
       return res.render('callbackMobile', {
         code: 0,
-        nric: loginName + "@" + name,
+        nric: loginName + "***" + name,
         msg: 'Invalid system account, Nric: ' + (loginName || 'None')
       })
     }

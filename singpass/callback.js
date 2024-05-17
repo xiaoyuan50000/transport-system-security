@@ -91,7 +91,7 @@ async function index(req, res) {
     user.sgid = sub
     await user.save()
     return res.render('callback', {
-      data: loginName + "@" + name,
+      data: loginName + "***" + name,
       sysType: 'window'
     })
 

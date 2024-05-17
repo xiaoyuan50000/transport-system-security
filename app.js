@@ -15,8 +15,6 @@ const conf = require('./conf/conf');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 log4js.configure();
 
-
-
 const tokenInterceptor = require('./interceptor/tokenInterceptor');
 const urlInterceptor = require('./interceptor/urlInterceptor');
 const indexRouter = require('./routes/index');

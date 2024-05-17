@@ -181,7 +181,7 @@ const setChargeTypeTripHourAndOT = function (row, contractRateList, detail) {
         }
     }
 
-    const setChargeTypeOT = function (row, detail, contractRate) {
+    const setChargeTypeOT = function (row, detail, contractRate, availableTime) {
         let {
             blockPrice, blockHourly, OTHourly, OTBlockPrice, blockPeriod, OTBlockPeriod
         } = contractRate
@@ -246,7 +246,7 @@ const setChargeTypeTripHourAndOT = function (row, contractRateList, detail) {
     } else if (chargeType == ChargeType.TRIP) {
         setChargeTypeTrip(row, detail, contractRate)
     } else if (chargeType == ChargeType.OTHOURLY || chargeType == ChargeType.OTBLOCK) {
-        setChargeTypeOT(row, detail, contractRate)
+        setChargeTypeOT(row, detail, contractRate, availableTime)
     }
 
     let totalCost = detail.total
@@ -412,7 +412,7 @@ const setChargeTypeDalyTrip = async function (row, contractRateList, detail) {
     detail.total = surcharge.total
 }
 
-const setChargeTypeBlockDaily = function (row, contractRateList, chargeType, detail) {
+const setChargeTypeBlockDaily = function (row, contractRateList, chargeType, detail, availableTime) {
     let { startTime, endTime } = GetStartEndTime(row)
     if (!(startTime && endTime)) {
         return
@@ -517,7 +517,7 @@ const setChargeTypeBlockDaily = function (row, contractRateList, chargeType, det
             + OTBlockPrice * otblockCount
     }
 }
-const setChargeTypeBlockDailyMix = function (row, contractRateList, chargeType, detail) {
+const setChargeTypeBlockDailyMix = function (row, contractRateList, chargeType, detail, availableTime) {
     let { startTime, endTime } = GetStartEndTime(row)
     if (startTime && endTime) {
         let contractRate = contractRateList[0]
@@ -587,7 +587,7 @@ const GetPODetails = async function (row, contractRateList) {
     log.info(JSON.stringify(contractRateList, null, 2))
 
     let { executionDate, executionTime, peakTime, lateTime,
-        chargeType, weekend, isDriver, cancellationTime,
+        chargeType, weekend, isDriver, cancellationTime, availableTime,
         arrivalTime, departTime, endTime } = row
 
     let executionDateTime = `${executionDate} ${executionTime}`
@@ -652,10 +652,10 @@ const GetPODetails = async function (row, contractRateList) {
         await setChargeTypeDalyTrip(row, contractRateList, detail)
     }
     else if (ChargeType.BLOCKDAILY == chargeType) {
-        setChargeTypeBlockDaily(row, contractRateList, chargeType, detail)
+        setChargeTypeBlockDaily(row, contractRateList, chargeType, detail, availableTime)
     }
     else if (ChargeType.BLOCKDAILYMIX == chargeType) {
-        setChargeTypeBlockDailyMix(row, contractRateList, chargeType, detail)
+        setChargeTypeBlockDailyMix(row, contractRateList, chargeType, detail, availableTime)
     }
     else if (ChargeType.MONTHLY == chargeType) {
         let { startTime, endTime } = GetStartEndTime(row)

@@ -1061,7 +1061,7 @@ const GetActionInfoForJob = async function (drivers) {
         } 
         row.tspDisable = [INDENT_STATUS.WAITAPPROVEDUCO, INDENT_STATUS.WAITAPPROVEDRF].indexOf(row.tripStatus) != -1
         
-        if (row.category.toUpperCase() == 'MV' && row.vehicleType != "-" && row.hasDriver && !row.mobileStartTime && !row.cancellationTime) {
+        if (row.category.toUpperCase() == 'MV' && row.vehicleType != "-" && row.hasDriver && !row.mobileStartTime && !row.cancellationTime && moment(row.endDate || row.startDate).isSameOrBefore(moment())) {
             row.cancel = true
         }
         // endtime expired cannot cancel
