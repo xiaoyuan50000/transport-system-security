@@ -7,7 +7,7 @@ let ErrorMessage = {
     ExistNric: "NRIC already exists.",
     ExistLoginName: "Login Name already exists.",
     ExistContractNumber: "Mobile Number already exists.",
-    InvalidPassword: "Password length has to be minimum 12 characters includes 1 uppercase, 1 numeric and 1 symbol.",
+    InvalidPwd: "Password length has to be minimum 12 characters includes 1 uppercase, 1 numeric and 1 symbol.",
     MismatchPassword: "Confirm Password is different.",
     PasswordContainNric: "Password cannot contain NRIC.",
     PasswordReuse: "New password cannot be same as old password.",
@@ -64,7 +64,7 @@ let passwordReg = {
         let result = { success: true, errorMsg: "" }
         if (!pwdRegExp.test(data)) {
             result.success = false
-            result.errorMsg = ErrorMessage.InvalidPassword
+            result.errorMsg = ErrorMessage.InvalidPwd
         }
         return result
     },
