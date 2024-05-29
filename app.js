@@ -11,6 +11,9 @@ const helmet = require('helmet');
 const crypto = require('crypto');
 const systemConf = require('./conf/systemConf');
 const conf = require('./conf/conf');
+const rateLimit = require('express-rate-limit');
+const utils = require('./util/utils.js');
+const csrf = require('csurf');
 
 const { createProxyMiddleware } = require('http-proxy-middleware');
 log4js.configure();
@@ -36,6 +39,14 @@ let app = express();
 const cpuRouter = require('./routes/cpu')
 app.use('/cpu', cpuRouter)
 
+const limiter = rateLimit({
+	windowMs: utils.apiLimiter.windowMs,
+	max: utils.apiLimiter.max,
+	message: utils.apiLimiter.message,
+})
+app.use(limiter)
+
+const csrfProtection = csrf({ cookie: { secure: true, httpOnly: true } });
 
 const proxyOptions = {
 	target: conf.atms_server_url,
@@ -44,7 +55,6 @@ const proxyOptions = {
 		'^/atms': '',
 	},
 	onProxyRes: function (proxyRes, req, res) {
-		res.header('Access-Control-Allow-Origin', '*');
 		res.header('Access-Control-Allow-Credentials', true);
 	},
 };

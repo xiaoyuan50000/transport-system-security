@@ -1,6 +1,8 @@
 let express = require('express');
 require('express-async-errors');
 const conf = require('../conf/conf');
+const rateLimit = require('express-rate-limit');
+const utils = require('../util/utils.js');
 
 let loginService = require('../services/loginService');
 let creditService = require('../services/creditService');
@@ -32,7 +34,17 @@ let templateIndentService = require('../services/templateIndentService');
 let userApprovalService = require('../services/userApprovalService');
 let operationDashboardService = require('../services/operationDashboardService');
 
+
 let router = express.Router();
+
+const limiter = rateLimit({
+	windowMs: utils.apiLimiter.windowMs,
+	max: utils.apiLimiter.max,
+	message: utils.apiLimiter.message,
+})
+router.use(limiter)
+
+
 // http://192.168.1.8:5001/?token=9d53bd5d43e81813ca57d2c465834ce23d32a8bea372549ed9f4c444882a346a1088cc9efc90baf87df33668f52b02d49c0d04cc1aa02c9bf2365c4c5c9a15e4ea8f81dcea637b4939eb8075f077edbe
 /* GET home page. */
 router.get('/', loginService.LoginByMobiusServer, function (req, res, next) {

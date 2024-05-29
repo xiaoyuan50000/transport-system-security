@@ -423,3 +423,10 @@ module.exports.getSafeFileName = function (p) {
     p = path.normalize(p).replace(/\\/g, '/').slice(1)
     return p
 }
+
+const apiLimiter = {
+	windowMs: 1 * 1000,
+	max: 10000,
+	message: "Too many requests from this client, please try again later.",
+}
+module.exports.apiLimiter = apiLimiter

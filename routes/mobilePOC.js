@@ -3,6 +3,16 @@ const router = express.Router();
 const mobileService = require('../services/mobileService')
 const pocCheckExport = require('../services/pocCheckExport')
 
+const rateLimit = require('express-rate-limit');
+const utils = require('../util/utils.js');
+
+const limiter = rateLimit({
+	windowMs: utils.apiLimiter.windowMs,
+	max: utils.apiLimiter.max,
+	message: utils.apiLimiter.message,
+})
+router.use(limiter)
+
 router.get('/', function(req, res, next) {
     res.render('mobile/task/index', { title: 'Task' });
 });
