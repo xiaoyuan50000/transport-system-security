@@ -11,19 +11,22 @@ let operationDashboardUtil = {
     initBodyData: async function(dataType, currentDate, userId, monthDay){
         let startDate = null;
         let endDate = null;
-        if(currentDate) {
-            currentDate = currentDate.split(' ~ ')
-            startDate = moment(currentDate[0], "DD/MM/YYYY").format("YYYY-MM-DD")
-            endDate = moment(currentDate[1], "DD/MM/YYYY").format("YYYY-MM-DD")
-        }
-        if(monthDay){
-            if(startDate) {
-                endDate = moment(startDate).format("YYYY-MM-DD");
-            } else {
-                endDate = moment().format("YYYY-MM-DD");
+        const initStartEndDate = function (){
+            if(currentDate) {
+                currentDate = currentDate.split(' ~ ')
+                startDate = moment(currentDate[0], "DD/MM/YYYY").format("YYYY-MM-DD")
+                endDate = moment(currentDate[1], "DD/MM/YYYY").format("YYYY-MM-DD")
             }
-            startDate = moment(endDate).subtract(monthDay, 'months').format("YYYY-MM-DD");
-        } 
+            if(monthDay){
+                if(startDate) {
+                    endDate = moment(startDate).format("YYYY-MM-DD");
+                } else {
+                    endDate = moment().format("YYYY-MM-DD");
+                }
+                startDate = moment(endDate).subtract(monthDay, 'months').format("YYYY-MM-DD");
+            } 
+        }
+        initStartEndDate()
         log.warn(`current Date ==> ${ JSON.stringify(startDate) } / ${ JSON.stringify(endDate) }`)
 
         let typeSql = ` like 'bus%'`;
@@ -237,14 +240,17 @@ module.exports.getMostResourcesIndentsByUnits = async function (req, res) {
                     let purposeDataList = [];
                     let totalNum = 0
                     let purposeValues = Object.values(item2);
-                    for (let index = 0; index < conditionData.purposeList.length; index++) {
-                        for (let index2 = 0; index2 < purposeValues.length; index2++) {
-                            if(index == index2) {
-                                purposeDataList.push({ name: conditionData.purposeList[index], value: purposeValues[index2] })
-                                totalNum += Number(purposeValues[index2])
+                    const initPurposeListAndTotal = function (){
+                        for (let index = 0; index < conditionData.purposeList.length; index++) {
+                            for (let index2 = 0; index2 < purposeValues.length; index2++) {
+                                if(index == index2) {
+                                    purposeDataList.push({ name: conditionData.purposeList[index], value: purposeValues[index2] })
+                                    totalNum += Number(purposeValues[index2])
+                                }
                             }
                         }
-                    }
+                    } 
+                    initPurposeListAndTotal()
                     obj.dataList = purposeDataList
                     obj.totalNum = totalNum
                     continue
