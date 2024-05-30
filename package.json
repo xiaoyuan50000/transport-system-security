@@ -15,7 +15,7 @@
     "crypto-js": "^4.2.0",
     "csurf": "^1.11.0",
     "debug": "~4.3.4",
-    "docxtemplater": "3.5.2",
+    "docxtemplater": "3.47.2",
     "dompurify": "^3.1.1",
     "echarts": "^5.5.0",
     "ejs": "^3.1.10",
